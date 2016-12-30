@@ -2,12 +2,11 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Docker on Brian Z</title>
-    <link>http://blog.brianz.bz/tags/docker/</link>
+    <link>http://blog.brianz.bz/tags/docker/index.xml</link>
     <description>Recent content in Docker on Brian Z</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <copyright>&amp;copy; 2016. All rights reserved.</copyright>
-    <lastBuildDate>Wed, 13 Apr 2016 07:24:44 -0600</lastBuildDate>
+    <copyright>&amp;copy; 2016-2017. All rights reserved.</copyright>
     <atom:link href="http://blog.brianz.bz/tags/docker/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
@@ -33,7 +32,7 @@ amazing tool.  No software tool is perfect and Docker is no different.  Still, n
 find from going the Docker route are shadowed by the problems it solves. Here are a few ways that
 Docker can help you which you may not realize or have thought about.&lt;/p&gt;
 
-&lt;h2 id=&#34;throw-away-work:0d4479024504bf6891234dff2c30a8b8&#34;&gt;Throw away work&lt;/h2&gt;
+&lt;h2 id=&#34;throw-away-work&#34;&gt;Throw away work&lt;/h2&gt;
 
 &lt;p&gt;As a heavy user of Python I was very accustomed to using &lt;code&gt;virtualenv&lt;/code&gt; and &lt;code&gt;virtualenvwrapper&lt;/code&gt; to
 test things out.  Want to test out Kafka or Sphinx or whatever?  No problem, create a new
@@ -46,7 +45,7 @@ install all of the packages you need.  Here&amp;rsquo;s a two-line &lt;code&gt;D
 used to build documentation using the popular (Sphinx)[&lt;a href=&#34;http://sphinx.pocoo.org&#34; target=&#34;_blank&#34;&gt;http://sphinx.pocoo.org&lt;/a&gt;] library&amp;hellip;I&amp;rsquo;ll
 install some extension just for fun:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;# Dockerfile
+&lt;pre&gt;&lt;code class=&#34;language-dockerfile&#34;&gt;# Dockerfile
 FROM python:2.7
 
 RUN pip install sphinx sphinxcontrib-argdoc
@@ -54,7 +53,7 @@ RUN pip install sphinx sphinxcontrib-argdoc
 
 &lt;p&gt;Now, let&amp;rsquo;s build it:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;docker build -t bz/sphinx .
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;$ docker build -t bz/sphinx .
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;And now you have a little Docker image named &lt;code&gt;bz/sphinx&lt;/code&gt; which you can use to build Sphinx documentation. Doing that
@@ -62,7 +61,7 @@ may not be as obvious as you&amp;rsquo;d think. If you create a container and wr
 everything will disappear once the container is killed. The trick is to mount a local folder on
 your host system as a volume in the Docker container.&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;brianz@bz-cconline$ docker run --rm -it -v `pwd`:/code  bz/sphinx  bash
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;brianz@bz-cconline$ docker run --rm -it -v `pwd`:/code  bz/sphinx  bash
 root@675a26dba565:/# cd /code/
 root@675a26dba565:/code# sphinx-quickstart
 &lt;/code&gt;&lt;/pre&gt;
@@ -75,7 +74,7 @@ your container.&lt;/p&gt;
 &lt;p&gt;This makes is really really easy to use Docker as a sort of &lt;strong&gt;package manager&lt;/strong&gt; for &lt;em&gt;any&lt;/em&gt; system,
 language or ecosystem. I&amp;rsquo;ve used it for Node, Java and Python to name a few&amp;hellip;it&amp;rsquo;s awesome.&lt;/p&gt;
 
-&lt;h2 id=&#34;testing-a-somewhat-complex-system:0d4479024504bf6891234dff2c30a8b8&#34;&gt;Testing a somewhat complex system&lt;/h2&gt;
+&lt;h2 id=&#34;testing-a-somewhat-complex-system&#34;&gt;Testing a somewhat complex system&lt;/h2&gt;
 
 &lt;p&gt;A while ago I wanted to play around with Wordpress a bit. I have no idea how to set up Wordpress or
 what the requirements are other than something with PHP&amp;hellip;definitely not my world. Of course, I
@@ -93,7 +92,7 @@ complicated, but there are many &lt;code&gt;docker-compose.yml&lt;/code&gt; refe
 systems allow you to either do zero work or make some light tweaks to get things to suit your
 needs.&lt;/p&gt;
 
-&lt;h2 id=&#34;helper-scripts:0d4479024504bf6891234dff2c30a8b8&#34;&gt;Helper scripts&lt;/h2&gt;
+&lt;h2 id=&#34;helper-scripts&#34;&gt;Helper scripts&lt;/h2&gt;
 
 &lt;p&gt;There is a small theme here&amp;hellip;since containers are well, self-contained, you can use them as
 package managers in some sense.  This is sort of a contrived example but imagine you want to use
@@ -118,7 +117,7 @@ much.  I was able to successfully:&lt;/p&gt;
 
 &lt;p&gt;Here&amp;rsquo;s the &lt;code&gt;Dockerfile&lt;/code&gt;&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;# Dockerfile
+&lt;pre&gt;&lt;code class=&#34;language-dockerfile&#34;&gt;# Dockerfile
 FROM kavolorn/opencv
 
 RUN apt-get update
@@ -131,13 +130,13 @@ RUN python3 -m pip install matplotlib
 
 &lt;p&gt;Now, let&amp;rsquo;s build it:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;&amp;gt; docker build -t bz/opencv .
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;$ docker build -t bz/opencv .
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;And the Python3 file to create the histogram&amp;hellip;mostly &lt;a href=&#34;http://opencv-python-tutroals.readthedocs.org/en/latest/py_tutorials/py_imgproc/py_histograms/py_histogram_begins/py_histogram_begins.html&#34; target=&#34;_blank&#34;&gt;copied from
 here&lt;/a&gt;&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;# histo.py
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;# histo.py
 import cv2
 import numpy as np
 from matplotlib import pyplot as plt
@@ -155,8 +154,8 @@ container and see those changes in both places.&lt;/p&gt;
 &lt;code&gt;plt.savefig(&#39;histogram.png&#39;)&lt;/code&gt; will write a new png file in the container&amp;hellip;however, because we
 mounted this as a volume it will end up on our &lt;em&gt;local&lt;/em&gt; system. Nice.&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;# run the image
-&amp;gt; docker run --rm -it -v $(pwd):/code bz/opencv bash
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;# run the image
+$ docker run --rm -it -v $(pwd):/code bz/opencv bash
 root@f278f7a7124e:/# 
 root@f278f7a7124e:/# cd /code
 root@f278f7a7124e:/code# python histo.py
@@ -164,7 +163,7 @@ root@f278f7a7124e:/code# python histo.py
 
 &lt;p&gt;And with that, I get an image on my &lt;em&gt;local&lt;/em&gt; system which I can open:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;brianz@gold$ pwd
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;brianz@gold$ pwd
 /Users/brianz/dev/opencv-test
 brianz@gold$ open histogram.png 
 &lt;/code&gt;&lt;/pre&gt;
@@ -178,7 +177,7 @@ Docker image into an executable rather than a long-lived running system.&lt;/p&g
 &lt;p&gt;A few tweaks to the python script could be made such that the command to create
 historgrams from images would look something like the following:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;&amp;gt; docker run --rm \
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;$ docker run --rm \
     -v path/to/images:/images \
     bz/opencv \
     python3 histo.py --in-file=some-image.jpg --out-file=some-image-histogram.png

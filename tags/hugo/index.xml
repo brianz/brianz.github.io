@@ -2,12 +2,11 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Hugo on Brian Z</title>
-    <link>http://blog.brianz.bz/tags/hugo/</link>
+    <link>http://blog.brianz.bz/tags/hugo/index.xml</link>
     <description>Recent content in Hugo on Brian Z</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <copyright>&amp;copy; 2016. All rights reserved.</copyright>
-    <lastBuildDate>Mon, 21 Mar 2016 15:45:26 -0600</lastBuildDate>
+    <copyright>&amp;copy; 2016-2017. All rights reserved.</copyright>
     <atom:link href="http://blog.brianz.bz/tags/hugo/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
@@ -35,7 +34,7 @@ it&amp;rsquo;s written in Go (I usually hate dealing with Ruby gems and dependen
 &lt;p&gt;Here&amp;rsquo;s the TL;DR of what I did to go from zero to blogging &lt;em&gt;(this is from memory so it may not be
 100% correct)&lt;/em&gt;:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;$ brew install hugo
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;$ brew install hugo
 $ mkdir bz-blog &amp;amp;&amp;amp; cd bz-blog
 $ hugo new site brianz
 &lt;/code&gt;&lt;/pre&gt;
@@ -43,7 +42,7 @@ $ hugo new site brianz
 &lt;p&gt;To find a theme I liked went to the &lt;a href=&#34;http://themes.gohugo.io&#34; target=&#34;_blank&#34;&gt;Hugo themes&lt;/a&gt; site and picked
 &lt;a href=&#34;http://themes.gohugo.io/greyshade/&#34; target=&#34;_blank&#34;&gt;greyshade&lt;/a&gt;. Hugo themes are &lt;em&gt;really&lt;/em&gt; easy to use:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;$ cd brianz/themes
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;$ cd brianz/themes
 $ git clone https://github.com/cxfksword/greyshade.git
 &lt;/code&gt;&lt;/pre&gt;
 
@@ -75,7 +74,7 @@ $ python
 creating a new post. To fix this simply create a file at &lt;code&gt;archetypes/default.md&lt;/code&gt; with the following
 contents (or customize as you see fit):&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;+++
+&lt;pre&gt;&lt;code class=&#34;language-markdown&#34;&gt;+++
 
 draft=true
 tags = []

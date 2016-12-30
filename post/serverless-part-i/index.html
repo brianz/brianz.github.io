@@ -1,233 +1,111 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>Serverless part I &middot; </title>
+        <meta name="description" content="It&rsquo;s a pretty exciting (and challenging) time to build software-based applications. Every week there are more and more tools to make our jobs easier or to enable us to focus on application development rather than dealing with the infrastructure around those applications. Of course, this makes our jobs challenging since we need to keep up with the innovation.
+This will be part one of a multi-part series about &ldquo;serverless&rdquo; architecture/design.">
+        <meta name="HandheldFriendly" content="True">
+        <meta name="MobileOptimized" content="320">
+        <meta name="generator" content="Hugo 0.18" />
+        <meta name="robots" content="index,follow">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <link rel="stylesheet" href="http://blog.brianz.bzcss/normalize.css">
+        <link rel="stylesheet" href="http://blog.brianz.bzcss/github-gist.css">
+        <link rel="stylesheet" href="http://blog.brianz.bzcss/style.css">
+        <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,600,700,300&subset=latin,cyrillic-ext,latin-ext,cyrillic">
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    </head>
+    <body>
+        
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.15" />
-
-  <title>Serverless part I &middot; Brian Z</title>
-
-  
-  
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css">
-
-  <!--[if lte IE 8]>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-old-ie-min.css">
-  <![endif]-->
-  <!--[if gt IE 8]><!-->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-min.css">
-  <!--<![endif]-->
-
-  <!--[if lte IE 8]>
-  <link rel="stylesheet" href="http://blog.brianz.bz/css/side-menu-old-ie.css">
-  <![endif]-->
-  <!--[if gt IE 8]><!-->
-  <link rel="stylesheet" href="http://blog.brianz.bz/css/side-menu.css">
-  <!--<![endif]-->
-
-  <link rel="stylesheet" href="http://blog.brianz.bz/css/blackburn.css">
-
-  
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
-
-  
-  <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
-
-  
-  
-
-  
-  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.1.0/styles/androidstudio.min.css">
-  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.1.0/highlight.min.js"></script>
-  <script>hljs.initHighlightingOnLoad();</script>
-  
-
-  <link rel="shortcut icon" href="http://blog.brianz.bzimg/favicon.ico" type="image/x-icon" />
-
-</head>
+ga('create', 'UA-75475240-1', 'auto');
+ga('send', 'pageview');
+</script>
 
 
-<body>
-<div id="layout">
+        <div id="wrapper">
+            <header class="site-header">
+                <div class="container">
+                    <div class="site-title-wrapper">
+                        
+                            <h1 class="site-title">
+                                <a title="Brian Z" href="http://blog.brianz.bz">Brian Z</a>
+                            </h1>
+                        
+                        <a class="button-square" href="http://blog.brianz.bzindex.xml"><i class="fa fa-rss"></i></a>
+                        
+                            <a class="button-square button-social hint--top" data-hint="Twitter" title="Twitter" href="https://twitter.com/brianzambrano">
+                                <i class="fa fa-twitter"></i>
+                            </a>
+                        
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="Github" title="Github" href="https://github.com/brianz">
+                                <i class="fa fa-github-alt"></i>
+                            </a>
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="Stack Overflow" title="Stack Overflow" href="http://stackoverflow.com/users/87858/brianz">
+                                <i class="fa fa-stack-overflow"></i>
+                            </a>
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="LinkedIn" title="LinkedIn" href="https://www.linkedin.com/in/brianzambrano">
+                                <i class="fa fa-linkedin"></i>
+                            </a>
+                        
+                        
+                    </div>
 
-  
-<a href="#menu" id="menuLink" class="menu-link">
-  
-  <span></span>
-</a>
-<div id="menu">
-
-  
-  <a class="pure-menu-heading brand" href="http://blog.brianz.bz/">brianz</a>
-
-
-  <div class="pure-menu">
-    <ul class="pure-menu-list">
-      
-      
-        <li class="pure-menu-item">
-          <a class="pure-menu-link" href="http://blog.brianz.bz/"><i class='fa fa-home fa-fw'></i>Home</a>
-      
-        </li>
-      
-      
-        <li class="pure-menu-item">
-          <a class="pure-menu-link" href="http://blog.brianz.bz/about/"><i class='fa fa-user fa-fw'></i>About</a>
-      
-        </li>
-      
-      
-        <li class="pure-menu-item">
-          <a class="pure-menu-link" href="http://blog.brianz.bz/post/"><i class='fa fa-list fa-fw'></i>Posts</a>
-      
-        </li>
-      
-    </ul>
-  </div>
-
-  <div class="pure-menu social">
-  <ul class="pure-menu-list">
-
-    
-
-    
-
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://twitter.com/brianzambrano" target="_blank"><i class="fa fa-twitter-square fa-fw"></i>Twitter</a>
+                    <ul class="site-nav">
+                        
+    <li class="site-nav-item">
+        <a title="Home" href="http://blog.brianz.bz/">Home</a>
     </li>
-    
 
-    
-
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://facebook.com/brian.zambrano" target="_blank"><i class="fa fa-facebook-square fa-fw"></i>Facebook</a>
+    <li class="site-nav-item">
+        <a title="About" href="http://blog.brianz.bz/about/">About</a>
     </li>
-    
 
-    
-
-    
-
-    
-
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://instagram.com/bzambrano" target="_blank"><i class="fa fa-instagram fa-fw"></i>Instagram</a>
+    <li class="site-nav-item">
+        <a title="Posts" href="http://blog.brianz.bz/post/">Posts</a>
     </li>
+
+                    </ul>
+                </div>
+            </header>
+
+            <div id="container">
+
+
+<div class="container">
+    <article class="post-container" itemscope="" itemtype="http://schema.org/BlogPosting">
+        <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Serverless part I</h1>
+    
+    <p class="post-date">
+        <span>Published <time datetime="2016-04-20" itemprop="datePublished">Wed, Apr 20, 2016</time></span>
+        <span>by</span>
+        <span itemscope="" itemprop="author" itemtype="https://schema.org/Person">
+            <span itemprop="name">
+                <a href="" itemprop="url" rel="author"></a>
+            </span>
+        </span>
+    </p>
+</header>
+
+        <div class="post-content clearfix" itemprop="articleBody">
     
 
     
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://linkedin.com/in/brianzambrano" target="_blank"><i class="fa fa-linkedin-square fa-fw"></i>LinkedIn</a>
-    </li>
-    
-
-    
-
-    
-
-    
-
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://news.ycombinator.com/user?id=brianz" target="_blank"><i class="fa fa-hacker-news fa-fw"></i>Hacker News</a>
-    </li>
-    
-
-    
-
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://github.com/brianz" target="_blank"><i class="fa fa-github-square fa-fw"></i>GitHub</a>
-    </li>
-    
-
-    
-
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://stackoverflow.com/users/87858" target="_blank"><i class="fa fa-stack-overflow fa-fw"></i>Stack Overflow</a>
-    </li>
-    
-
-    
-
-    
-
-  </ul>
-</div>
-
-
-  <div>
-  <div class="small-print">
-    <small>&copy; 2016. All rights reserved.</small>
-  </div>
-  <div class="small-print">
-    <small>Built with&nbsp;<a href="https://gohugo.io/" target="_blank">Hugo</a></small>
-    <small>Theme&nbsp;<a href="https://github.com/yoshiharuyamashita/blackburn" target="_blank">Blackburn</a></small>
-  </div>
-</div>
-
-</div>
-
-
-  <div id="main">
-
-
-<div class="header">
-  <h1>Serverless part I</h1>
-  <h2></h2>
-</div>
-<div class="content">
-
-  <div class="post-meta">
-
-  <div>
-    <i class="fa fa-calendar fa-fw"></i>
-    <time>20 Apr 2016, 16:08</time>
-  </div>
-
-  
-
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-tags fa-fw"></i>
-    
-      <a class="post-taxonomy-tag" href="http://blog.brianz.bztags/aws">aws</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="http://blog.brianz.bztags/architecture">architecture</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="http://blog.brianz.bztags/serverless">serverless</a>
-    
-  </div>
-  
-  
-
-</div>
-
-  
 
 <p>It&rsquo;s a pretty exciting (and challenging) time to build software-based applications. Every week
 there are more and more tools to make our jobs easier or to enable us to focus on <em>application</em>
@@ -253,7 +131,7 @@ process HTTP requests are managed by AWS and never exposed to you as the applica
 <p>As a point of clarification, there is a project named Serverless. I&rsquo;ll try to differentiate the
 <em>term</em> &ldquo;serverless&rdquo; from the <em>project</em> Serverless by capitalizing the project.</p>
 
-<h2 id="api-gateway:16049c44302f91a3835f9f8afd5f9708">API Gateway</h2>
+<h2 id="api-gateway">API Gateway</h2>
 
 <p>In July of 2015 <a href="https://aws.amazon.com/blogs/aws/amazon-api-gateway-build-and-run-scalable-application-backends/" target="_blank">AWS released API
 Gateway</a>
@@ -285,7 +163,7 @@ response in response to a query to a public URL is quite an endeavor:</p>
 literally accomplish the same thing in 30 seconds. Not only that, you&rsquo;ll be paying every minute
 that your EC2 instance is running, regardless of the load. With API Gateway you pay per call.</p>
 
-<h2 id="lambda:16049c44302f91a3835f9f8afd5f9708">Lambda</h2>
+<h2 id="lambda">Lambda</h2>
 
 <p>So what is Lambda? <a href="https://docs.aws.amazon.com/lambda/latest/dg/welcome.html" target="_blank">From Amazon</a>:</p>
 
@@ -318,7 +196,7 @@ it&rsquo;s run. There are several beautiful things about this:</p>
 <li>Ability to execute a Lambda from various triggers</li>
 </ul>
 
-<h2 id="api-gateway-lambda-serverless:16049c44302f91a3835f9f8afd5f9708">API Gateway + Lambda == Serverless</h2>
+<h2 id="api-gateway-lambda-serverless">API Gateway + Lambda == Serverless</h2>
 
 <p>The confluence of API Gateway and Lambda is what serverless is all about. Above I described how
 easy it is to build a public URL which doesn&rsquo;t do anything. That&rsquo;s not interesting at all, but
@@ -353,7 +231,7 @@ single call cost a fraction of a penny. If you look at the <a href="https://aws.
 Lambda</a> and <a href="https://aws.amazon.com/api-gateway/pricing/" target="_blank">pricing for
 Gateway</a> you&rsquo;ll get a feel for how cheap this can be.</p>
 
-<h2 id="serverless-project:16049c44302f91a3835f9f8afd5f9708">Serverless project</h2>
+<h2 id="serverless-project">Serverless project</h2>
 
 <p>One of my big questions was how this fits into the normal development cycle. Sure, this is
 <strong>super</strong> powerful, but how do I actually <em>use</em> it in the real world. Other folks are realizing the
@@ -375,80 +253,93 @@ any tool that wraps AWS services.</p>
 through of the Serverless project and show some real-world examples of how to build something. Stay
 tuned!</p>
 
-
-  
-<div class="prev-next-post pure-g">
-  <div class="pure-u-1-24" style="text-align: left;">
-    
-    <a href="http://blog.brianz.bz/post/if-youre-not-using-docker-you-should-be/"><i class="fa fa-chevron-left"></i></a>
-    
-  </div>
-  <div class="pure-u-10-24">
-    
-    <nav class="prev">
-      <a href="http://blog.brianz.bz/post/if-youre-not-using-docker-you-should-be/">If you&#39;re not using Docker you should be</a>
-    </nav>
-    
-  </div>
-  <div class="pure-u-2-24">
-    &nbsp;
-  </div>
-  <div class="pure-u-10-24">
-    
-    <nav class="next">
-      <a href="http://blog.brianz.bz/post/serverless-part-ii/">Serverless part II</a>
-    </nav>
-    
-  </div>
-  <div class="pure-u-1-24" style="text-align: right;">
-    
-    <a href="http://blog.brianz.bz/post/serverless-part-ii/"><i class="fa fa-chevron-right"></i></a>
-    
-  </div>
 </div>
 
+        <footer class="post-footer clearfix">
+    
+        <p class="post-tags">
+            <span>Tagged:</span>
+            
+                 <a href="http://blog.brianz.bz/tags/aws/">aws</a>
+            
+                 <a href="http://blog.brianz.bz/tags/architecture/">architecture</a>
+            
+                 <a href="http://blog.brianz.bz/tags/serverless/">serverless</a>
+            
+        </p>
+    
 
+    <div class="share">
+        <a class="icon-twitter" href="https://twitter.com/share?text=Serverless%20part%20I&url=http%3a%2f%2fblog.brianz.bz%2fpost%2fserverless-part-i%2f"
+            onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+            <i class="fa fa-twitter"></i>
+            <span class="hidden">Twitter</span>
+        </a>
 
-  
-<div id="disqus_thread"></div>
+        <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http%3a%2f%2fblog.brianz.bz%2fpost%2fserverless-part-i%2f"
+            onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+            <i class="fa fa-facebook"></i>
+            <span class="hidden">Facebook</span>
+        </a>
+
+        <a class="icon-google-plus" href="https://plus.google.com/share?url=http%3a%2f%2fblog.brianz.bz%2fpost%2fserverless-part-i%2f"
+           onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+           <i class="fa fa-google-plus"></i>
+            <span class="hidden">Google+</span>
+        </a>
+    </div>
+</footer>
+
+        
+    <div class="comments">
+        <div id="disqus_thread"></div>
 <script type="text/javascript">
-
-(function() {
-    
-    
-    if (window.location.hostname == "localhost")
-        return;
-
-    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
     var disqus_shortname = 'brianz';
-    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-})();
+    var disqus_identifier = 'http:\/\/blog.brianz.bz\/post\/serverless-part-i\/';
+    var disqus_title = 'Serverless part I';
+    var disqus_url = 'http:\/\/blog.brianz.bz\/post\/serverless-part-i\/';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
 </script>
 <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-<a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    </div>
 
-
+    </article>
 </div>
 
-</div>
-</div>
-<script src="http://blog.brianz.bzjs/ui.js"></script>
+            </div>
+        </div>
 
+        <footer class="footer">
+            <div class="container">
+                <div class="site-title-wrapper">
+                    <h1 class="site-title">
+                        <a title="Brian Z" href="http://blog.brianz.bz">Brian Z</a>
+                    </h1>
+                    <a class="button-square button-jump-top js-jump-top" href="#">
+                        <i class="fa fa-angle-up"></i>
+                    </a>
+                </div>
 
-<script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+                <p class="footer-copyright">
+                    <span>&copy; 2016 / Powered by <a href="https://gohugo.io/">Hugo</a></span>
+                </p>
+                <p class="footer-copyright">
+                    <span><a href="https://github.com/roryg/ghostwriter">Ghostwriter theme</a> By <a href="http://jollygoodthemes.com">JollyGoodThemes</a></span>
+                    <span>/ <a href="https://github.com/jbub/ghostwriter">Ported</a> to Hugo By <a href="https://github.com/jbub">jbub</a></span>
+                </p>
+            </div>
+        </footer>
 
-  ga('create', 'UA-75475240-1', 'auto');
-  ga('send', 'pageview');
-
-</script>
-
-
-
-</body>
+        <script src="http://blog.brianz.bzjs/jquery-1.11.3.min.js"></script>
+        <script src="http://blog.brianz.bzjs/highlight.min.js"></script>
+        <script src="http://blog.brianz.bzjs/jquery.fitvids.js"></script>
+        <script src="http://blog.brianz.bzjs/scripts.js"></script>
+    </body>
 </html>
 

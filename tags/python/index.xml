@@ -2,12 +2,11 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Python on Brian Z</title>
-    <link>http://blog.brianz.bz/tags/python/</link>
+    <link>http://blog.brianz.bz/tags/python/index.xml</link>
     <description>Recent content in Python on Brian Z</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <copyright>&amp;copy; 2016. All rights reserved.</copyright>
-    <lastBuildDate>Thu, 15 Sep 2016 17:41:39 -0400</lastBuildDate>
+    <copyright>&amp;copy; 2016-2017. All rights reserved.</copyright>
     <atom:link href="http://blog.brianz.bz/tags/python/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
@@ -18,8 +17,7 @@
       <guid>http://blog.brianz.bz/post/demo-service-with-servant/</guid>
       <description>
 
-&lt;p&gt;In a &lt;a href=&#34;No page found with path or logical name &#34;introducing-servant.md&#34;.
-&#34;&gt;previous post&lt;/a&gt; I introduced and discussed
+&lt;p&gt;In a &lt;a href=&#34;http://blog.brianz.bz/post/introducing-servant/&#34;&gt;previous post&lt;/a&gt; I introduced and discussed
 about an open source library I authored called Servant. Servant is a framework for building
 RPC-style services with Python. Servant is to services as Django or Rails is to web
 applications&amp;hellip;it&amp;rsquo;s framework you&amp;rsquo;d use when you need to build a service in Python.&lt;/p&gt;
@@ -29,9 +27,9 @@ Let&amp;rsquo;s first start by writing the service.  To save some time we&amp;rs
 href=&#34;https://github.com/brianz/servant/tree/master/examples/calculator_service&#34;&gt;&lt;code&gt;calculator_service&lt;/code&gt;&lt;/a&gt;
 which is in the &lt;code&gt;examples&lt;/code&gt; directory in the Servant repository.&lt;/p&gt;
 
-&lt;h2 id=&#34;writing-the-service:ce7670bcf55e51c26ab5dc928711bf57&#34;&gt;Writing the service&lt;/h2&gt;
+&lt;h2 id=&#34;writing-the-service&#34;&gt;Writing the service&lt;/h2&gt;
 
-&lt;h3 id=&#34;boilerplate:ce7670bcf55e51c26ab5dc928711bf57&#34;&gt;Boilerplate&lt;/h3&gt;
+&lt;h3 id=&#34;boilerplate&#34;&gt;Boilerplate&lt;/h3&gt;
 
 &lt;p&gt;There are a few requirements to write a service.  I&amp;rsquo;ll start with the boring parts which is mostly
 boilerplate to get your service setup as an install-able Python package. I also suggest looking at
@@ -46,7 +44,7 @@ example, the name is &lt;code&gt;calculator_service&lt;/code&gt;.&lt;/p&gt;
 
 &lt;p&gt;From there you&amp;rsquo;ll also need a directory where your source code will live.&lt;/p&gt;
 
-&lt;h3 id=&#34;service:ce7670bcf55e51c26ab5dc928711bf57&#34;&gt;Service&lt;/h3&gt;
+&lt;h3 id=&#34;service&#34;&gt;Service&lt;/h3&gt;
 
 &lt;p&gt;Every Servant service needs an entry-point to device the endpoints which will be exposed. This is
 pretty simple&amp;hellip;create a file names &lt;code&gt;service.py&lt;/code&gt; which contains a class that subclasses
@@ -69,7 +67,7 @@ started.&lt;/p&gt;
 &lt;p&gt;In our example you can see our &lt;code&gt;calculator_service&lt;/code&gt; exposed three calculate endpoints&amp;hellip;&lt;code&gt;add&lt;/code&gt;,
 &lt;code&gt;subtract&lt;/code&gt; and &lt;code&gt;divide&lt;/code&gt;.  These will do what you&amp;rsquo;d expect.&lt;/p&gt;
 
-&lt;h3 id=&#34;actions:ce7670bcf55e51c26ab5dc928711bf57&#34;&gt;Actions&lt;/h3&gt;
+&lt;h3 id=&#34;actions&#34;&gt;Actions&lt;/h3&gt;
 
 &lt;p&gt;An &lt;code&gt;Action&lt;/code&gt; is really the meat and potatoes for a particular endpoint. You can organize your
 actions however you like&amp;hellip;one action per file, multiple actions per file, etc.  Since we&amp;rsquo;re
@@ -95,7 +93,7 @@ one-liner.  By the time your &lt;code&gt;run&lt;/code&gt; method is being execut
 and all of the required and optional fields will be available to you as class attributes.  So, our
 &lt;code&gt;run&lt;/code&gt; method simple sets the result using the two inputs we received from the client:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;def run(self, **kwargs):
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;def run(self, **kwargs):
     self.result = self.number1 + self.number2
 &lt;/code&gt;&lt;/pre&gt;
 
@@ -107,14 +105,14 @@ implemented. Being a calculator, there really isn&amp;rsquo;t much to it.  You&a
 action subclassed the add action and just overrides the &lt;code&gt;run&lt;/code&gt; method.  The &lt;code&gt;divide&lt;/code&gt; action mostly
 just changes the names of the inputs and output.&lt;/p&gt;
 
-&lt;h2 id=&#34;using-the-service:ce7670bcf55e51c26ab5dc928711bf57&#34;&gt;Using the service&lt;/h2&gt;
+&lt;h2 id=&#34;using-the-service&#34;&gt;Using the service&lt;/h2&gt;
 
 &lt;p&gt;One neat feature of Servant is the ability to run your service as a locally installed Python
 library.&lt;/p&gt;
 
 &lt;p&gt;Let&amp;rsquo;s install both Servant and the calculator service into a new virtualenv:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;$ cd path/to/servant
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;$ cd path/to/servant
 $ mkvirtualenv calculator_service
 $ pip install -e .
 $ cd examples/calculator_service
@@ -123,7 +121,7 @@ $ pip install -e .
 
 &lt;p&gt;Now that we have these installed, we can actually test our service!&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;import servant.client
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;import servant.client
 
 client = servant.client.Client(&#39;calculator_service&#39;, version=1)
 
@@ -151,7 +149,7 @@ above.  You&amp;rsquo;ll note that the client code above &lt;em&gt;only&lt;/em&g
 only reference to the &lt;code&gt;calculator_service&lt;/code&gt; is when we instantiate the &lt;code&gt;Client&lt;/code&gt; class.  There is
 only one change we need to make to the client code above to hit a remote system:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;client.configure(&#39;http&#39;, host=&#39;192.168.88.100&#39;, port=8888)
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;client.configure(&#39;http&#39;, host=&#39;192.168.88.100&#39;, port=8888)
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;We&amp;rsquo;re configuring our client to connect via &lt;code&gt;http&lt;/code&gt; to the given host and port.  Once that single
@@ -170,10 +168,10 @@ matter of a minor change to your client code to point to the remote host.&lt;/p&
     
     <item>
       <title>Introducing servant</title>
-      <link>http://blog.brianz.bz/post/introducting-servant/</link>
+      <link>http://blog.brianz.bz/post/introducing-servant/</link>
       <pubDate>Mon, 04 Apr 2016 17:26:23 -0600</pubDate>
       
-      <guid>http://blog.brianz.bz/post/introducting-servant/</guid>
+      <guid>http://blog.brianz.bz/post/introducing-servant/</guid>
       <description>
 
 &lt;p&gt;Late in 2014 we began the process of discussing a payment system at
@@ -200,7 +198,7 @@ start evolving our architecture and services, while having their own sets of cha
 of sense. In late 2014 the issue was that there really wasn&amp;rsquo;t (and still aren&amp;rsquo;t) many existing and
 proven frameworks for building services in Python.&lt;/p&gt;
 
-&lt;h2 id=&#34;enter-servant:9879b9e4b526681137999e709cb09eff&#34;&gt;Enter servant&lt;/h2&gt;
+&lt;h2 id=&#34;enter-servant&#34;&gt;Enter servant&lt;/h2&gt;
 
 &lt;p&gt;Leaning on a custom service framework I had worked with while at
 &lt;a href=&#34;http://eventbrite.com&#34; target=&#34;_blank&#34;&gt;Eventbrite&lt;/a&gt; I came up with servant. You can see the project page on Github.
@@ -226,7 +224,7 @@ the Postgres. However, you use whatever you want depending on your needs&amp;hel
 your way and deals with executing service calls on behalf of the client. There is some validation
 here and there to ensure the service call is well-formed but I won&amp;rsquo;t go over that right now.&lt;/p&gt;
 
-&lt;h2 id=&#34;quick-code-examples:9879b9e4b526681137999e709cb09eff&#34;&gt;Quick code examples&lt;/h2&gt;
+&lt;h2 id=&#34;quick-code-examples&#34;&gt;Quick code examples&lt;/h2&gt;
 
 &lt;p&gt;When I first started using services I had no idea what looked like both authoring a service or
 talking to a service. If you have never worked with a service framework you may think it&amp;rsquo;s a matter
@@ -236,20 +234,20 @@ snippets which should make things more clear.&lt;/p&gt;
 &lt;p&gt;In this example, we&amp;rsquo;ll create a silly little &amp;ldquo;Calculator Service&amp;rdquo;. I&amp;rsquo;ll implement an &lt;code&gt;add&lt;/code&gt; endpoint
 which will take two numbers, add them up and return the sum.&lt;/p&gt;
 
-&lt;h3 id=&#34;client:9879b9e4b526681137999e709cb09eff&#34;&gt;Client&lt;/h3&gt;
+&lt;h3 id=&#34;client&#34;&gt;Client&lt;/h3&gt;
 
 &lt;p&gt;As a client, the only dependencies is having the servant library installed. You could call this
 from a Django app, one-off script&amp;hellip;wherever. Install servant from github. Here I install it into a
 virtualenv using virtualenvwrapper:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;brianz@gold$ mkvirtualenv test_servant
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;brianz@gold$ mkvirtualenv test_servant
 
 (test_servant)brianz@gold$ pip install git+https://github.com/clearcare/servant.git@master
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;Now, I can write some client code:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;# test_add.py
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;# test_add.py
 import servant.client
 
 client = servant.client.Client(&#39;calculator_service&#39;, version=1)
@@ -267,17 +265,17 @@ else:
 this code will work and spit out the expected result of &lt;code&gt;25&lt;/code&gt;. You can actually install
 &lt;code&gt;calculator_service&lt;/code&gt; yourself and run this code.&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;(test_servant)brianz@gold$ cd servant/examples/calculator_service/
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;(test_servant)brianz@gold$ cd servant/examples/calculator_service/
 (test_servant)brianz@gold$ pip install .
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;pre&gt;&lt;code&gt;(test_servant)brianz@bz-cconline$ python test_calculator.py 
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;(test_servant)brianz@bz-cconline$ python test_calculator.py 
 25
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;That&amp;rsquo;s how you actually &lt;em&gt;use&lt;/em&gt; a servant service. How do you author one?&lt;/p&gt;
 
-&lt;h3 id=&#34;server:9879b9e4b526681137999e709cb09eff&#34;&gt;Server&lt;/h3&gt;
+&lt;h3 id=&#34;server&#34;&gt;Server&lt;/h3&gt;
 
 &lt;p&gt;Authoring a service is a bit more work but still quite easy. This is how you&amp;rsquo;d implement the &lt;code&gt;add&lt;/code&gt;
 method we used above. Note you can also &lt;a href=&#34;https://github.com/clearcare/servant/tree/master/examples/calculator_service&#34; target=&#34;_blank&#34;&gt;peruse the
@@ -287,7 +285,7 @@ to see a more thorough implemenation..but the below code will actually work.&lt;
 &lt;p&gt;First, you need to define a single &lt;code&gt;service.py&lt;/code&gt; file which defines your service and declares all
 its endpoints:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;# service.py
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;# service.py
 from servant.service.base import Service
 
 import actions
@@ -310,7 +308,7 @@ names to actions is entirely up to you. We always have an &lt;code&gt;actions/&l
 actions broken up by area of responsibility. Again, for brevity we&amp;rsquo;ll just show a single action for
 our calculator service.&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;# actions.py
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;# actions.py
 import servant.fields
 from servant.service.actions import Action
 
@@ -334,7 +332,7 @@ class AddAction(Action):
 &lt;p&gt;If you ignore &lt;code&gt;setup.py&lt;/code&gt; and any other packaging code or files, our actual service is only a few
 files:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;(test_servant)brianz@gold$ tree
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;(test_servant)brianz@gold$ tree
 ├── __init__.py
 ├── actions.py
 └── service.py
@@ -345,7 +343,7 @@ can install your service as a Python package, this code is fully functional. You
 this and actually give it a try&amp;hellip;clone the repo and look in
 the &lt;a href=&#34;https://github.com/clearcare/servant/tree/master/examples/calculator_service&#34; target=&#34;_blank&#34;&gt;the examples directory&lt;/a&gt;.&lt;/p&gt;
 
-&lt;h2 id=&#34;local-library-mode:9879b9e4b526681137999e709cb09eff&#34;&gt;Local library mode&lt;/h2&gt;
+&lt;h2 id=&#34;local-library-mode&#34;&gt;Local library mode&lt;/h2&gt;
 
 &lt;p&gt;One killer feature IMO which I have only seen in Eventbrite&amp;rsquo;s SOA library is that of local mode.
 You&amp;rsquo;ll notice in all of the code above, there is no mention or reference to where the service is
@@ -357,7 +355,7 @@ as if it were running on a remote system. The magic here is that the servant cli
 your service and executes it as a local library.  When you&amp;rsquo;re ready to deploy your service
 somewhere else and point your clients to the &lt;em&gt;real&lt;/em&gt; server, it&amp;rsquo;s a one line change:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;import servant.client
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;import servant.client
 
 client = servant.client.Client(&#39;calculator_service&#39;, version=1)
 # Now point your client to the remote host
@@ -369,7 +367,7 @@ Unit testing is &lt;em&gt;really&lt;/em&gt; easy.  The code which gets executed 
 running on a real server rather than as a local library cannot be &lt;em&gt;identical&lt;/em&gt;, but it&amp;rsquo;s quite close
 and any differences are definitely worth the increase in productivity.&lt;/p&gt;
 
-&lt;h2 id=&#34;why-servant:9879b9e4b526681137999e709cb09eff&#34;&gt;Why servant?&lt;/h2&gt;
+&lt;h2 id=&#34;why-servant&#34;&gt;Why servant?&lt;/h2&gt;
 
 &lt;blockquote&gt;
 &lt;p&gt;This is dumb, REST rules!&lt;/p&gt;
@@ -399,7 +397,7 @@ look at the
 &lt;a href=&#34;https://github.com/clearcare/servant/blob/master/examples/calculator_service/README.md&#34; target=&#34;_blank&#34;&gt;README&lt;/a&gt;
 you&amp;rsquo;ll see example of how to run the demo via &lt;code&gt;uwsgi&lt;/code&gt;.&lt;/p&gt;
 
-&lt;h2 id=&#34;trade-offs:9879b9e4b526681137999e709cb09eff&#34;&gt;Trade offs&lt;/h2&gt;
+&lt;h2 id=&#34;trade-offs&#34;&gt;Trade offs&lt;/h2&gt;
 
 &lt;p&gt;As with any technology there are trade-offs. Here are a few issues with servant today:&lt;/p&gt;
 
@@ -410,7 +408,7 @@ you&amp;rsquo;ll see example of how to run the demo via &lt;code&gt;uwsgi&lt;/co
 &lt;li&gt;Need another layer to expose a service publicly (i.e., hitting from JavaScript)&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h2 id=&#34;closing-thoughts:9879b9e4b526681137999e709cb09eff&#34;&gt;Closing thoughts&lt;/h2&gt;
+&lt;h2 id=&#34;closing-thoughts&#34;&gt;Closing thoughts&lt;/h2&gt;
 
 &lt;p&gt;Servant has served us quite well at work and I really would like to keep iterating on it. It&amp;rsquo;s open
 source, so if you&amp;rsquo;re interested clone the repo and give it a try. I haven&amp;rsquo;t looked at the current

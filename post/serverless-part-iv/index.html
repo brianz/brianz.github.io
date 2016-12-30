@@ -1,233 +1,111 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>Serverless part IV &middot; </title>
+        <meta name="description" content="Welcome to part four in my series about Serverless. As a reminder, there are now three other parts you can read if you aren&rsquo;t coming here from those posts already:
+ Serverless Part I Serverless Part II Serverless Part III  In the previous posts I worked through some of the basics of Serverless and stood up an API endpoint which returned HTML. Now I&rsquo;d like to start working through some more real-world examples and talk through some warts I&rsquo;ve found with Serverless.">
+        <meta name="HandheldFriendly" content="True">
+        <meta name="MobileOptimized" content="320">
+        <meta name="generator" content="Hugo 0.18" />
+        <meta name="robots" content="index,follow">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <link rel="stylesheet" href="http://blog.brianz.bzcss/normalize.css">
+        <link rel="stylesheet" href="http://blog.brianz.bzcss/github-gist.css">
+        <link rel="stylesheet" href="http://blog.brianz.bzcss/style.css">
+        <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,600,700,300&subset=latin,cyrillic-ext,latin-ext,cyrillic">
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    </head>
+    <body>
+        
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.15" />
-
-  <title>Serverless part IV &middot; Brian Z</title>
-
-  
-  
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css">
-
-  <!--[if lte IE 8]>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-old-ie-min.css">
-  <![endif]-->
-  <!--[if gt IE 8]><!-->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-min.css">
-  <!--<![endif]-->
-
-  <!--[if lte IE 8]>
-  <link rel="stylesheet" href="http://blog.brianz.bz/css/side-menu-old-ie.css">
-  <![endif]-->
-  <!--[if gt IE 8]><!-->
-  <link rel="stylesheet" href="http://blog.brianz.bz/css/side-menu.css">
-  <!--<![endif]-->
-
-  <link rel="stylesheet" href="http://blog.brianz.bz/css/blackburn.css">
-
-  
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
-
-  
-  <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
-
-  
-  
-
-  
-  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.1.0/styles/androidstudio.min.css">
-  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.1.0/highlight.min.js"></script>
-  <script>hljs.initHighlightingOnLoad();</script>
-  
-
-  <link rel="shortcut icon" href="http://blog.brianz.bzimg/favicon.ico" type="image/x-icon" />
-
-</head>
+ga('create', 'UA-75475240-1', 'auto');
+ga('send', 'pageview');
+</script>
 
 
-<body>
-<div id="layout">
+        <div id="wrapper">
+            <header class="site-header">
+                <div class="container">
+                    <div class="site-title-wrapper">
+                        
+                            <h1 class="site-title">
+                                <a title="Brian Z" href="http://blog.brianz.bz">Brian Z</a>
+                            </h1>
+                        
+                        <a class="button-square" href="http://blog.brianz.bzindex.xml"><i class="fa fa-rss"></i></a>
+                        
+                            <a class="button-square button-social hint--top" data-hint="Twitter" title="Twitter" href="https://twitter.com/brianzambrano">
+                                <i class="fa fa-twitter"></i>
+                            </a>
+                        
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="Github" title="Github" href="https://github.com/brianz">
+                                <i class="fa fa-github-alt"></i>
+                            </a>
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="Stack Overflow" title="Stack Overflow" href="http://stackoverflow.com/users/87858/brianz">
+                                <i class="fa fa-stack-overflow"></i>
+                            </a>
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="LinkedIn" title="LinkedIn" href="https://www.linkedin.com/in/brianzambrano">
+                                <i class="fa fa-linkedin"></i>
+                            </a>
+                        
+                        
+                    </div>
 
-  
-<a href="#menu" id="menuLink" class="menu-link">
-  
-  <span></span>
-</a>
-<div id="menu">
-
-  
-  <a class="pure-menu-heading brand" href="http://blog.brianz.bz/">brianz</a>
-
-
-  <div class="pure-menu">
-    <ul class="pure-menu-list">
-      
-      
-        <li class="pure-menu-item">
-          <a class="pure-menu-link" href="http://blog.brianz.bz/"><i class='fa fa-home fa-fw'></i>Home</a>
-      
-        </li>
-      
-      
-        <li class="pure-menu-item">
-          <a class="pure-menu-link" href="http://blog.brianz.bz/about/"><i class='fa fa-user fa-fw'></i>About</a>
-      
-        </li>
-      
-      
-        <li class="pure-menu-item">
-          <a class="pure-menu-link" href="http://blog.brianz.bz/post/"><i class='fa fa-list fa-fw'></i>Posts</a>
-      
-        </li>
-      
-    </ul>
-  </div>
-
-  <div class="pure-menu social">
-  <ul class="pure-menu-list">
-
-    
-
-    
-
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://twitter.com/brianzambrano" target="_blank"><i class="fa fa-twitter-square fa-fw"></i>Twitter</a>
+                    <ul class="site-nav">
+                        
+    <li class="site-nav-item">
+        <a title="Home" href="http://blog.brianz.bz/">Home</a>
     </li>
-    
 
-    
-
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://facebook.com/brian.zambrano" target="_blank"><i class="fa fa-facebook-square fa-fw"></i>Facebook</a>
+    <li class="site-nav-item">
+        <a title="About" href="http://blog.brianz.bz/about/">About</a>
     </li>
-    
 
-    
-
-    
-
-    
-
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://instagram.com/bzambrano" target="_blank"><i class="fa fa-instagram fa-fw"></i>Instagram</a>
+    <li class="site-nav-item">
+        <a title="Posts" href="http://blog.brianz.bz/post/">Posts</a>
     </li>
+
+                    </ul>
+                </div>
+            </header>
+
+            <div id="container">
+
+
+<div class="container">
+    <article class="post-container" itemscope="" itemtype="http://schema.org/BlogPosting">
+        <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Serverless part IV</h1>
+    
+    <p class="post-date">
+        <span>Published <time datetime="2016-07-01" itemprop="datePublished">Fri, Jul 1, 2016</time></span>
+        <span>by</span>
+        <span itemscope="" itemprop="author" itemtype="https://schema.org/Person">
+            <span itemprop="name">
+                <a href="" itemprop="url" rel="author"></a>
+            </span>
+        </span>
+    </p>
+</header>
+
+        <div class="post-content clearfix" itemprop="articleBody">
     
 
     
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://linkedin.com/in/brianzambrano" target="_blank"><i class="fa fa-linkedin-square fa-fw"></i>LinkedIn</a>
-    </li>
-    
-
-    
-
-    
-
-    
-
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://news.ycombinator.com/user?id=brianz" target="_blank"><i class="fa fa-hacker-news fa-fw"></i>Hacker News</a>
-    </li>
-    
-
-    
-
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://github.com/brianz" target="_blank"><i class="fa fa-github-square fa-fw"></i>GitHub</a>
-    </li>
-    
-
-    
-
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://stackoverflow.com/users/87858" target="_blank"><i class="fa fa-stack-overflow fa-fw"></i>Stack Overflow</a>
-    </li>
-    
-
-    
-
-    
-
-  </ul>
-</div>
-
-
-  <div>
-  <div class="small-print">
-    <small>&copy; 2016. All rights reserved.</small>
-  </div>
-  <div class="small-print">
-    <small>Built with&nbsp;<a href="https://gohugo.io/" target="_blank">Hugo</a></small>
-    <small>Theme&nbsp;<a href="https://github.com/yoshiharuyamashita/blackburn" target="_blank">Blackburn</a></small>
-  </div>
-</div>
-
-</div>
-
-
-  <div id="main">
-
-
-<div class="header">
-  <h1>Serverless part IV</h1>
-  <h2></h2>
-</div>
-<div class="content">
-
-  <div class="post-meta">
-
-  <div>
-    <i class="fa fa-calendar fa-fw"></i>
-    <time>01 Jul 2016, 11:55</time>
-  </div>
-
-  
-
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-tags fa-fw"></i>
-    
-      <a class="post-taxonomy-tag" href="http://blog.brianz.bztags/aws">aws</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="http://blog.brianz.bztags/architecture">architecture</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="http://blog.brianz.bztags/serverless">serverless</a>
-    
-  </div>
-  
-  
-
-</div>
-
-  
 
 <p>Welcome to part four in my series about <a href="http://serverless.com" target="_blank">Serverless</a>. As a reminder, there
 are now three other parts you can read if you aren&rsquo;t coming here from those posts already:</p>
@@ -260,7 +138,7 @@ different in the way it organizing things.</p>
 <li>Creating a new API endpoint and function</li>
 </ul>
 
-<h2 id="syncing-with-the-meta-sync-plugin:c45138b3e8031bde51353796bd1f4daf">Syncing with the <code>meta sync</code> plugin</h2>
+<h2 id="syncing-with-the-meta-sync-plugin">Syncing with the <code>meta sync</code> plugin</h2>
 
 <p>One issue you will quickly run in to when either working on a project with someone else <em>or</em>
 working on your own project on different computers is that of the <code>_meta</code> directory. If you <a href="https://github.com/brianz/serverless-demo" target="_blank">look at
@@ -299,7 +177,7 @@ S3 bucket.</p>
 original author of the project. After all, the <code>_meta</code> directory will be created when the project
 is first brought to life, so it&rsquo;ll be the responsibility of that first developer to set this up:</p>
 
-<pre><code>root@1035dd7cffb6:/code# npm install serverless-meta-sync --save
+<pre><code class="language-bash">root@1035dd7cffb6:/code$ npm install serverless-meta-sync --save
 </code></pre>
 
 <p>Now that the plugin is installed I just need to update the <code>s-project.json</code> file:</p>
@@ -331,23 +209,23 @@ meta sync</code> commands.</strong></p>
 <p>From part iii of this series I created two stages&hellip;<code>dev</code> and
 <code>production</code>. I authored that project on my laptop so I&rsquo;ll be doing the following on that computer:</p>
 
-<pre><code class="language-bash">root@5457e51bf687:/code# sls meta sync -s dev -r us-west-2
+<pre><code class="language-bash">root@5457e51bf687:/code$ sls meta sync -s dev -r us-west-2
 Serverless: Going to sync &quot;s-variables-dev-uswest2.json&quot;... 
 Serverless: Creating remote copy of s-variables-dev-uswest2.json...  
 Serverless: Done  
-root@5457e51bf687:/code# sls meta sync -s production -r us-west-2
+root@5457e51bf687:/code$ sls meta sync -s production -r us-west-2
 Serverless: Creating remote copy of s-variables-production-uswest2.json...  
 Serverless: Done  
 </code></pre>
 
 <p>This is the first step in setting yourself up for development on multiple system.</p>
 
-<h2 id="setup-a-project-after-git-clone:c45138b3e8031bde51353796bd1f4daf">Setup a project after <code>git clone</code></h2>
+<h2 id="setup-a-project-after-git-clone">Setup a project after <code>git clone</code></h2>
 
 <p>Now, I switch over to my iMac and clone the repo. You&rsquo;d hope that you&rsquo;d just be able to clone the
 repo, install packages, <code>sync</code> the <code>_meta</code> folder and you&rsquo;d be done.  You&rsquo;d be wrong.</p>
 
-<pre><code>brianz@gold$ git clone https://github.com/brianz/serverless-demo.git
+<pre><code class="language-bash">brianz@gold$ git clone https://github.com/brianz/serverless-demo.git
 brianz@gold$ cd serverless-demo/
 brianz@gold(master=)$ ls -l
 total 32
@@ -369,7 +247,7 @@ drwxr-xr-x  3 brianz  staff   102 May 19 09:53 src
 <p>OK&hellip;this is what we expect.  There isn&rsquo;t a <code>_meta</code> folder. Let&rsquo;s start getting set up and see
 what happens (as a reminder I&rsquo;m in a Docker container when running <code>sls</code> aka <code>serverless</code>):</p>
 
-<pre><code>root@bcdeb57d5754:/code# sls meta sync  
+<pre><code class="language-bash">root@bcdeb57d5754:/code$ sls meta sync  
 /usr/local/lib/node_modules/serverless/node_modules/bluebird/js/release/async.js:61
         fn = function () { throw arg; };
                            ^
@@ -381,15 +259,15 @@ ServerlessError: This plugin could not be found: serverless-meta-sync
 project, aka me on my MBPro) performed an <code>npm install --save</code> of the plugin it&rsquo;ll be in our <code>package.json</code>. As with
 any node/npm system all we&rsquo;ll need to do is <code>npm install</code>:</p>
 
-<pre><code>root@bcdeb57d5754:/code#  npm install
+<pre><code class="language-bash">root@bcdeb57d5754:/code$  npm install
 # snip...lots of output
 npm info ok 
-root@bcdeb57d5754:/code# 
+root@bcdeb57d5754:/code$ 
 </code></pre>
 
 <p>Now that we have met all our requirements let&rsquo;s try to sync again:</p>
 
-<pre><code>root@bcdeb57d5754:/code# sls meta sync 
+<pre><code class="language-bash">root@bcdeb57d5754:/code$ sls meta sync 
 /usr/local/lib/node_modules/serverless/node_modules/bluebird/js/release/async.js:61
         fn = function () { throw arg; };
                            ^
@@ -417,7 +295,7 @@ recreate a few files.</p>
 speed this up as needed.  Doing a <code>sls project init --help</code> will show you all of the options you
 can use.</p>
 
-<pre><code>root@bcdeb57d5754:/code# sls project init
+<pre><code class="language-bash">root@bcdeb57d5754:/code$ sls project init
  _______                             __
 |   _   .-----.----.--.--.-----.----|  .-----.-----.-----.
 |   |___|  -__|   _|  |  |  -__|   _|  |  -__|__ --|__ --|
@@ -467,7 +345,7 @@ drwxr-xr-x   3 brianz  staff   102 May 19 09:53 src/
 empty.  We&rsquo;re finally at the point where we can pull down our secret variables and config which we
 previously synced using meta-sync.</p>
 
-<pre><code>root@bcdeb57d5754:/code# sls meta sync 
+<pre><code class="language-bash">root@bcdeb57d5754:/code$ sls meta sync 
 Serverless: WARNING: This variable is not defined: magicVariable  
 Serverless: WARNING: This variable is not defined: region  
 Serverless: WARNING: This variable is not defined: region  
@@ -487,7 +365,7 @@ Serverless: Done
 
 <p>Excellent&hellip;it finally worked.  At this point we&rsquo;re all set to use the <code>dev</code> stage.</p>
 
-<pre><code>root@bcdeb57d5754:/code# ls -l _meta/variables/
+<pre><code class="language-bash">root@bcdeb57d5754:/code$ ls -l _meta/variables/
 total 12
 -rw-r--r-- 1 1000 staff 34 Jun 28 22:58 s-variables-common.json
 -rw-r--r-- 1 1000 staff 27 Jun 28 22:58 s-variables-dev-uswest2.json
@@ -499,7 +377,7 @@ variables file hasn&rsquo;t been pulled down after our <code>sync</code>.  <stro
 need to issue multiple <code>project init</code> and sync commands for different stages/regions!</strong> This is
 clunky, but at least we only need to do it once per stage:</p>
 
-<pre><code>root@bcdeb57d5754:/code# sls project init -s production
+<pre><code class="language-bash">root@bcdeb57d5754:/code$ sls project init -s production
 Serverless: Initializing Serverless Project...  
 Serverless: For the &quot;production&quot; stage, do you want to use an existing Amazon Web Services profile
 or create a new one?
@@ -525,7 +403,7 @@ Serverless: Successfully initialized project &quot;serverless-demo&quot;
 
 <p>Now that we&rsquo;ve <code>init'ed</code> the production stage we can finally sync it:</p>
 
-<pre><code>root@bcdeb57d5754:/code# sls meta sync -s production
+<pre><code>root@bcdeb57d5754:/code$ sls meta sync -s production
 Serverless: WARNING: This variable is not defined: magicVariable  
 Serverless: WARNING: This variable is not defined: region  
 Serverless: WARNING: This variable is not defined: region  
@@ -546,7 +424,7 @@ Serverless: Done
 <p>Phew. In my opinion that&rsquo;s a lot of work to do just to get the project in a state where you can
 start working on. I expect and hope this flow to get much easier in Serverless v1.0.</p>
 
-<h2 id="creating-a-new-api-endpoint:c45138b3e8031bde51353796bd1f4daf">Creating a new API endpoint</h2>
+<h2 id="creating-a-new-api-endpoint">Creating a new API endpoint</h2>
 
 <p>Now that we&rsquo;re set up on a new system let&rsquo;s start the process of creating a new function. A simple
 <code>Hello world!</code> example is quite boring, so what I&rsquo;ll do is create a new endpoint which accepts a
@@ -560,7 +438,7 @@ Python library and some of our own Python code. This will demonstrate a few thin
 
 <p>First we&rsquo;ll create the function and endpoint&hellip;this is a Python 2.7 function:</p>
 
-<pre><code>root@bcdeb57d5754:/code# sls function create src/authenticate -r python2.7
+<pre><code class="language-bash">root@bcdeb57d5754:/code$ sls function create src/authenticate -r python2.7
 Serverless: For this new Function, would you like to create an Endpoint, Event, or just the
 Function?
   &gt; Create Endpoint
@@ -576,7 +454,7 @@ Github</a>.</p>
 
 <p>There are a few things to note in order to get non-trivial functions like this one working:</p>
 
-<h3 id="installing-libraries:c45138b3e8031bde51353796bd1f4daf">Installing libraries</h3>
+<h3 id="installing-libraries">Installing libraries</h3>
 
 <p>Since we&rsquo;re relying on a <code>jwt</code> library from a 3rd party we need to send that up to Lambda with our
 own function. Serverless does the work of creating a zip file of your code and any supporting
@@ -589,7 +467,7 @@ directory.  Running this script will get the <code>lib/</code> directory bootstr
 done will you be able to move on to the next step.  <em>Without</em> the supporting libraries installed
 and uploaded your function will throw an <code>ImportError</code> and not execute successfully.</p>
 
-<h3 id="path-hacking:c45138b3e8031bde51353796bd1f4daf">Path hacking</h3>
+<h3 id="path-hacking">Path hacking</h3>
 
 <p>With our <code>lib/</code> directory successfully populated and uploaded with our application code we need
 to make our application code/Lambda function aware that it exists.  Remember, this is just an
@@ -611,7 +489,7 @@ function which is nested any deeper in the package structure you&rsquo;ll have t
 <code>os.path.join</code> call&hellip;for example if you create a function in <code>authenticate/users/handler.py</code> that
 function would then need to use <code>&quot;../..lib&quot; since it's two directories away from</code>lib/`.</p>
 
-<h3 id="packaging-lib:c45138b3e8031bde51353796bd1f4daf">Packaging <code>lib/</code></h3>
+<h3 id="packaging-lib">Packaging <code>lib/</code></h3>
 
 <p>The last thing we need to take care of is instructing Serverless to package up our <code>lib/</code> directory
 with our handler function. This is done by mangling the <code>handler</code> value in <code>s-function.json</code>. In
@@ -640,24 +518,24 @@ drwxr-xr-x  4 brianz  staff  136 Jun 28 20:45 lib/
 
 <p>Everything you see here will wind up in our final zip file.</p>
 
-<h3 id="extracting-post-body:c45138b3e8031bde51353796bd1f4daf">Extracting POST body</h3>
+<h3 id="extracting-post-body">Extracting POST body</h3>
 
 <p>Finally, there&rsquo;s the work of extracting content from the actual <code>POST</code> body and sending it over to
 the Lambda function.  This is handled by API Gateway.  Here&rsquo;s the change/addition in
 <code>s-function.json</code>:</p>
 
-<pre><code class="language-json">  &quot;requestTemplates&quot;: {
-    &quot;application/json&quot;: {
-      &quot;token&quot;: &quot;$input.json('$.token')&quot;
-    }   
+<pre><code class="language-json">&quot;requestTemplates&quot;: {
+  &quot;application/json&quot;: {
+    &quot;token&quot;: &quot;$input.json('$.token')&quot;
   }
+}
 </code></pre>
 
 <p>This is one of the most confusing parts of API Gateway IMO. This ends up injecting a <code>token</code> field
 into your Lambda <code>event</code> by extracting the <code>token</code> field from the expected json payload in the
 <code>POST</code>.  Our Python function can then reference this:</p>
 
-<pre><code class="language-python">    token = event.get('token', '')
+<pre><code class="language-python">token = event.get('token', '')
 </code></pre>
 
 <p>Phew! Let&rsquo;s try this out. Our JWT secret for signing our tokens is simply the string <code>&quot;secret&quot;</code>.
@@ -667,27 +545,32 @@ function will raise an exception which will be returned to you:</p>
 
 <p>Here&rsquo;s a valid token:</p>
 
-<p>```bash curl -s -d &lsquo;{&ldquo;token&rdquo;: &ldquo;eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImJyaWFueiIsIm9yaWdfaWF0IjoxNDY3MTMyMTgzLCJleHAiOjE3ODI3NTIzNzIsImVtYWlsIjoiYnJpYW56QGdtYWlsLmNvbSIsInNjb3BlcyI6WyJkZXZlbG9wZXIiLCJzZXJ2ZXJsZXNzLWZhbiJdfQ.tmbOyytr0vbNdaFL0wc31SIpWw8E_xqUIDoWsXYM2do&rdquo;}&rsquo; <a href="https://4m98c4l3i1.execute-api.us-west-2.amazonaws.com/dev/authenticate" target="_blank">https://4m98c4l3i1.execute-api.us-west-2.amazonaws.com/dev/authenticate</a> | python -mjson.tool
-{
-    &ldquo;email&rdquo;: &ldquo;brianz@gmail.com&rdquo;,
-    &ldquo;exp&rdquo;: 1782752372,
-    &ldquo;orig_iat&rdquo;: 1467132183,
-    &ldquo;scopes&rdquo;: [
-        &ldquo;developer&rdquo;,
-        &ldquo;serverless-fan&rdquo;
+<pre><code class="language-bash">$ curl -s -d '{&quot;token&quot;: &quot;eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImJyaWFueiIsIm9yaWdfaWF0IjoxNDY3MTMyMTgzLCJleHAiOjE3ODI3NTIzNzIsImVtYWlsIjoiYnJpYW56QGdtYWlsLmNvbSIsInNjb3BlcyI6WyJkZXZlbG9wZXIiLCJzZXJ2ZXJsZXNzLWZhbiJdfQ.tmbOyytr0vbNdaFL0wc31SIpWw8E_xqUIDoWsXYM2do&quot;}' \
+https://4m98c4l3i1.execute-api.us-west-2.amazonaws.com/dev/authenticate | python -mjson.tool
+</code></pre>
+
+<pre><code>{
+    &quot;email&quot;: &quot;brianz@gmail.com&quot;,
+    &quot;exp&quot;: 1782752372,
+    &quot;orig_iat&quot;: 1467132183,
+    &quot;scopes&quot;: [
+        &quot;developer&quot;,
+        &quot;serverless-fan&quot;
     ],
-    &ldquo;username&rdquo;: &ldquo;brianz&rdquo;
-}</p>
+    &quot;username&quot;: &quot;brianz&quot;
+}
+</code></pre>
 
-<pre><code>
-Neat! Generated this token by plugging in some arbitrary data at the https://jwt.io playground. Note
-that I pushed the `exp` (expires) field far in the future.
+<p>Neat! Generated this token by plugging in some arbitrary data at the <a href="https://jwt.io" target="_blank">https://jwt.io</a> playground. Note
+that I pushed the <code>exp</code> (expires) field far in the future.</p>
 
-Let's try an invalid signature where the `exp` field is in the past:
+<p>Let&rsquo;s try an invalid signature where the <code>exp</code> field is in the past:</p>
 
-```bash
-curl -s -d '{&quot;token&quot;: &quot;eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImJyaWFueiIsIm9yaWdfaWF0IjoxNDY3MTMyMTgzLCJleHAiOjE0NjcyMTk2OTMsImVtYWlsIjoiYnJpYW56QGdtYWlsLmNvbSIsInNjb3BlcyI6WyJkZXZlbG9wZXIiLCJzZXJ2ZXJsZXNzLWZhbiJdfQ.A1UJOKcSfpUSuAgZoBO9g0oBtGdkrl71VtNt4F5eJZg&quot;}' https://4m98c4l3i1.execute-api.us-west-2.amazonaws.com/dev/authenticate | python -mjson.tool
-{
+<pre><code class="language-bash">curl -s -d '{&quot;token&quot;: &quot;eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImJyaWFueiIsIm9yaWdfaWF0IjoxNDY3MTMyMTgzLCJleHAiOjE0NjcyMTk2OTMsImVtYWlsIjoiYnJpYW56QGdtYWlsLmNvbSIsInNjb3BlcyI6WyJkZXZlbG9wZXIiLCJzZXJ2ZXJsZXNzLWZhbiJdfQ.A1UJOKcSfpUSuAgZoBO9g0oBtGdkrl71VtNt4F5eJZg&quot;}' \
+https://4m98c4l3i1.execute-api.us-west-2.amazonaws.com/dev/authenticate | python -mjson.tool
+</code></pre>
+
+<pre><code class="language-json">{
     &quot;errorMessage&quot;: &quot;Signature has expired&quot;,
     &quot;errorType&quot;: &quot;ExpiredSignatureError&quot;,
     &quot;stackTrace&quot;: [
@@ -727,8 +610,10 @@ curl -s -d '{&quot;token&quot;: &quot;eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c
 
 <p>Pretty cool. And how about a missing token?</p>
 
-<pre><code class="language-bash">curl -s -X POST https://4m98c4l3i1.execute-api.us-west-2.amazonaws.com/dev/authenticate | python -mjson.tool
-{
+<pre><code class="language-bash">$ curl -s -X POST https://4m98c4l3i1.execute-api.us-west-2.amazonaws.com/dev/authenticate | python -mjson.tool
+</code></pre>
+
+<pre><code class="language-json">{
     &quot;errorMessage&quot;: &quot;Mission token&quot;,
     &quot;errorType&quot;: &quot;Exception&quot;,
     &quot;stackTrace&quot;: [
@@ -750,80 +635,93 @@ the details of the stack blowing up and instead return some nicer error messages
 application. I&rsquo;ll continue developing this series and I&rsquo;m sure there will be updates as Serverless
 v1.0 evolves!</p>
 
-
-  
-<div class="prev-next-post pure-g">
-  <div class="pure-u-1-24" style="text-align: left;">
-    
-    <a href="http://blog.brianz.bz/post/serverless-part-iii/"><i class="fa fa-chevron-left"></i></a>
-    
-  </div>
-  <div class="pure-u-10-24">
-    
-    <nav class="prev">
-      <a href="http://blog.brianz.bz/post/serverless-part-iii/">Serverless part III</a>
-    </nav>
-    
-  </div>
-  <div class="pure-u-2-24">
-    &nbsp;
-  </div>
-  <div class="pure-u-10-24">
-    
-    <nav class="next">
-      <a href="http://blog.brianz.bz/post/demo-service-with-servant/">Demo service with Servant</a>
-    </nav>
-    
-  </div>
-  <div class="pure-u-1-24" style="text-align: right;">
-    
-    <a href="http://blog.brianz.bz/post/demo-service-with-servant/"><i class="fa fa-chevron-right"></i></a>
-    
-  </div>
 </div>
 
+        <footer class="post-footer clearfix">
+    
+        <p class="post-tags">
+            <span>Tagged:</span>
+            
+                 <a href="http://blog.brianz.bz/tags/aws/">aws</a>
+            
+                 <a href="http://blog.brianz.bz/tags/architecture/">architecture</a>
+            
+                 <a href="http://blog.brianz.bz/tags/serverless/">serverless</a>
+            
+        </p>
+    
 
+    <div class="share">
+        <a class="icon-twitter" href="https://twitter.com/share?text=Serverless%20part%20IV&url=http%3a%2f%2fblog.brianz.bz%2fpost%2fserverless-part-iv%2f"
+            onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+            <i class="fa fa-twitter"></i>
+            <span class="hidden">Twitter</span>
+        </a>
 
-  
-<div id="disqus_thread"></div>
+        <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http%3a%2f%2fblog.brianz.bz%2fpost%2fserverless-part-iv%2f"
+            onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+            <i class="fa fa-facebook"></i>
+            <span class="hidden">Facebook</span>
+        </a>
+
+        <a class="icon-google-plus" href="https://plus.google.com/share?url=http%3a%2f%2fblog.brianz.bz%2fpost%2fserverless-part-iv%2f"
+           onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+           <i class="fa fa-google-plus"></i>
+            <span class="hidden">Google+</span>
+        </a>
+    </div>
+</footer>
+
+        
+    <div class="comments">
+        <div id="disqus_thread"></div>
 <script type="text/javascript">
-
-(function() {
-    
-    
-    if (window.location.hostname == "localhost")
-        return;
-
-    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
     var disqus_shortname = 'brianz';
-    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-})();
+    var disqus_identifier = 'http:\/\/blog.brianz.bz\/post\/serverless-part-iv\/';
+    var disqus_title = 'Serverless part IV';
+    var disqus_url = 'http:\/\/blog.brianz.bz\/post\/serverless-part-iv\/';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
 </script>
 <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-<a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    </div>
 
-
+    </article>
 </div>
 
-</div>
-</div>
-<script src="http://blog.brianz.bzjs/ui.js"></script>
+            </div>
+        </div>
 
+        <footer class="footer">
+            <div class="container">
+                <div class="site-title-wrapper">
+                    <h1 class="site-title">
+                        <a title="Brian Z" href="http://blog.brianz.bz">Brian Z</a>
+                    </h1>
+                    <a class="button-square button-jump-top js-jump-top" href="#">
+                        <i class="fa fa-angle-up"></i>
+                    </a>
+                </div>
 
-<script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+                <p class="footer-copyright">
+                    <span>&copy; 2016 / Powered by <a href="https://gohugo.io/">Hugo</a></span>
+                </p>
+                <p class="footer-copyright">
+                    <span><a href="https://github.com/roryg/ghostwriter">Ghostwriter theme</a> By <a href="http://jollygoodthemes.com">JollyGoodThemes</a></span>
+                    <span>/ <a href="https://github.com/jbub/ghostwriter">Ported</a> to Hugo By <a href="https://github.com/jbub">jbub</a></span>
+                </p>
+            </div>
+        </footer>
 
-  ga('create', 'UA-75475240-1', 'auto');
-  ga('send', 'pageview');
-
-</script>
-
-
-
-</body>
+        <script src="http://blog.brianz.bzjs/jquery-1.11.3.min.js"></script>
+        <script src="http://blog.brianz.bzjs/highlight.min.js"></script>
+        <script src="http://blog.brianz.bzjs/jquery.fitvids.js"></script>
+        <script src="http://blog.brianz.bzjs/scripts.js"></script>
+    </body>
 </html>
 

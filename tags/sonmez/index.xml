@@ -2,12 +2,11 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Sonmez on Brian Z</title>
-    <link>http://blog.brianz.bz/tags/sonmez/</link>
+    <link>http://blog.brianz.bz/tags/sonmez/index.xml</link>
     <description>Recent content in Sonmez on Brian Z</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <copyright>&amp;copy; 2016. All rights reserved.</copyright>
-    <lastBuildDate>Thu, 07 Apr 2016 18:41:18 -0600</lastBuildDate>
+    <copyright>&amp;copy; 2016-2017. All rights reserved.</copyright>
     <atom:link href="http://blog.brianz.bz/tags/sonmez/index.xml" rel="self" type="application/rss+xml" />
     
     <item>

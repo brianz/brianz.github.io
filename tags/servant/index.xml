@@ -2,12 +2,11 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Servant on Brian Z</title>
-    <link>http://blog.brianz.bz/tags/servant/</link>
+    <link>http://blog.brianz.bz/tags/servant/index.xml</link>
     <description>Recent content in Servant on Brian Z</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <copyright>&amp;copy; 2016. All rights reserved.</copyright>
-    <lastBuildDate>Thu, 15 Sep 2016 17:41:39 -0400</lastBuildDate>
+    <copyright>&amp;copy; 2016-2017. All rights reserved.</copyright>
     <atom:link href="http://blog.brianz.bz/tags/servant/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
@@ -18,8 +17,7 @@
       <guid>http://blog.brianz.bz/post/demo-service-with-servant/</guid>
       <description>
 
-&lt;p&gt;In a &lt;a href=&#34;No page found with path or logical name &#34;introducing-servant.md&#34;.
-&#34;&gt;previous post&lt;/a&gt; I introduced and discussed
+&lt;p&gt;In a &lt;a href=&#34;http://blog.brianz.bz/post/introducing-servant/&#34;&gt;previous post&lt;/a&gt; I introduced and discussed
 about an open source library I authored called Servant. Servant is a framework for building
 RPC-style services with Python. Servant is to services as Django or Rails is to web
 applications&amp;hellip;it&amp;rsquo;s framework you&amp;rsquo;d use when you need to build a service in Python.&lt;/p&gt;
@@ -29,9 +27,9 @@ Let&amp;rsquo;s first start by writing the service.  To save some time we&amp;rs
 href=&#34;https://github.com/brianz/servant/tree/master/examples/calculator_service&#34;&gt;&lt;code&gt;calculator_service&lt;/code&gt;&lt;/a&gt;
 which is in the &lt;code&gt;examples&lt;/code&gt; directory in the Servant repository.&lt;/p&gt;
 
-&lt;h2 id=&#34;writing-the-service:ce7670bcf55e51c26ab5dc928711bf57&#34;&gt;Writing the service&lt;/h2&gt;
+&lt;h2 id=&#34;writing-the-service&#34;&gt;Writing the service&lt;/h2&gt;
 
-&lt;h3 id=&#34;boilerplate:ce7670bcf55e51c26ab5dc928711bf57&#34;&gt;Boilerplate&lt;/h3&gt;
+&lt;h3 id=&#34;boilerplate&#34;&gt;Boilerplate&lt;/h3&gt;
 
 &lt;p&gt;There are a few requirements to write a service.  I&amp;rsquo;ll start with the boring parts which is mostly
 boilerplate to get your service setup as an install-able Python package. I also suggest looking at
@@ -46,7 +44,7 @@ example, the name is &lt;code&gt;calculator_service&lt;/code&gt;.&lt;/p&gt;
 
 &lt;p&gt;From there you&amp;rsquo;ll also need a directory where your source code will live.&lt;/p&gt;
 
-&lt;h3 id=&#34;service:ce7670bcf55e51c26ab5dc928711bf57&#34;&gt;Service&lt;/h3&gt;
+&lt;h3 id=&#34;service&#34;&gt;Service&lt;/h3&gt;
 
 &lt;p&gt;Every Servant service needs an entry-point to device the endpoints which will be exposed. This is
 pretty simple&amp;hellip;create a file names &lt;code&gt;service.py&lt;/code&gt; which contains a class that subclasses
@@ -69,7 +67,7 @@ started.&lt;/p&gt;
 &lt;p&gt;In our example you can see our &lt;code&gt;calculator_service&lt;/code&gt; exposed three calculate endpoints&amp;hellip;&lt;code&gt;add&lt;/code&gt;,
 &lt;code&gt;subtract&lt;/code&gt; and &lt;code&gt;divide&lt;/code&gt;.  These will do what you&amp;rsquo;d expect.&lt;/p&gt;
 
-&lt;h3 id=&#34;actions:ce7670bcf55e51c26ab5dc928711bf57&#34;&gt;Actions&lt;/h3&gt;
+&lt;h3 id=&#34;actions&#34;&gt;Actions&lt;/h3&gt;
 
 &lt;p&gt;An &lt;code&gt;Action&lt;/code&gt; is really the meat and potatoes for a particular endpoint. You can organize your
 actions however you like&amp;hellip;one action per file, multiple actions per file, etc.  Since we&amp;rsquo;re
@@ -95,7 +93,7 @@ one-liner.  By the time your &lt;code&gt;run&lt;/code&gt; method is being execut
 and all of the required and optional fields will be available to you as class attributes.  So, our
 &lt;code&gt;run&lt;/code&gt; method simple sets the result using the two inputs we received from the client:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;def run(self, **kwargs):
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;def run(self, **kwargs):
     self.result = self.number1 + self.number2
 &lt;/code&gt;&lt;/pre&gt;
 
@@ -107,14 +105,14 @@ implemented. Being a calculator, there really isn&amp;rsquo;t much to it.  You&a
 action subclassed the add action and just overrides the &lt;code&gt;run&lt;/code&gt; method.  The &lt;code&gt;divide&lt;/code&gt; action mostly
 just changes the names of the inputs and output.&lt;/p&gt;
 
-&lt;h2 id=&#34;using-the-service:ce7670bcf55e51c26ab5dc928711bf57&#34;&gt;Using the service&lt;/h2&gt;
+&lt;h2 id=&#34;using-the-service&#34;&gt;Using the service&lt;/h2&gt;
 
 &lt;p&gt;One neat feature of Servant is the ability to run your service as a locally installed Python
 library.&lt;/p&gt;
 
 &lt;p&gt;Let&amp;rsquo;s install both Servant and the calculator service into a new virtualenv:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;$ cd path/to/servant
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;$ cd path/to/servant
 $ mkvirtualenv calculator_service
 $ pip install -e .
 $ cd examples/calculator_service
@@ -123,7 +121,7 @@ $ pip install -e .
 
 &lt;p&gt;Now that we have these installed, we can actually test our service!&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;import servant.client
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;import servant.client
 
 client = servant.client.Client(&#39;calculator_service&#39;, version=1)
 
@@ -151,7 +149,7 @@ above.  You&amp;rsquo;ll note that the client code above &lt;em&gt;only&lt;/em&g
 only reference to the &lt;code&gt;calculator_service&lt;/code&gt; is when we instantiate the &lt;code&gt;Client&lt;/code&gt; class.  There is
 only one change we need to make to the client code above to hit a remote system:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;client.configure(&#39;http&#39;, host=&#39;192.168.88.100&#39;, port=8888)
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;client.configure(&#39;http&#39;, host=&#39;192.168.88.100&#39;, port=8888)
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;We&amp;rsquo;re configuring our client to connect via &lt;code&gt;http&lt;/code&gt; to the given host and port.  Once that single

@@ -1,233 +1,110 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>Serverless 1.x &middot; </title>
+        <meta name="description" content="Since my last posts on Serverless, Serverless has gone 1.0. In fact, as of this writing Serverless is at version 1.3. I&rsquo;ve had the luck of taking 1.3 for a spin with my new job by implementing an application for the Amazon Alexa platform. Alexa has a really nice integration with Lambda and we&rsquo;ve been using Serverless to do our Lambda development. Our development pace has been insanely high and much of that can be attributed to Serverless.">
+        <meta name="HandheldFriendly" content="True">
+        <meta name="MobileOptimized" content="320">
+        <meta name="generator" content="Hugo 0.18" />
+        <meta name="robots" content="index,follow">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <link rel="stylesheet" href="http://blog.brianz.bzcss/normalize.css">
+        <link rel="stylesheet" href="http://blog.brianz.bzcss/github-gist.css">
+        <link rel="stylesheet" href="http://blog.brianz.bzcss/style.css">
+        <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,600,700,300&subset=latin,cyrillic-ext,latin-ext,cyrillic">
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    </head>
+    <body>
+        
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.15" />
-
-  <title>Serverless 1.x &middot; Brian Z</title>
-
-  
-  
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css">
-
-  <!--[if lte IE 8]>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-old-ie-min.css">
-  <![endif]-->
-  <!--[if gt IE 8]><!-->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-min.css">
-  <!--<![endif]-->
-
-  <!--[if lte IE 8]>
-  <link rel="stylesheet" href="http://blog.brianz.bz/css/side-menu-old-ie.css">
-  <![endif]-->
-  <!--[if gt IE 8]><!-->
-  <link rel="stylesheet" href="http://blog.brianz.bz/css/side-menu.css">
-  <!--<![endif]-->
-
-  <link rel="stylesheet" href="http://blog.brianz.bz/css/blackburn.css">
-
-  
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
-
-  
-  <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
-
-  
-  
-
-  
-  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.1.0/styles/androidstudio.min.css">
-  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.1.0/highlight.min.js"></script>
-  <script>hljs.initHighlightingOnLoad();</script>
-  
-
-  <link rel="shortcut icon" href="http://blog.brianz.bzimg/favicon.ico" type="image/x-icon" />
-
-</head>
+ga('create', 'UA-75475240-1', 'auto');
+ga('send', 'pageview');
+</script>
 
 
-<body>
-<div id="layout">
+        <div id="wrapper">
+            <header class="site-header">
+                <div class="container">
+                    <div class="site-title-wrapper">
+                        
+                            <h1 class="site-title">
+                                <a title="Brian Z" href="http://blog.brianz.bz">Brian Z</a>
+                            </h1>
+                        
+                        <a class="button-square" href="http://blog.brianz.bzindex.xml"><i class="fa fa-rss"></i></a>
+                        
+                            <a class="button-square button-social hint--top" data-hint="Twitter" title="Twitter" href="https://twitter.com/brianzambrano">
+                                <i class="fa fa-twitter"></i>
+                            </a>
+                        
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="Github" title="Github" href="https://github.com/brianz">
+                                <i class="fa fa-github-alt"></i>
+                            </a>
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="Stack Overflow" title="Stack Overflow" href="http://stackoverflow.com/users/87858/brianz">
+                                <i class="fa fa-stack-overflow"></i>
+                            </a>
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="LinkedIn" title="LinkedIn" href="https://www.linkedin.com/in/brianzambrano">
+                                <i class="fa fa-linkedin"></i>
+                            </a>
+                        
+                        
+                    </div>
 
-  
-<a href="#menu" id="menuLink" class="menu-link">
-  
-  <span></span>
-</a>
-<div id="menu">
-
-  
-  <a class="pure-menu-heading brand" href="http://blog.brianz.bz/">brianz</a>
-
-
-  <div class="pure-menu">
-    <ul class="pure-menu-list">
-      
-      
-        <li class="pure-menu-item">
-          <a class="pure-menu-link" href="http://blog.brianz.bz/"><i class='fa fa-home fa-fw'></i>Home</a>
-      
-        </li>
-      
-      
-        <li class="pure-menu-item">
-          <a class="pure-menu-link" href="http://blog.brianz.bz/about/"><i class='fa fa-user fa-fw'></i>About</a>
-      
-        </li>
-      
-      
-        <li class="pure-menu-item">
-          <a class="pure-menu-link" href="http://blog.brianz.bz/post/"><i class='fa fa-list fa-fw'></i>Posts</a>
-      
-        </li>
-      
-    </ul>
-  </div>
-
-  <div class="pure-menu social">
-  <ul class="pure-menu-list">
-
-    
-
-    
-
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://twitter.com/brianzambrano" target="_blank"><i class="fa fa-twitter-square fa-fw"></i>Twitter</a>
+                    <ul class="site-nav">
+                        
+    <li class="site-nav-item">
+        <a title="Home" href="http://blog.brianz.bz/">Home</a>
     </li>
-    
 
-    
-
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://facebook.com/brian.zambrano" target="_blank"><i class="fa fa-facebook-square fa-fw"></i>Facebook</a>
+    <li class="site-nav-item">
+        <a title="About" href="http://blog.brianz.bz/about/">About</a>
     </li>
-    
 
-    
-
-    
-
-    
-
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://instagram.com/bzambrano" target="_blank"><i class="fa fa-instagram fa-fw"></i>Instagram</a>
+    <li class="site-nav-item">
+        <a title="Posts" href="http://blog.brianz.bz/post/">Posts</a>
     </li>
+
+                    </ul>
+                </div>
+            </header>
+
+            <div id="container">
+
+
+<div class="container">
+    <article class="post-container" itemscope="" itemtype="http://schema.org/BlogPosting">
+        <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Serverless 1.x</h1>
+    
+    <p class="post-date">
+        <span>Published <time datetime="2016-12-21" itemprop="datePublished">Wed, Dec 21, 2016</time></span>
+        <span>by</span>
+        <span itemscope="" itemprop="author" itemtype="https://schema.org/Person">
+            <span itemprop="name">
+                <a href="" itemprop="url" rel="author"></a>
+            </span>
+        </span>
+    </p>
+</header>
+
+        <div class="post-content clearfix" itemprop="articleBody">
     
 
     
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://linkedin.com/in/brianzambrano" target="_blank"><i class="fa fa-linkedin-square fa-fw"></i>LinkedIn</a>
-    </li>
-    
-
-    
-
-    
-
-    
-
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://news.ycombinator.com/user?id=brianz" target="_blank"><i class="fa fa-hacker-news fa-fw"></i>Hacker News</a>
-    </li>
-    
-
-    
-
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://github.com/brianz" target="_blank"><i class="fa fa-github-square fa-fw"></i>GitHub</a>
-    </li>
-    
-
-    
-
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://stackoverflow.com/users/87858" target="_blank"><i class="fa fa-stack-overflow fa-fw"></i>Stack Overflow</a>
-    </li>
-    
-
-    
-
-    
-
-  </ul>
-</div>
-
-
-  <div>
-  <div class="small-print">
-    <small>&copy; 2016. All rights reserved.</small>
-  </div>
-  <div class="small-print">
-    <small>Built with&nbsp;<a href="https://gohugo.io/" target="_blank">Hugo</a></small>
-    <small>Theme&nbsp;<a href="https://github.com/yoshiharuyamashita/blackburn" target="_blank">Blackburn</a></small>
-  </div>
-</div>
-
-</div>
-
-
-  <div id="main">
-
-
-<div class="header">
-  <h1>Serverless 1.x</h1>
-  <h2></h2>
-</div>
-<div class="content">
-
-  <div class="post-meta">
-
-  <div>
-    <i class="fa fa-calendar fa-fw"></i>
-    <time>21 Dec 2016, 12:04</time>
-  </div>
-
-  
-
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-tags fa-fw"></i>
-    
-      <a class="post-taxonomy-tag" href="http://blog.brianz.bztags/aws">aws</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="http://blog.brianz.bztags/architecture">architecture</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="http://blog.brianz.bztags/serverless">serverless</a>
-    
-  </div>
-  
-  
-
-</div>
-
-  
 
 <p>Since my last posts on <a href="https://serverless.com" target="_blank">Serverless</a>, Serverless has gone 1.0. In fact, as
 of this writing Serverless is at version 1.3.  I&rsquo;ve had the luck of taking 1.3 for a spin with my
@@ -242,7 +119,7 @@ working application. In addition to changes in the Serverless library comes with
 improvements in API Gateway and Lambda themselves. The great news is that authoring a service with
 these tools is getting even easier.</p>
 
-<h1 id="setup:e88a0069bdbe5b045acd10455439b616">Setup</h1>
+<h1 id="setup">Setup</h1>
 
 <p>To get started, I like to run Serverless inside of a Docker container  Why? Because I &hearts;
 Docker and it makes switching versions <em>trivial</em> without mucking with your local system. Since I
@@ -255,7 +132,7 @@ create resources. If you do any amount of AWS work changes are you&rsquo;ll have
 <code>AWS_ACCESS_SECRET_KEY</code> on your local system. What I do is simply copy these into a file called
 <code>.env</code></p>
 
-<pre><code>env | grep AWS &gt;&gt; .env
+<pre><code class="language-bash">$ env | grep AWS &gt;&gt; .env
 </code></pre>
 
 <p>Now, I can easily inject these into my Docker container using <code>--env-file .env</code>. If you are
@@ -265,7 +142,7 @@ more details on AWS credentials if you need it.</p>
 
 <p><strong>NOTE:</strong> Code snippets will be running inside my Docker container</p>
 
-<h1 id="create-a-serverless-project:e88a0069bdbe5b045acd10455439b616">Create a Serverless project</h1>
+<h1 id="create-a-serverless-project">Create a Serverless project</h1>
 
 <p>Let&rsquo;s create a really simple Slack plugin. What we&rsquo;ll do is create an HTTP API which will reply
 with a URL to a Dilbert comic.  For example: <a href="http://dilbert.com/strip/2016-11-28" target="_blank">http://dilbert.com/strip/2016-11-28</a></p>
@@ -290,7 +167,7 @@ following:</p>
 
 <p>Let&rsquo;s create a new project. As usual, we&rsquo;ll be using Python to implement our application code:</p>
 
-<pre><code># serverless create --template aws-python --path dilbert --name dilbert                                                                                                               
+<pre><code class="language-bash">$ serverless create --template aws-python --path dilbert --name dilbert
 Serverless: Generating boilerplate...
 Serverless: Generating boilerplate in &quot;/code/dilbert&quot;
  _______                             __
@@ -306,7 +183,7 @@ Serverless: Successfully generated boilerplate for template: &quot;aws-python&qu
 
 <p>Let&rsquo;s <code>cd dilbert</code> and take a look at the files which were generated:</p>
 
-<pre><code>$ tree dilbert/
+<pre><code class="language-bash">$ tree dilbert/
 dilbert/
 ├── event.json
 ├── handler.py
@@ -316,13 +193,13 @@ dilbert/
 <p>This is very similar to previous versions of Serverless and much different at the same time.
 Previously we would have received a higher level <code>s-project.json</code> and <code>s-resources-cf.json</code> files.</p>
 
-<h1 id="setup-api-gateway:e88a0069bdbe5b045acd10455439b616">Setup API Gateway</h1>
+<h1 id="setup-api-gateway">Setup API Gateway</h1>
 
 <p>Crack open <code>serverless.yml</code> and you&rsquo;ll see the details on how your function and endpoint(s) are
 configured.  First, let&rsquo;s tune back the memory and timeout&hellip;we&rsquo;re running a very small Lambda
 function so we can tune these both back to some pretty small values.</p>
 
-<pre><code>service: dilbert
+<pre><code class="language-yaml">service: dilbert
 
 provider:
   name: aws 
@@ -340,7 +217,7 @@ hard or unclear how to define a &ldquo;service&rdquo; vs a &ldquo;function&rdquo
 created a Serverless &ldquo;service&rdquo; which can be made up of one or more &ldquo;functions&rdquo;, all sharing the
 same resources (which we&rsquo;ll get to later).</p>
 
-<pre><code>functions:
+<pre><code class="language-yaml">functions:
   hello:
     handler: handler.hello
 </code></pre>
@@ -354,7 +231,7 @@ same <code>function</code> block let&rsquo;s add an HTTP <code>GET</code> event 
 will pick this up and setup our API Gateway entry-point and wire it together with our Lambda
 function/handler:</p>
 
-<pre><code>functions:
+<pre><code class="language-yaml">functions:
   hello:
     handler: handler.hello
     events:
@@ -366,11 +243,11 @@ function/handler:</p>
 <p>Again, quite simple. Serverless is going to take this and create an API Gateway endpoint which
 responds to <code>GET</code> requests at the root.</p>
 
-<h1 id="deployment:e88a0069bdbe5b045acd10455439b616">Deployment</h1>
+<h1 id="deployment">Deployment</h1>
 
 <p>Now, let&rsquo;s deploy this and watch Serverless work its magic:</p>
 
-<pre><code>root@ae95b29ae049:/code/dilbert# sls deploy 
+<pre><code class="language-bash">root@ae95b29ae049:/code/dilbert$ sls deploy 
 Serverless: Packaging service...
 Serverless: Uploading CloudFormation file to S3...
 Serverless: Uploading service .zip file to S3 (2.19 KB)...
@@ -393,8 +270,10 @@ functions:
 
 <p>Great&hellip;let&rsquo;s hit our endpoint:</p>
 
-<pre><code>curl -s ps://cjkxszhmwi.execute-api.us-west-2.amazonaws.com/dev/ | python -mjson.tool 
-{
+<pre><code class="language-bash">$ curl -s ps://cjkxszhmwi.execute-api.us-west-2.amazonaws.com/dev/ | python -mjson.tool 
+</code></pre>
+
+<pre><code>{
     &quot;input&quot;: {
         &quot;body&quot;: null,
         &quot;headers&quot;: {
@@ -467,7 +346,7 @@ field called <code>queryStringParameters</code>. Let&rsquo;s make another reques
 and much more complicated than it should have been. Now, we get this out of the box which is really
 what we should all expect.</p>
 
-<h1 id="building-our-application:e88a0069bdbe5b045acd10455439b616">Building our application</h1>
+<h1 id="building-our-application">Building our application</h1>
 
 <p>Now that we have the boilerplate (mostly) out of the way we can focus on our actual Dilbert
 application. I won&rsquo;t cover the details of it, but instead show the finished product based on our
@@ -479,7 +358,7 @@ little spec above for the Slash commands.</p>
 
 <p>For this project, let&rsquo;s rename the function from <code>hello</code> to <code>dilbert</code> in <code>serverless.yml</code>:</p>
 
-<pre><code>functions:
+<pre><code class="language-yaml">functions:
   dilbert:
     handler: handler.dilbert
 </code></pre>
@@ -496,13 +375,13 @@ response. This requires parsing the dilbert.com page for a given day and extract
 URL. For performance reason&rsquo;s, it&rsquo;d be nice to cache this value&hellip;so let&rsquo;s put the image&rsquo;s URL in
 DynamoDB!</p>
 
-<h2 id="building-arbitrary-resources:e88a0069bdbe5b045acd10455439b616">Building arbitrary resources</h2>
+<h2 id="building-arbitrary-resources">Building arbitrary resources</h2>
 
 <p>Because Serverless uses CloudFormation to create your service it&rsquo;s possible to create and manage
 arbitrary AWS resources such as DynamoDB. For our purposes, we&rsquo;d like to create a DynamoDB table to
 cache image urls when we create our stack.</p>
 
-<pre><code>resources:
+<pre><code class="language-yaml">resources:
   Resources:
     dynamoUsersTable:
       Type: AWS::DynamoDB::Table
@@ -527,7 +406,7 @@ attributes.</p>
 application code in <code>handler.py</code>) has access.  To add the IAM policy we put this block under our
 <code>provider</code> block in <code>serverless.yml</code>:</p>
 
-<pre><code>provider:
+<pre><code class="language-yaml">provider:
   ...
   iamRoleStatements:
     - Effect: &quot;Allow&quot;
@@ -536,7 +415,7 @@ application code in <code>handler.py</code>) has access.  To add the IAM policy 
       Resource: &quot;arn:aws:dynamodb:${self:provider.region}:*:table/devDilbert&quot;
 </code></pre>
 
-<h2 id="deploying-and-iterations:e88a0069bdbe5b045acd10455439b616">Deploying and iterations</h2>
+<h2 id="deploying-and-iterations">Deploying and iterations</h2>
 
 <p>Once this is all setup we can now do another <code>sls deploy</code>. Serverless will set up our DynamoDB
 table and update our Lambda function appropriately.</p>
@@ -557,7 +436,7 @@ take a few seconds. On the other hand, <code>sls deploy function -f dilbert</cod
 current version of <code>handler.py</code> and supporting files to Lambda. This takes just a few seconds at
 most.</p>
 
-<h1 id="results:e88a0069bdbe5b045acd10455439b616">Results</h1>
+<h1 id="results">Results</h1>
 
 <p>After deployment and getting Slack configured here&rsquo;s the end result:</p>
 
@@ -565,7 +444,7 @@ most.</p>
 
 <p><img src="http://blog.brianz.bz/images/dilbert/dilbert-random.png" alt="Dilbert random in Slack" style="width: 680px;"/></p>
 
-<h1 id="summary:e88a0069bdbe5b045acd10455439b616">Summary</h1>
+<h1 id="summary">Summary</h1>
 
 <p>Serverless 1.X is much improved over the 0.X versions. I have found it to be much easier to use
 especially when collaborating with other developers. The notion of a &ldquo;service&rdquo; makes a lot of
@@ -581,74 +460,93 @@ staging server vs production server in a typical web application deployment.</p>
 few different projects.  I&rsquo;m excited to see what&rsquo;s coming next in Serverless to make application
 and microservice development even easier.</p>
 
-
-  
-<div class="prev-next-post pure-g">
-  <div class="pure-u-1-24" style="text-align: left;">
-    
-    <a href="http://blog.brianz.bz/post/demo-service-with-servant/"><i class="fa fa-chevron-left"></i></a>
-    
-  </div>
-  <div class="pure-u-10-24">
-    
-    <nav class="prev">
-      <a href="http://blog.brianz.bz/post/demo-service-with-servant/">Demo service with Servant</a>
-    </nav>
-    
-  </div>
-  <div class="pure-u-2-24">
-    &nbsp;
-  </div>
-  <div class="pure-u-10-24">
-    
-  </div>
-  <div class="pure-u-1-24" style="text-align: right;">
-    
-  </div>
 </div>
 
+        <footer class="post-footer clearfix">
+    
+        <p class="post-tags">
+            <span>Tagged:</span>
+            
+                 <a href="http://blog.brianz.bz/tags/aws/">aws</a>
+            
+                 <a href="http://blog.brianz.bz/tags/architecture/">architecture</a>
+            
+                 <a href="http://blog.brianz.bz/tags/serverless/">serverless</a>
+            
+        </p>
+    
 
+    <div class="share">
+        <a class="icon-twitter" href="https://twitter.com/share?text=Serverless%201.x&url=http%3a%2f%2fblog.brianz.bz%2fpost%2fserverless-1.0%2f"
+            onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+            <i class="fa fa-twitter"></i>
+            <span class="hidden">Twitter</span>
+        </a>
 
-  
-<div id="disqus_thread"></div>
+        <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http%3a%2f%2fblog.brianz.bz%2fpost%2fserverless-1.0%2f"
+            onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+            <i class="fa fa-facebook"></i>
+            <span class="hidden">Facebook</span>
+        </a>
+
+        <a class="icon-google-plus" href="https://plus.google.com/share?url=http%3a%2f%2fblog.brianz.bz%2fpost%2fserverless-1.0%2f"
+           onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+           <i class="fa fa-google-plus"></i>
+            <span class="hidden">Google+</span>
+        </a>
+    </div>
+</footer>
+
+        
+    <div class="comments">
+        <div id="disqus_thread"></div>
 <script type="text/javascript">
-
-(function() {
-    
-    
-    if (window.location.hostname == "localhost")
-        return;
-
-    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
     var disqus_shortname = 'brianz';
-    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-})();
+    var disqus_identifier = 'http:\/\/blog.brianz.bz\/post\/serverless-1.0\/';
+    var disqus_title = 'Serverless 1.x';
+    var disqus_url = 'http:\/\/blog.brianz.bz\/post\/serverless-1.0\/';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
 </script>
 <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-<a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    </div>
 
-
+    </article>
 </div>
 
-</div>
-</div>
-<script src="http://blog.brianz.bzjs/ui.js"></script>
+            </div>
+        </div>
 
+        <footer class="footer">
+            <div class="container">
+                <div class="site-title-wrapper">
+                    <h1 class="site-title">
+                        <a title="Brian Z" href="http://blog.brianz.bz">Brian Z</a>
+                    </h1>
+                    <a class="button-square button-jump-top js-jump-top" href="#">
+                        <i class="fa fa-angle-up"></i>
+                    </a>
+                </div>
 
-<script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+                <p class="footer-copyright">
+                    <span>&copy; 2016 / Powered by <a href="https://gohugo.io/">Hugo</a></span>
+                </p>
+                <p class="footer-copyright">
+                    <span><a href="https://github.com/roryg/ghostwriter">Ghostwriter theme</a> By <a href="http://jollygoodthemes.com">JollyGoodThemes</a></span>
+                    <span>/ <a href="https://github.com/jbub/ghostwriter">Ported</a> to Hugo By <a href="https://github.com/jbub">jbub</a></span>
+                </p>
+            </div>
+        </footer>
 
-  ga('create', 'UA-75475240-1', 'auto');
-  ga('send', 'pageview');
-
-</script>
-
-
-
-</body>
+        <script src="http://blog.brianz.bzjs/jquery-1.11.3.min.js"></script>
+        <script src="http://blog.brianz.bzjs/highlight.min.js"></script>
+        <script src="http://blog.brianz.bzjs/jquery.fitvids.js"></script>
+        <script src="http://blog.brianz.bzjs/scripts.js"></script>
+    </body>
 </html>
 

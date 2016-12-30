@@ -2,12 +2,6 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>http://blog.brianz.bz/</loc>
-    <lastmod>2016-12-21T12:04:30-07:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
     <loc>http://blog.brianz.bz/post/serverless-1.0/</loc>
     <lastmod>2016-12-21T12:04:30-07:00</lastmod>
   </url>
@@ -48,7 +42,7 @@
   </url>
   
   <url>
-    <loc>http://blog.brianz.bz/post/introducting-servant/</loc>
+    <loc>http://blog.brianz.bz/post/introducing-servant/</loc>
     <lastmod>2016-04-04T17:26:23-06:00</lastmod>
   </url>
   
@@ -65,6 +59,83 @@
   <url>
     <loc>http://blog.brianz.bz/about/</loc>
     <lastmod>2016-03-21T09:07:04-06:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://blog.brianz.bz/tags/architecture/</loc>
+    <lastmod>2016-12-21T12:04:30-07:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.brianz.bz/tags/aws/</loc>
+    <lastmod>2016-12-21T12:04:30-07:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.brianz.bz/</loc>
+    <lastmod>2016-12-21T12:04:30-07:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.brianz.bz/tags/career-development/</loc>
+    <lastmod>2016-04-07T18:41:18-06:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.brianz.bz/tags/docker/</loc>
+    <lastmod>2016-04-13T07:24:44-06:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.brianz.bz/tags/hugo/</loc>
+    <lastmod>2016-03-21T15:45:26-06:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.brianz.bz/tags/microservices/</loc>
+    <lastmod>2016-09-15T17:41:39-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.brianz.bz/post/</loc>
+    <lastmod>2016-12-21T12:04:30-07:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.brianz.bz/tags/python/</loc>
+    <lastmod>2016-09-15T17:41:39-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.brianz.bz/tags/servant/</loc>
+    <lastmod>2016-09-15T17:41:39-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.brianz.bz/tags/serverless/</loc>
+    <lastmod>2016-12-21T12:04:30-07:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.brianz.bz/tags/sonmez/</loc>
+    <lastmod>2016-04-07T18:41:18-06:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.brianz.bz/tags/</loc>
+    <priority>0</priority>
   </url>
   
 </urlset>

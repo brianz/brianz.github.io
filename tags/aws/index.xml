@@ -2,12 +2,11 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Aws on Brian Z</title>
-    <link>http://blog.brianz.bz/tags/aws/</link>
+    <link>http://blog.brianz.bz/tags/aws/index.xml</link>
     <description>Recent content in Aws on Brian Z</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <copyright>&amp;copy; 2016. All rights reserved.</copyright>
-    <lastBuildDate>Wed, 21 Dec 2016 12:04:30 -0700</lastBuildDate>
+    <copyright>&amp;copy; 2016-2017. All rights reserved.</copyright>
     <atom:link href="http://blog.brianz.bz/tags/aws/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
@@ -31,7 +30,7 @@ working application. In addition to changes in the Serverless library comes with
 improvements in API Gateway and Lambda themselves. The great news is that authoring a service with
 these tools is getting even easier.&lt;/p&gt;
 
-&lt;h1 id=&#34;setup:e88a0069bdbe5b045acd10455439b616&#34;&gt;Setup&lt;/h1&gt;
+&lt;h1 id=&#34;setup&#34;&gt;Setup&lt;/h1&gt;
 
 &lt;p&gt;To get started, I like to run Serverless inside of a Docker container  Why? Because I &amp;hearts;
 Docker and it makes switching versions &lt;em&gt;trivial&lt;/em&gt; without mucking with your local system. Since I
@@ -44,7 +43,7 @@ create resources. If you do any amount of AWS work changes are you&amp;rsquo;ll 
 &lt;code&gt;AWS_ACCESS_SECRET_KEY&lt;/code&gt; on your local system. What I do is simply copy these into a file called
 &lt;code&gt;.env&lt;/code&gt;&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;env | grep AWS &amp;gt;&amp;gt; .env
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;$ env | grep AWS &amp;gt;&amp;gt; .env
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;Now, I can easily inject these into my Docker container using &lt;code&gt;--env-file .env&lt;/code&gt;. If you are
@@ -54,7 +53,7 @@ more details on AWS credentials if you need it.&lt;/p&gt;
 
 &lt;p&gt;&lt;strong&gt;NOTE:&lt;/strong&gt; Code snippets will be running inside my Docker container&lt;/p&gt;
 
-&lt;h1 id=&#34;create-a-serverless-project:e88a0069bdbe5b045acd10455439b616&#34;&gt;Create a Serverless project&lt;/h1&gt;
+&lt;h1 id=&#34;create-a-serverless-project&#34;&gt;Create a Serverless project&lt;/h1&gt;
 
 &lt;p&gt;Let&amp;rsquo;s create a really simple Slack plugin. What we&amp;rsquo;ll do is create an HTTP API which will reply
 with a URL to a Dilbert comic.  For example: &lt;a href=&#34;http://dilbert.com/strip/2016-11-28&#34; target=&#34;_blank&#34;&gt;http://dilbert.com/strip/2016-11-28&lt;/a&gt;&lt;/p&gt;
@@ -79,7 +78,7 @@ following:&lt;/p&gt;
 
 &lt;p&gt;Let&amp;rsquo;s create a new project. As usual, we&amp;rsquo;ll be using Python to implement our application code:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;# serverless create --template aws-python --path dilbert --name dilbert                                                                                                               
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;$ serverless create --template aws-python --path dilbert --name dilbert
 Serverless: Generating boilerplate...
 Serverless: Generating boilerplate in &amp;quot;/code/dilbert&amp;quot;
  _______                             __
@@ -95,7 +94,7 @@ Serverless: Successfully generated boilerplate for template: &amp;quot;aws-pytho
 
 &lt;p&gt;Let&amp;rsquo;s &lt;code&gt;cd dilbert&lt;/code&gt; and take a look at the files which were generated:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;$ tree dilbert/
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;$ tree dilbert/
 dilbert/
 ├── event.json
 ├── handler.py
@@ -105,13 +104,13 @@ dilbert/
 &lt;p&gt;This is very similar to previous versions of Serverless and much different at the same time.
 Previously we would have received a higher level &lt;code&gt;s-project.json&lt;/code&gt; and &lt;code&gt;s-resources-cf.json&lt;/code&gt; files.&lt;/p&gt;
 
-&lt;h1 id=&#34;setup-api-gateway:e88a0069bdbe5b045acd10455439b616&#34;&gt;Setup API Gateway&lt;/h1&gt;
+&lt;h1 id=&#34;setup-api-gateway&#34;&gt;Setup API Gateway&lt;/h1&gt;
 
 &lt;p&gt;Crack open &lt;code&gt;serverless.yml&lt;/code&gt; and you&amp;rsquo;ll see the details on how your function and endpoint(s) are
 configured.  First, let&amp;rsquo;s tune back the memory and timeout&amp;hellip;we&amp;rsquo;re running a very small Lambda
 function so we can tune these both back to some pretty small values.&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;service: dilbert
+&lt;pre&gt;&lt;code class=&#34;language-yaml&#34;&gt;service: dilbert
 
 provider:
   name: aws 
@@ -129,7 +128,7 @@ hard or unclear how to define a &amp;ldquo;service&amp;rdquo; vs a &amp;ldquo;fu
 created a Serverless &amp;ldquo;service&amp;rdquo; which can be made up of one or more &amp;ldquo;functions&amp;rdquo;, all sharing the
 same resources (which we&amp;rsquo;ll get to later).&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;functions:
+&lt;pre&gt;&lt;code class=&#34;language-yaml&#34;&gt;functions:
   hello:
     handler: handler.hello
 &lt;/code&gt;&lt;/pre&gt;
@@ -143,7 +142,7 @@ same &lt;code&gt;function&lt;/code&gt; block let&amp;rsquo;s add an HTTP &lt;cod
 will pick this up and setup our API Gateway entry-point and wire it together with our Lambda
 function/handler:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;functions:
+&lt;pre&gt;&lt;code class=&#34;language-yaml&#34;&gt;functions:
   hello:
     handler: handler.hello
     events:
@@ -155,11 +154,11 @@ function/handler:&lt;/p&gt;
 &lt;p&gt;Again, quite simple. Serverless is going to take this and create an API Gateway endpoint which
 responds to &lt;code&gt;GET&lt;/code&gt; requests at the root.&lt;/p&gt;
 
-&lt;h1 id=&#34;deployment:e88a0069bdbe5b045acd10455439b616&#34;&gt;Deployment&lt;/h1&gt;
+&lt;h1 id=&#34;deployment&#34;&gt;Deployment&lt;/h1&gt;
 
 &lt;p&gt;Now, let&amp;rsquo;s deploy this and watch Serverless work its magic:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;root@ae95b29ae049:/code/dilbert# sls deploy 
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;root@ae95b29ae049:/code/dilbert$ sls deploy 
 Serverless: Packaging service...
 Serverless: Uploading CloudFormation file to S3...
 Serverless: Uploading service .zip file to S3 (2.19 KB)...
@@ -182,8 +181,10 @@ functions:
 
 &lt;p&gt;Great&amp;hellip;let&amp;rsquo;s hit our endpoint:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;curl -s ps://cjkxszhmwi.execute-api.us-west-2.amazonaws.com/dev/ | python -mjson.tool 
-{
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;$ curl -s ps://cjkxszhmwi.execute-api.us-west-2.amazonaws.com/dev/ | python -mjson.tool 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;{
     &amp;quot;input&amp;quot;: {
         &amp;quot;body&amp;quot;: null,
         &amp;quot;headers&amp;quot;: {
@@ -256,7 +257,7 @@ field called &lt;code&gt;queryStringParameters&lt;/code&gt;. Let&amp;rsquo;s mak
 and much more complicated than it should have been. Now, we get this out of the box which is really
 what we should all expect.&lt;/p&gt;
 
-&lt;h1 id=&#34;building-our-application:e88a0069bdbe5b045acd10455439b616&#34;&gt;Building our application&lt;/h1&gt;
+&lt;h1 id=&#34;building-our-application&#34;&gt;Building our application&lt;/h1&gt;
 
 &lt;p&gt;Now that we have the boilerplate (mostly) out of the way we can focus on our actual Dilbert
 application. I won&amp;rsquo;t cover the details of it, but instead show the finished product based on our
@@ -268,7 +269,7 @@ little spec above for the Slash commands.&lt;/p&gt;
 
 &lt;p&gt;For this project, let&amp;rsquo;s rename the function from &lt;code&gt;hello&lt;/code&gt; to &lt;code&gt;dilbert&lt;/code&gt; in &lt;code&gt;serverless.yml&lt;/code&gt;:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;functions:
+&lt;pre&gt;&lt;code class=&#34;language-yaml&#34;&gt;functions:
   dilbert:
     handler: handler.dilbert
 &lt;/code&gt;&lt;/pre&gt;
@@ -285,13 +286,13 @@ response. This requires parsing the dilbert.com page for a given day and extract
 URL. For performance reason&amp;rsquo;s, it&amp;rsquo;d be nice to cache this value&amp;hellip;so let&amp;rsquo;s put the image&amp;rsquo;s URL in
 DynamoDB!&lt;/p&gt;
 
-&lt;h2 id=&#34;building-arbitrary-resources:e88a0069bdbe5b045acd10455439b616&#34;&gt;Building arbitrary resources&lt;/h2&gt;
+&lt;h2 id=&#34;building-arbitrary-resources&#34;&gt;Building arbitrary resources&lt;/h2&gt;
 
 &lt;p&gt;Because Serverless uses CloudFormation to create your service it&amp;rsquo;s possible to create and manage
 arbitrary AWS resources such as DynamoDB. For our purposes, we&amp;rsquo;d like to create a DynamoDB table to
 cache image urls when we create our stack.&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;resources:
+&lt;pre&gt;&lt;code class=&#34;language-yaml&#34;&gt;resources:
   Resources:
     dynamoUsersTable:
       Type: AWS::DynamoDB::Table
@@ -316,7 +317,7 @@ attributes.&lt;/p&gt;
 application code in &lt;code&gt;handler.py&lt;/code&gt;) has access.  To add the IAM policy we put this block under our
 &lt;code&gt;provider&lt;/code&gt; block in &lt;code&gt;serverless.yml&lt;/code&gt;:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;provider:
+&lt;pre&gt;&lt;code class=&#34;language-yaml&#34;&gt;provider:
   ...
   iamRoleStatements:
     - Effect: &amp;quot;Allow&amp;quot;
@@ -325,7 +326,7 @@ application code in &lt;code&gt;handler.py&lt;/code&gt;) has access.  To add the
       Resource: &amp;quot;arn:aws:dynamodb:${self:provider.region}:*:table/devDilbert&amp;quot;
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;h2 id=&#34;deploying-and-iterations:e88a0069bdbe5b045acd10455439b616&#34;&gt;Deploying and iterations&lt;/h2&gt;
+&lt;h2 id=&#34;deploying-and-iterations&#34;&gt;Deploying and iterations&lt;/h2&gt;
 
 &lt;p&gt;Once this is all setup we can now do another &lt;code&gt;sls deploy&lt;/code&gt;. Serverless will set up our DynamoDB
 table and update our Lambda function appropriately.&lt;/p&gt;
@@ -346,7 +347,7 @@ take a few seconds. On the other hand, &lt;code&gt;sls deploy function -f dilber
 current version of &lt;code&gt;handler.py&lt;/code&gt; and supporting files to Lambda. This takes just a few seconds at
 most.&lt;/p&gt;
 
-&lt;h1 id=&#34;results:e88a0069bdbe5b045acd10455439b616&#34;&gt;Results&lt;/h1&gt;
+&lt;h1 id=&#34;results&#34;&gt;Results&lt;/h1&gt;
 
 &lt;p&gt;After deployment and getting Slack configured here&amp;rsquo;s the end result:&lt;/p&gt;
 
@@ -354,7 +355,7 @@ most.&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&#34;http://blog.brianz.bz/images/dilbert/dilbert-random.png&#34; alt=&#34;Dilbert random in Slack&#34; style=&#34;width: 680px;&#34;/&gt;&lt;/p&gt;
 
-&lt;h1 id=&#34;summary:e88a0069bdbe5b045acd10455439b616&#34;&gt;Summary&lt;/h1&gt;
+&lt;h1 id=&#34;summary&#34;&gt;Summary&lt;/h1&gt;
 
 &lt;p&gt;Serverless 1.X is much improved over the 0.X versions. I have found it to be much easier to use
 especially when collaborating with other developers. The notion of a &amp;ldquo;service&amp;rdquo; makes a lot of
@@ -411,7 +412,7 @@ different in the way it organizing things.&lt;/p&gt;
 &lt;li&gt;Creating a new API endpoint and function&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h2 id=&#34;syncing-with-the-meta-sync-plugin:c45138b3e8031bde51353796bd1f4daf&#34;&gt;Syncing with the &lt;code&gt;meta sync&lt;/code&gt; plugin&lt;/h2&gt;
+&lt;h2 id=&#34;syncing-with-the-meta-sync-plugin&#34;&gt;Syncing with the &lt;code&gt;meta sync&lt;/code&gt; plugin&lt;/h2&gt;
 
 &lt;p&gt;One issue you will quickly run in to when either working on a project with someone else &lt;em&gt;or&lt;/em&gt;
 working on your own project on different computers is that of the &lt;code&gt;_meta&lt;/code&gt; directory. If you &lt;a href=&#34;https://github.com/brianz/serverless-demo&#34; target=&#34;_blank&#34;&gt;look at
@@ -450,7 +451,7 @@ S3 bucket.&lt;/p&gt;
 original author of the project. After all, the &lt;code&gt;_meta&lt;/code&gt; directory will be created when the project
 is first brought to life, so it&amp;rsquo;ll be the responsibility of that first developer to set this up:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;root@1035dd7cffb6:/code# npm install serverless-meta-sync --save
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;root@1035dd7cffb6:/code$ npm install serverless-meta-sync --save
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;Now that the plugin is installed I just need to update the &lt;code&gt;s-project.json&lt;/code&gt; file:&lt;/p&gt;
@@ -482,23 +483,23 @@ meta sync&lt;/code&gt; commands.&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;From part iii of this series I created two stages&amp;hellip;&lt;code&gt;dev&lt;/code&gt; and
 &lt;code&gt;production&lt;/code&gt;. I authored that project on my laptop so I&amp;rsquo;ll be doing the following on that computer:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;root@5457e51bf687:/code# sls meta sync -s dev -r us-west-2
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;root@5457e51bf687:/code$ sls meta sync -s dev -r us-west-2
 Serverless: Going to sync &amp;quot;s-variables-dev-uswest2.json&amp;quot;... 
 Serverless: Creating remote copy of s-variables-dev-uswest2.json...  
 Serverless: Done  
-root@5457e51bf687:/code# sls meta sync -s production -r us-west-2
+root@5457e51bf687:/code$ sls meta sync -s production -r us-west-2
 Serverless: Creating remote copy of s-variables-production-uswest2.json...  
 Serverless: Done  
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;This is the first step in setting yourself up for development on multiple system.&lt;/p&gt;
 
-&lt;h2 id=&#34;setup-a-project-after-git-clone:c45138b3e8031bde51353796bd1f4daf&#34;&gt;Setup a project after &lt;code&gt;git clone&lt;/code&gt;&lt;/h2&gt;
+&lt;h2 id=&#34;setup-a-project-after-git-clone&#34;&gt;Setup a project after &lt;code&gt;git clone&lt;/code&gt;&lt;/h2&gt;
 
 &lt;p&gt;Now, I switch over to my iMac and clone the repo. You&amp;rsquo;d hope that you&amp;rsquo;d just be able to clone the
 repo, install packages, &lt;code&gt;sync&lt;/code&gt; the &lt;code&gt;_meta&lt;/code&gt; folder and you&amp;rsquo;d be done.  You&amp;rsquo;d be wrong.&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;brianz@gold$ git clone https://github.com/brianz/serverless-demo.git
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;brianz@gold$ git clone https://github.com/brianz/serverless-demo.git
 brianz@gold$ cd serverless-demo/
 brianz@gold(master=)$ ls -l
 total 32
@@ -520,7 +521,7 @@ drwxr-xr-x  3 brianz  staff   102 May 19 09:53 src
 &lt;p&gt;OK&amp;hellip;this is what we expect.  There isn&amp;rsquo;t a &lt;code&gt;_meta&lt;/code&gt; folder. Let&amp;rsquo;s start getting set up and see
 what happens (as a reminder I&amp;rsquo;m in a Docker container when running &lt;code&gt;sls&lt;/code&gt; aka &lt;code&gt;serverless&lt;/code&gt;):&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;root@bcdeb57d5754:/code# sls meta sync  
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;root@bcdeb57d5754:/code$ sls meta sync  
 /usr/local/lib/node_modules/serverless/node_modules/bluebird/js/release/async.js:61
         fn = function () { throw arg; };
                            ^
@@ -532,15 +533,15 @@ ServerlessError: This plugin could not be found: serverless-meta-sync
 project, aka me on my MBPro) performed an &lt;code&gt;npm install --save&lt;/code&gt; of the plugin it&amp;rsquo;ll be in our &lt;code&gt;package.json&lt;/code&gt;. As with
 any node/npm system all we&amp;rsquo;ll need to do is &lt;code&gt;npm install&lt;/code&gt;:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;root@bcdeb57d5754:/code#  npm install
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;root@bcdeb57d5754:/code$  npm install
 # snip...lots of output
 npm info ok 
-root@bcdeb57d5754:/code# 
+root@bcdeb57d5754:/code$ 
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;Now that we have met all our requirements let&amp;rsquo;s try to sync again:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;root@bcdeb57d5754:/code# sls meta sync 
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;root@bcdeb57d5754:/code$ sls meta sync 
 /usr/local/lib/node_modules/serverless/node_modules/bluebird/js/release/async.js:61
         fn = function () { throw arg; };
                            ^
@@ -568,7 +569,7 @@ recreate a few files.&lt;/p&gt;
 speed this up as needed.  Doing a &lt;code&gt;sls project init --help&lt;/code&gt; will show you all of the options you
 can use.&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;root@bcdeb57d5754:/code# sls project init
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;root@bcdeb57d5754:/code$ sls project init
  _______                             __
 |   _   .-----.----.--.--.-----.----|  .-----.-----.-----.
 |   |___|  -__|   _|  |  |  -__|   _|  |  -__|__ --|__ --|
@@ -618,7 +619,7 @@ drwxr-xr-x   3 brianz  staff   102 May 19 09:53 src/
 empty.  We&amp;rsquo;re finally at the point where we can pull down our secret variables and config which we
 previously synced using meta-sync.&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;root@bcdeb57d5754:/code# sls meta sync 
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;root@bcdeb57d5754:/code$ sls meta sync 
 Serverless: WARNING: This variable is not defined: magicVariable  
 Serverless: WARNING: This variable is not defined: region  
 Serverless: WARNING: This variable is not defined: region  
@@ -638,7 +639,7 @@ Serverless: Done
 
 &lt;p&gt;Excellent&amp;hellip;it finally worked.  At this point we&amp;rsquo;re all set to use the &lt;code&gt;dev&lt;/code&gt; stage.&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;root@bcdeb57d5754:/code# ls -l _meta/variables/
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;root@bcdeb57d5754:/code$ ls -l _meta/variables/
 total 12
 -rw-r--r-- 1 1000 staff 34 Jun 28 22:58 s-variables-common.json
 -rw-r--r-- 1 1000 staff 27 Jun 28 22:58 s-variables-dev-uswest2.json
@@ -650,7 +651,7 @@ variables file hasn&amp;rsquo;t been pulled down after our &lt;code&gt;sync&lt;/
 need to issue multiple &lt;code&gt;project init&lt;/code&gt; and sync commands for different stages/regions!&lt;/strong&gt; This is
 clunky, but at least we only need to do it once per stage:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;root@bcdeb57d5754:/code# sls project init -s production
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;root@bcdeb57d5754:/code$ sls project init -s production
 Serverless: Initializing Serverless Project...  
 Serverless: For the &amp;quot;production&amp;quot; stage, do you want to use an existing Amazon Web Services profile
 or create a new one?
@@ -676,7 +677,7 @@ Serverless: Successfully initialized project &amp;quot;serverless-demo&amp;quot;
 
 &lt;p&gt;Now that we&amp;rsquo;ve &lt;code&gt;init&#39;ed&lt;/code&gt; the production stage we can finally sync it:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;root@bcdeb57d5754:/code# sls meta sync -s production
+&lt;pre&gt;&lt;code&gt;root@bcdeb57d5754:/code$ sls meta sync -s production
 Serverless: WARNING: This variable is not defined: magicVariable  
 Serverless: WARNING: This variable is not defined: region  
 Serverless: WARNING: This variable is not defined: region  
@@ -697,7 +698,7 @@ Serverless: Done
 &lt;p&gt;Phew. In my opinion that&amp;rsquo;s a lot of work to do just to get the project in a state where you can
 start working on. I expect and hope this flow to get much easier in Serverless v1.0.&lt;/p&gt;
 
-&lt;h2 id=&#34;creating-a-new-api-endpoint:c45138b3e8031bde51353796bd1f4daf&#34;&gt;Creating a new API endpoint&lt;/h2&gt;
+&lt;h2 id=&#34;creating-a-new-api-endpoint&#34;&gt;Creating a new API endpoint&lt;/h2&gt;
 
 &lt;p&gt;Now that we&amp;rsquo;re set up on a new system let&amp;rsquo;s start the process of creating a new function. A simple
 &lt;code&gt;Hello world!&lt;/code&gt; example is quite boring, so what I&amp;rsquo;ll do is create a new endpoint which accepts a
@@ -711,7 +712,7 @@ Python library and some of our own Python code. This will demonstrate a few thin
 
 &lt;p&gt;First we&amp;rsquo;ll create the function and endpoint&amp;hellip;this is a Python 2.7 function:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;root@bcdeb57d5754:/code# sls function create src/authenticate -r python2.7
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;root@bcdeb57d5754:/code$ sls function create src/authenticate -r python2.7
 Serverless: For this new Function, would you like to create an Endpoint, Event, or just the
 Function?
   &amp;gt; Create Endpoint
@@ -727,7 +728,7 @@ Github&lt;/a&gt;.&lt;/p&gt;
 
 &lt;p&gt;There are a few things to note in order to get non-trivial functions like this one working:&lt;/p&gt;
 
-&lt;h3 id=&#34;installing-libraries:c45138b3e8031bde51353796bd1f4daf&#34;&gt;Installing libraries&lt;/h3&gt;
+&lt;h3 id=&#34;installing-libraries&#34;&gt;Installing libraries&lt;/h3&gt;
 
 &lt;p&gt;Since we&amp;rsquo;re relying on a &lt;code&gt;jwt&lt;/code&gt; library from a 3rd party we need to send that up to Lambda with our
 own function. Serverless does the work of creating a zip file of your code and any supporting
@@ -740,7 +741,7 @@ directory.  Running this script will get the &lt;code&gt;lib/&lt;/code&gt; direc
 done will you be able to move on to the next step.  &lt;em&gt;Without&lt;/em&gt; the supporting libraries installed
 and uploaded your function will throw an &lt;code&gt;ImportError&lt;/code&gt; and not execute successfully.&lt;/p&gt;
 
-&lt;h3 id=&#34;path-hacking:c45138b3e8031bde51353796bd1f4daf&#34;&gt;Path hacking&lt;/h3&gt;
+&lt;h3 id=&#34;path-hacking&#34;&gt;Path hacking&lt;/h3&gt;
 
 &lt;p&gt;With our &lt;code&gt;lib/&lt;/code&gt; directory successfully populated and uploaded with our application code we need
 to make our application code/Lambda function aware that it exists.  Remember, this is just an
@@ -762,7 +763,7 @@ function which is nested any deeper in the package structure you&amp;rsquo;ll ha
 &lt;code&gt;os.path.join&lt;/code&gt; call&amp;hellip;for example if you create a function in &lt;code&gt;authenticate/users/handler.py&lt;/code&gt; that
 function would then need to use &lt;code&gt;&amp;quot;../..lib&amp;quot; since it&#39;s two directories away from&lt;/code&gt;lib/`.&lt;/p&gt;
 
-&lt;h3 id=&#34;packaging-lib:c45138b3e8031bde51353796bd1f4daf&#34;&gt;Packaging &lt;code&gt;lib/&lt;/code&gt;&lt;/h3&gt;
+&lt;h3 id=&#34;packaging-lib&#34;&gt;Packaging &lt;code&gt;lib/&lt;/code&gt;&lt;/h3&gt;
 
 &lt;p&gt;The last thing we need to take care of is instructing Serverless to package up our &lt;code&gt;lib/&lt;/code&gt; directory
 with our handler function. This is done by mangling the &lt;code&gt;handler&lt;/code&gt; value in &lt;code&gt;s-function.json&lt;/code&gt;. In
@@ -791,24 +792,24 @@ drwxr-xr-x  4 brianz  staff  136 Jun 28 20:45 lib/
 
 &lt;p&gt;Everything you see here will wind up in our final zip file.&lt;/p&gt;
 
-&lt;h3 id=&#34;extracting-post-body:c45138b3e8031bde51353796bd1f4daf&#34;&gt;Extracting POST body&lt;/h3&gt;
+&lt;h3 id=&#34;extracting-post-body&#34;&gt;Extracting POST body&lt;/h3&gt;
 
 &lt;p&gt;Finally, there&amp;rsquo;s the work of extracting content from the actual &lt;code&gt;POST&lt;/code&gt; body and sending it over to
 the Lambda function.  This is handled by API Gateway.  Here&amp;rsquo;s the change/addition in
 &lt;code&gt;s-function.json&lt;/code&gt;:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code class=&#34;language-json&#34;&gt;  &amp;quot;requestTemplates&amp;quot;: {
-    &amp;quot;application/json&amp;quot;: {
-      &amp;quot;token&amp;quot;: &amp;quot;$input.json(&#39;$.token&#39;)&amp;quot;
-    }   
+&lt;pre&gt;&lt;code class=&#34;language-json&#34;&gt;&amp;quot;requestTemplates&amp;quot;: {
+  &amp;quot;application/json&amp;quot;: {
+    &amp;quot;token&amp;quot;: &amp;quot;$input.json(&#39;$.token&#39;)&amp;quot;
   }
+}
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;This is one of the most confusing parts of API Gateway IMO. This ends up injecting a &lt;code&gt;token&lt;/code&gt; field
 into your Lambda &lt;code&gt;event&lt;/code&gt; by extracting the &lt;code&gt;token&lt;/code&gt; field from the expected json payload in the
 &lt;code&gt;POST&lt;/code&gt;.  Our Python function can then reference this:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;    token = event.get(&#39;token&#39;, &#39;&#39;)
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;token = event.get(&#39;token&#39;, &#39;&#39;)
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;Phew! Let&amp;rsquo;s try this out. Our JWT secret for signing our tokens is simply the string &lt;code&gt;&amp;quot;secret&amp;quot;&lt;/code&gt;.
@@ -818,27 +819,32 @@ function will raise an exception which will be returned to you:&lt;/p&gt;
 
 &lt;p&gt;Here&amp;rsquo;s a valid token:&lt;/p&gt;
 
-&lt;p&gt;```bash curl -s -d &amp;lsquo;{&amp;ldquo;token&amp;rdquo;: &amp;ldquo;eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImJyaWFueiIsIm9yaWdfaWF0IjoxNDY3MTMyMTgzLCJleHAiOjE3ODI3NTIzNzIsImVtYWlsIjoiYnJpYW56QGdtYWlsLmNvbSIsInNjb3BlcyI6WyJkZXZlbG9wZXIiLCJzZXJ2ZXJsZXNzLWZhbiJdfQ.tmbOyytr0vbNdaFL0wc31SIpWw8E_xqUIDoWsXYM2do&amp;rdquo;}&amp;rsquo; &lt;a href=&#34;https://4m98c4l3i1.execute-api.us-west-2.amazonaws.com/dev/authenticate&#34; target=&#34;_blank&#34;&gt;https://4m98c4l3i1.execute-api.us-west-2.amazonaws.com/dev/authenticate&lt;/a&gt; | python -mjson.tool
-{
-    &amp;ldquo;email&amp;rdquo;: &amp;ldquo;brianz@gmail.com&amp;rdquo;,
-    &amp;ldquo;exp&amp;rdquo;: 1782752372,
-    &amp;ldquo;orig_iat&amp;rdquo;: 1467132183,
-    &amp;ldquo;scopes&amp;rdquo;: [
-        &amp;ldquo;developer&amp;rdquo;,
-        &amp;ldquo;serverless-fan&amp;rdquo;
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;$ curl -s -d &#39;{&amp;quot;token&amp;quot;: &amp;quot;eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImJyaWFueiIsIm9yaWdfaWF0IjoxNDY3MTMyMTgzLCJleHAiOjE3ODI3NTIzNzIsImVtYWlsIjoiYnJpYW56QGdtYWlsLmNvbSIsInNjb3BlcyI6WyJkZXZlbG9wZXIiLCJzZXJ2ZXJsZXNzLWZhbiJdfQ.tmbOyytr0vbNdaFL0wc31SIpWw8E_xqUIDoWsXYM2do&amp;quot;}&#39; \
+https://4m98c4l3i1.execute-api.us-west-2.amazonaws.com/dev/authenticate | python -mjson.tool
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;{
+    &amp;quot;email&amp;quot;: &amp;quot;brianz@gmail.com&amp;quot;,
+    &amp;quot;exp&amp;quot;: 1782752372,
+    &amp;quot;orig_iat&amp;quot;: 1467132183,
+    &amp;quot;scopes&amp;quot;: [
+        &amp;quot;developer&amp;quot;,
+        &amp;quot;serverless-fan&amp;quot;
     ],
-    &amp;ldquo;username&amp;rdquo;: &amp;ldquo;brianz&amp;rdquo;
-}&lt;/p&gt;
+    &amp;quot;username&amp;quot;: &amp;quot;brianz&amp;quot;
+}
+&lt;/code&gt;&lt;/pre&gt;
 
-&lt;pre&gt;&lt;code&gt;
-Neat! Generated this token by plugging in some arbitrary data at the https://jwt.io playground. Note
-that I pushed the `exp` (expires) field far in the future.
+&lt;p&gt;Neat! Generated this token by plugging in some arbitrary data at the &lt;a href=&#34;https://jwt.io&#34; target=&#34;_blank&#34;&gt;https://jwt.io&lt;/a&gt; playground. Note
+that I pushed the &lt;code&gt;exp&lt;/code&gt; (expires) field far in the future.&lt;/p&gt;
 
-Let&#39;s try an invalid signature where the `exp` field is in the past:
+&lt;p&gt;Let&amp;rsquo;s try an invalid signature where the &lt;code&gt;exp&lt;/code&gt; field is in the past:&lt;/p&gt;
 
-```bash
-curl -s -d &#39;{&amp;quot;token&amp;quot;: &amp;quot;eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImJyaWFueiIsIm9yaWdfaWF0IjoxNDY3MTMyMTgzLCJleHAiOjE0NjcyMTk2OTMsImVtYWlsIjoiYnJpYW56QGdtYWlsLmNvbSIsInNjb3BlcyI6WyJkZXZlbG9wZXIiLCJzZXJ2ZXJsZXNzLWZhbiJdfQ.A1UJOKcSfpUSuAgZoBO9g0oBtGdkrl71VtNt4F5eJZg&amp;quot;}&#39; https://4m98c4l3i1.execute-api.us-west-2.amazonaws.com/dev/authenticate | python -mjson.tool
-{
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;curl -s -d &#39;{&amp;quot;token&amp;quot;: &amp;quot;eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImJyaWFueiIsIm9yaWdfaWF0IjoxNDY3MTMyMTgzLCJleHAiOjE0NjcyMTk2OTMsImVtYWlsIjoiYnJpYW56QGdtYWlsLmNvbSIsInNjb3BlcyI6WyJkZXZlbG9wZXIiLCJzZXJ2ZXJsZXNzLWZhbiJdfQ.A1UJOKcSfpUSuAgZoBO9g0oBtGdkrl71VtNt4F5eJZg&amp;quot;}&#39; \
+https://4m98c4l3i1.execute-api.us-west-2.amazonaws.com/dev/authenticate | python -mjson.tool
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-json&#34;&gt;{
     &amp;quot;errorMessage&amp;quot;: &amp;quot;Signature has expired&amp;quot;,
     &amp;quot;errorType&amp;quot;: &amp;quot;ExpiredSignatureError&amp;quot;,
     &amp;quot;stackTrace&amp;quot;: [
@@ -878,8 +884,10 @@ curl -s -d &#39;{&amp;quot;token&amp;quot;: &amp;quot;eyJhbGciOiJIUzI1NiIsInR5cC
 
 &lt;p&gt;Pretty cool. And how about a missing token?&lt;/p&gt;
 
-&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;curl -s -X POST https://4m98c4l3i1.execute-api.us-west-2.amazonaws.com/dev/authenticate | python -mjson.tool
-{
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;$ curl -s -X POST https://4m98c4l3i1.execute-api.us-west-2.amazonaws.com/dev/authenticate | python -mjson.tool
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-json&#34;&gt;{
     &amp;quot;errorMessage&amp;quot;: &amp;quot;Mission token&amp;quot;,
     &amp;quot;errorType&amp;quot;: &amp;quot;Exception&amp;quot;,
     &amp;quot;stackTrace&amp;quot;: [
@@ -926,7 +934,7 @@ you&amp;rsquo;ll undoubtedly run into when doing real development with Serverles
 &lt;li&gt;Managing configuration with variables&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h2 id=&#34;api-gateway-stages:48f3c93668433bcff400a726b76f0ce0&#34;&gt;API Gateway Stages&lt;/h2&gt;
+&lt;h2 id=&#34;api-gateway-stages&#34;&gt;API Gateway Stages&lt;/h2&gt;
 
 &lt;p&gt;If you&amp;rsquo;re new to API Gateway and Lambda an obvious question you may ask is, &amp;ldquo;How do I setup
 different deployments for my Serverless system?&amp;rdquo;  Coming from a traditional setup most everyone
@@ -958,7 +966,7 @@ docker run --rm -it \
         -v `pwd`:/code \
         --name=slsdemo &amp;quot;bz/serverless&amp;quot; bash
 root@8941047f877c:/code# 
-root@7c84db71d474:/code/serverless-demo# sls stage create   
+root@7c84db71d474:/code/serverless-demo$ sls stage create   
 Serverless: Enter a new stage name for this project:  (dev) production
 Serverless: For the &amp;quot;production&amp;quot; stage, do you want to use an existing Amazon Web Services profile
 or create a new one?
@@ -984,7 +992,7 @@ Serverless: Successfully created stage &amp;quot;production&amp;quot;
 actually have anything behind the scenes&amp;hellip;we just have scaffolding in place so that we can deploy
 some stuff.  So, let&amp;rsquo;s deploy our existing &lt;code&gt;hello&lt;/code&gt; function and endpoint:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;root@7c84db71d474:/code/serverless-demo# sls dash deploy
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;root@7c84db71d474:/code/serverless-demo$ sls dash deploy
 Serverless: Select the assets you wish to deploy:
     hello
       &amp;gt; function - hello
@@ -1023,7 +1031,7 @@ the &lt;code&gt;production&lt;/code&gt; alias of our lambda function.&lt;/p&gt;
 Serverless docs&lt;/a&gt; and playing
 around to see for yourself what changes in the AWS console as you deploy code.&lt;/p&gt;
 
-&lt;h2 id=&#34;managing-configuration-with-variables:48f3c93668433bcff400a726b76f0ce0&#34;&gt;Managing configuration with variables&lt;/h2&gt;
+&lt;h2 id=&#34;managing-configuration-with-variables&#34;&gt;Managing configuration with variables&lt;/h2&gt;
 
 &lt;p&gt;Now that we have two different stages let&amp;rsquo;s show that they are indeed separated and can be
 controlled independently. What we&amp;rsquo;ll do is actually print out the name of the stage from our Lambda function.
@@ -1035,7 +1043,7 @@ one to use specific settings.&lt;/p&gt;
 &lt;p&gt;Crack open &lt;code&gt;s-function.json&lt;/code&gt; and grep for &lt;code&gt;environment&lt;/code&gt;&amp;hellip;you&amp;rsquo;ll see that Serverless is referencing
 three different environment variables:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;  &amp;quot;environment&amp;quot;: {
+&lt;pre&gt;&lt;code class=&#34;language-json&#34;&gt;  &amp;quot;environment&amp;quot;: {
     &amp;quot;SERVERLESS_PROJECT&amp;quot;: &amp;quot;${project}&amp;quot;,
     &amp;quot;SERVERLESS_STAGE&amp;quot;: &amp;quot;${stage}&amp;quot;,
     &amp;quot;SERVERLESS_REGION&amp;quot;: &amp;quot;${region}&amp;quot;
@@ -1047,7 +1055,7 @@ deployment. Here, the &amp;ldquo;values&amp;rdquo; are being referenced by some 
 &lt;code&gt;${thing}&lt;/code&gt; syntax.  What is actually populating the values?  The answer lies in the &lt;code&gt;_meta&lt;/code&gt;
 directory:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;brianz@gold(master=)$ ls -l
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;brianz@gold(master=)$ ls -l
 total 40
 -rw-r--r--  1 brianz  staff   34 Jun  2 15:22 s-variables-common.json
 -rw-r--r--  1 brianz  staff  220 Jun  2 15:22 s-variables-dev-uswest2.json
@@ -1060,7 +1068,7 @@ total 40
 contains some meta data about our deployments&amp;hellip;for now, we&amp;rsquo;re more interested in the
 &lt;code&gt;s-variables-production.json&lt;/code&gt; file.&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;brianz@gold(master=)$ grep stage *
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;brianz@gold(master=)$ grep stage *
 s-variables-dev.json:  &amp;quot;stage&amp;quot;: &amp;quot;dev&amp;quot;,
 s-variables-production.json:  &amp;quot;stage&amp;quot;: &amp;quot;production&amp;quot;
 &lt;/code&gt;&lt;/pre&gt;
@@ -1084,7 +1092,7 @@ contains your Function&amp;rsquo;s Environment Variables in-lined in the code.&l
 .Getting access to the values is quite easy&amp;hellip;it&amp;rsquo;s just the stock Python way of getting stuff from
 the environment Here&amp;rsquo;s the change we&amp;rsquo;ll make to get the stage name and return it in the HTML message:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;def handler(event, context):
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;def handler(event, context):
     value = os.environ.get(&#39;SERVERLESS_STAGE&#39;, &#39;&#39;)
     return &amp;quot;&amp;quot;&amp;quot;&amp;lt;html&amp;gt;
     &amp;lt;head&amp;gt;&amp;lt;/head&amp;gt;
@@ -1109,10 +1117,10 @@ when I hit the two endpoint I get what I expect:&lt;/p&gt;
 download the zip file containing your code which backs your lambda function you&amp;rsquo;ll see what your
 rewritten handler actually looks like:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;brianz@gold(master=)$ cat ~/Desktop/serverless-demo-hello-5b5a957b-4073-43fd-8b76-d315422fd269/_serverless_handler.py 
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;brianz@gold(master=)$ cat ~/Desktop/serverless-demo-hello-5b5a957b-4073-43fd-8b76-d315422fd269/_serverless_handler.py 
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;pre&gt;&lt;code&gt;import os, sys
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;import os, sys
 os.environ[&#39;SERVERLESS_PROJECT&#39;] = str(&#39;serverless-demo&#39;)
 os.environ[&#39;SERVERLESS_STAGE&#39;] = str(&#39;dev&#39;)
 os.environ[&#39;SERVERLESS_REGION&#39;] = str(&#39;us-west-2&#39;)
@@ -1126,13 +1134,13 @@ do the work of adding some configuration of our own!&lt;/p&gt;
 
 &lt;p&gt;I&amp;rsquo;m going to add another reference in &lt;code&gt;handler.py&lt;/code&gt; to a new variable:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;magic = os.environ.get(&#39;MAGIC_VARIABLE&#39;, &#39;&#39;)
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;magic = os.environ.get(&#39;MAGIC_VARIABLE&#39;, &#39;&#39;)
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;The other small change is simply putting it in the HTML output string.  I also will need to inject
 this variable into the lambda function by adding it to &lt;code&gt;s-function.json&lt;/code&gt;&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;  &amp;quot;environment&amp;quot;: {
+&lt;pre&gt;&lt;code class=&#34;language-json&#34;&gt;  &amp;quot;environment&amp;quot;: {
     &amp;quot;MAGIC_VARIABLE&amp;quot;: &amp;quot;${magicVariable}&amp;quot;,
     // existing vars
 &lt;/code&gt;&lt;/pre&gt;
@@ -1144,7 +1152,7 @@ configuration/variable files.  I&amp;rsquo;m going to add two different values&a
 deployments. Open up &lt;code&gt;s-variables-production.json&lt;/code&gt; and &lt;code&gt;s-variables-dev.json&lt;/code&gt;. The &lt;code&gt;dev&lt;/code&gt; version
 turns into this:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;{
+&lt;pre&gt;&lt;code class=&#34;language-json&#34;&gt;{
   &amp;quot;magicVariable&amp;quot;: &amp;quot;Not secret or important&amp;quot;,
   &amp;quot;stage&amp;quot;: &amp;quot;dev&amp;quot;
 }
@@ -1159,7 +1167,7 @@ both of these and see what we get:&lt;/p&gt;
 &lt;p&gt;&amp;hellip;and, &lt;code&gt;production&lt;/code&gt;
 &lt;img src=&#34;http://blog.brianz.bz/images/serverless-demo-magic-var-production.png&#34; width=&#34;800&#34;&gt;&lt;/p&gt;
 
-&lt;h2 id=&#34;conclusion:48f3c93668433bcff400a726b76f0ce0&#34;&gt;Conclusion&lt;/h2&gt;
+&lt;h2 id=&#34;conclusion&#34;&gt;Conclusion&lt;/h2&gt;
 
 &lt;p&gt;We now know how to create different deployments and control them independently. I also explained
 some of the voodoo going on behind the scenes. In Part IV I&amp;rsquo;ll cover some other features in the
@@ -1179,7 +1187,7 @@ Hopefully, we can also start building out a more interesting demo which actually
 &lt;p&gt;Following up from my &lt;a href=&#34;http://blog.brianz.bz/post/serverless-part-i/&#34; target=&#34;_blank&#34;&gt;last post about serverless&lt;/a&gt; systems, let&amp;rsquo;s do
 a walk-through of the &lt;a href=&#34;http://serverless.com&#34; target=&#34;_blank&#34;&gt;Serverless&lt;/a&gt; project.&lt;/p&gt;
 
-&lt;h2 id=&#34;getting-started:0b254221062177bc7d224c33605af89c&#34;&gt;Getting started&lt;/h2&gt;
+&lt;h2 id=&#34;getting-started&#34;&gt;Getting started&lt;/h2&gt;
 
 &lt;p&gt;As usual I&amp;rsquo;ll demo this using a Docker container. You can check out the code on Github and follow
 along: &lt;a href=&#34;https://github.com/brianz/serverless-demo&#34; target=&#34;_blank&#34;&gt;https://github.com/brianz/serverless-demo&lt;/a&gt;.&lt;/p&gt;
@@ -1192,7 +1200,7 @@ look at it yourself and change the container name if you&amp;rsquo;d like to fol
 website&lt;/a&gt;, perhaps in parallel with this blog post
 in case I have missed any details.&lt;/p&gt;
 
-&lt;h3 id=&#34;prerequisites:0b254221062177bc7d224c33605af89c&#34;&gt;Prerequisites&lt;/h3&gt;
+&lt;h3 id=&#34;prerequisites&#34;&gt;Prerequisites&lt;/h3&gt;
 
 &lt;p&gt;If you&amp;rsquo;re following along, you should create two files alongside the Makefile:&lt;/p&gt;
 
@@ -1219,18 +1227,18 @@ region=YOUR_PREFERRED_REGION(ex. us-west-2)
 output=json
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;h2 id=&#34;really-getting-started:0b254221062177bc7d224c33605af89c&#34;&gt;Really getting started&lt;/h2&gt;
+&lt;h2 id=&#34;really-getting-started&#34;&gt;Really getting started&lt;/h2&gt;
 
 &lt;p&gt;With that out of the way, fire up your container and let&amp;rsquo;s take this for a spin. To build the
 container just type &lt;code&gt;make&lt;/code&gt;.&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;brianz@bz-cconline(master)$ make
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;brianz@bz-cconline(master)$ make
 brianz@bz-cconline(master)$ # lots of output
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;After that you can start the container with &lt;code&gt;make shell&lt;/code&gt;.&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;brianz@bz-cconline(master)$ make shell
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;brianz@bz-cconline(master)$ make shell
 docker run --rm -it \
         -v `pwd`:/code \
         --name=slsdemo &amp;quot;bz/serverless&amp;quot; bash
@@ -1246,7 +1254,7 @@ Serverless is largely/completely controlled by writing and reading files on the 
 By mapping the &lt;code&gt;/code&lt;/code&gt; directory on the Docker container to our host system&amp;rsquo;s we&amp;rsquo;re ensured we
 won&amp;rsquo;t lose all of our work/files when we stop the container.&lt;/p&gt;
 
-&lt;h2 id=&#34;starting-a-project:0b254221062177bc7d224c33605af89c&#34;&gt;Starting a project&lt;/h2&gt;
+&lt;h2 id=&#34;starting-a-project&#34;&gt;Starting a project&lt;/h2&gt;
 
 &lt;p&gt;We can now start setting up a new serverless project. It&amp;rsquo;s
 important to understand that Serverless is coordinating &lt;em&gt;both&lt;/em&gt; AWS API Gateway and AWS Lambda for
@@ -1256,7 +1264,7 @@ affect your commands have on those services.&lt;/p&gt;
 
 &lt;p&gt;The first thing we&amp;rsquo;ll do is create a new project which will bootstrap the entire project.&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;root@48f5e89483ac:/code# serverless project create
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;root@48f5e89483ac:/code$ serverless project create
  _______                             __
 |   _   .-----.----.--.--.-----.----|  .-----.-----.-----.
 |   |___|  -__|   _|  |  |  -__|   _|  |  -__|__ --|__ --|
@@ -1297,7 +1305,7 @@ selecting &lt;code&gt;Create A New Profile&lt;/code&gt;. This will save your AWS
 Setting up profiles the &lt;code&gt;admin.env&lt;/code&gt; file instead references your named profile stored in your home
 directory.&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;root@48f5e89483ac:/code/serverless-demo# cat admin.env 
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;root@48f5e89483ac:/code/serverless-demo$ cat admin.env 
 AWS_DEV_PROFILE=defaultroot
 &lt;/code&gt;&lt;/pre&gt;
 
@@ -1305,8 +1313,8 @@ AWS_DEV_PROFILE=defaultroot
 name of your project. From now on you&amp;rsquo;ll need to be in this directory when executing any
 &lt;code&gt;serverless&lt;/code&gt; commands (or the alias, &lt;code&gt;sls&lt;/code&gt;). Let&amp;rsquo;s have a look inside:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;root@c477313ae84f:/code# cd serverless-demo/
-root@c477313ae84f:/code/serverless-demo# ls -l
+&lt;pre&gt;&lt;code&gt;root@c477313ae84f:/code$ cd serverless-demo/
+root@c477313ae84f:/code/serverless-demo$ ls -l
 total 16
 drwxr-xr-x 1 1000 staff  136 Apr 18 22:46 _meta
 -rw-r--r-- 1 1000 staff   35 Apr 18 22:46 admin.env
@@ -1325,7 +1333,7 @@ matching what you see in &lt;code&gt;s-resources-cf.json&lt;/code&gt;.&lt;/p&gt;
 
 &lt;p&gt;Now that we&amp;rsquo;re bootstrapped let&amp;rsquo;s get to something more fun.&lt;/p&gt;
 
-&lt;h2 id=&#34;create-a-function-and-endpoint:0b254221062177bc7d224c33605af89c&#34;&gt;Create a function and endpoint&lt;/h2&gt;
+&lt;h2 id=&#34;create-a-function-and-endpoint&#34;&gt;Create a function and endpoint&lt;/h2&gt;
 
 &lt;p&gt;Next up, we need to actually create a Lambda function. Again, remember that at this point we really
 have nothing to use..just some IAM roles.&lt;/p&gt;
@@ -1334,12 +1342,12 @@ have nothing to use..just some IAM roles.&lt;/p&gt;
 any library dependencies (which we&amp;rsquo;ll use later) and a &lt;code&gt;src&lt;/code&gt; directory which is where we&amp;rsquo;ll put our
 own source code.&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;root@c477313ae84f:/code/serverless-demo# mkdir lib src
+&lt;pre&gt;&lt;code&gt;root@c477313ae84f:/code/serverless-demo$ mkdir lib src
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;Now, we&amp;rsquo;re ready to create our own Lambda function which will be a Python 2.7 function.&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;root@c477313ae84f:/code/serverless-demo# sls function create src/hello
+&lt;pre&gt;&lt;code&gt;root@c477313ae84f:/code/serverless-demo$ sls function create src/hello
 Serverless: Please, select a runtime for this new Function
     nodejs4.3
   &amp;gt; python2.7
@@ -1364,7 +1372,7 @@ how/when it&amp;rsquo;s triggered&lt;/li&gt;
 
 &lt;p&gt;Now, we have some Python code:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;root@c477313ae84f:/code/serverless-demo# ls -l src/hello/
+&lt;pre&gt;&lt;code&gt;root@c477313ae84f:/code/serverless-demo$ ls -l src/hello/
 total 12
 -rw-r--r-- 1 1000 staff    2 Apr 18 22:53 event.json
 -rw-r--r-- 1 1000 staff  226 Apr 18 22:53 handler.py
@@ -1397,8 +1405,8 @@ Lambda&lt;/li&gt;
 
 &lt;p&gt;This function is a bit boring&amp;hellip;let&amp;rsquo;s change the return value to be more fun:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;    # stuff
-    return {&#39;message&#39;: &#39;Serverless is the future!&#39;}
+&lt;pre&gt;&lt;code&gt;# stuff
+return {&#39;message&#39;: &#39;Serverless is the future!&#39;}
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;Now, for the curious browse over to the AWS Lambda page in the AWS Console.  Note, &lt;strong&gt;your new hello
@@ -1407,14 +1415,14 @@ local system but you haven&amp;rsquo;t pushed it to AWS yet.&lt;/p&gt;
 
 &lt;p&gt;To get your code running, we need to &lt;em&gt;deploy&lt;/em&gt; it.&lt;/p&gt;
 
-&lt;h2 id=&#34;deploying-an-endpoint:0b254221062177bc7d224c33605af89c&#34;&gt;Deploying an endpoint&lt;/h2&gt;
+&lt;h2 id=&#34;deploying-an-endpoint&#34;&gt;Deploying an endpoint&lt;/h2&gt;
 
 &lt;p&gt;Now for the fun part&amp;hellip;we&amp;rsquo;re going to tell Serverless to package up our code, upload it to Lambda
 and create us a new endpoint with API Gateway.  Sounds complicated and indeed, if you did this by
 hand there are several clicks and &lt;code&gt;zip&lt;/code&gt; commands to take care of. Let&amp;rsquo;s see how easy it is with
 Serverless.&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;root@3ce920c5854d:/code/serverless-demo# sls dash deploy
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;root@3ce920c5854d:/code/serverless-demo$ sls dash deploy
  _______                             __
 |   _   .-----.----.--.--.-----.----|  .-----.-----.-----.
 |   |___|  -__|   _|  |  |  -__|   _|  |  -__|__ --|__ --|
@@ -1464,14 +1472,14 @@ upload, etc.&lt;/li&gt;
 
 &lt;p&gt;With that we get a URL&amp;hellip;let&amp;rsquo;s test it out:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;brianz@bz-cconline(master)$ curl https://4m98c4l3i1.execute-api.us-west-2.amazonaws.com/dev/hello &amp;amp;&amp;amp; echo
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;brianz@bz-cconline(master)$ curl https://4m98c4l3i1.execute-api.us-west-2.amazonaws.com/dev/hello &amp;amp;&amp;amp; echo
 {&amp;quot;message&amp;quot;: &amp;quot;Serverless is the future!&amp;quot;}
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;Nice!  You can see that it just returns a our fun message, but hot damned, it worked! Let&amp;rsquo;s add a
 &lt;code&gt;-v&lt;/code&gt; to see the details from the request:o&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;brianz@bz-cconline(master)$ curl -v https://4m98c4l3i1.execute-api.us-west-2.amazonaws.com/dev/hello &amp;amp;&amp;amp; echo
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;brianz@bz-cconline(master)$ curl -v https://4m98c4l3i1.execute-api.us-west-2.amazonaws.com/dev/hello &amp;amp;&amp;amp; echo
 *   Trying 54.192.137.191...
 * Connected to 4m98c4l3i1.execute-api.us-west-2.amazonaws.com (54.192.137.191) port 443 (#0)
 * TLS 1.2 connection using TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256
@@ -1502,11 +1510,11 @@ works quite well for us in this case since our Lambda function returned a Python
 apparently it&amp;rsquo;s getting cast to a JSON object somewhere along the way. Here is where the details of
 API Gateway come into play.  Let&amp;rsquo;s assume we wanted our API to return HTML&amp;hellip;how would we do that?&lt;/p&gt;
 
-&lt;h2 id=&#34;update-and-deploy-a-function:0b254221062177bc7d224c33605af89c&#34;&gt;Update and deploy a function&lt;/h2&gt;
+&lt;h2 id=&#34;update-and-deploy-a-function&#34;&gt;Update and deploy a function&lt;/h2&gt;
 
 &lt;p&gt;With our goal of returning HTML, let&amp;rsquo;s update our function.&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;def handler(event, context):
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;def handler(event, context):
     return &amp;quot;&amp;quot;&amp;quot;&amp;lt;html&amp;gt;
     &amp;lt;head&amp;gt;&amp;lt;/head&amp;gt;
     &amp;lt;body&amp;gt;
@@ -1526,7 +1534,7 @@ out our code with one small command and it will take mere seconds:&lt;/p&gt;
 
 &lt;p&gt;Note, some text removed for brevity:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;root@3ce920c5854d:/code/serverless-demo# sls dash deploy
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;root@3ce920c5854d:/code/serverless-demo$ sls dash deploy
 Serverless: Select the assets you wish to deploy:
     hello
       &amp;gt; function - hello
@@ -1543,7 +1551,7 @@ be larger and uploads will take slightly longer.&lt;/p&gt;
 
 &lt;p&gt;Let&amp;rsquo;s load it in browser and see what we get now!&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;&amp;quot;&amp;lt;html&amp;gt;\n    &amp;lt;head&amp;gt;&amp;lt;/head&amp;gt;\n    &amp;lt;body&amp;gt;\n        &amp;lt;h1&amp;gt;Hello from Serverless/API Gateway/Lambda&amp;lt;/h1&amp;gt;\n
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;quot;&amp;lt;html&amp;gt;\n    &amp;lt;head&amp;gt;&amp;lt;/head&amp;gt;\n    &amp;lt;body&amp;gt;\n        &amp;lt;h1&amp;gt;Hello from Serverless/API Gateway/Lambda&amp;lt;/h1&amp;gt;\n
 &amp;lt;h2&amp;gt;Event:&amp;lt;/h2&amp;gt;\n        &amp;lt;pre&amp;gt;\n            {}\n        &amp;lt;/pre&amp;gt;\n        &amp;lt;/body&amp;gt;\n    &amp;lt;/html&amp;gt;&amp;quot;
 &lt;/code&gt;&lt;/pre&gt;
 
@@ -1551,7 +1559,7 @@ be larger and uploads will take slightly longer.&lt;/p&gt;
 
 &lt;p&gt;Remember our &lt;code&gt;Content-Type&lt;/code&gt; header? Let&amp;rsquo;s see what it is now:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;brianz@bz-cconline(master)$ curl -v -s https://4m98c4l3i1.execute-api.us-west-2.amazonaws.com/dev/hello 2&amp;gt;&amp;amp;1 | grep Content-Type
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;brianz@bz-cconline(master)$ curl -v -s https://4m98c4l3i1.execute-api.us-west-2.amazonaws.com/dev/hello 2&amp;gt;&amp;amp;1 | grep Content-Type
 &amp;lt; Content-Type: application/json;charset=UTF-8
 &lt;/code&gt;&lt;/pre&gt;
 
@@ -1563,7 +1571,7 @@ need to tweak the mappings in API Gateway via the &lt;code&gt;s-function.json&lt
 the details for now mostly because I&amp;rsquo;m still figuring out exactly how these mapping work. For now,
 here are the lines you&amp;rsquo;ll need to change:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;&amp;quot;responses&amp;quot;: {
+&lt;pre&gt;&lt;code class=&#34;language-json&#34;&gt;&amp;quot;responses&amp;quot;: {
     &amp;quot;400&amp;quot;: {
     &amp;quot;statusCode&amp;quot;: &amp;quot;400&amp;quot;
 },  
@@ -1585,7 +1593,7 @@ endpoint and refresh our browser:&lt;/p&gt;
 
 &lt;p&gt;Success!&lt;/p&gt;
 
-&lt;h2 id=&#34;summary:0b254221062177bc7d224c33605af89c&#34;&gt;Summary&lt;/h2&gt;
+&lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;
 
 &lt;p&gt;Serverless is quite amazing and I&amp;rsquo;m very excited by this project. When building SAAS applications
 it&amp;rsquo;s quite obvious how much power and flexibility this gives us. Of course, there are limitations
@@ -1627,7 +1635,7 @@ process HTTP requests are managed by AWS and never exposed to you as the applica
 &lt;p&gt;As a point of clarification, there is a project named Serverless. I&amp;rsquo;ll try to differentiate the
 &lt;em&gt;term&lt;/em&gt; &amp;ldquo;serverless&amp;rdquo; from the &lt;em&gt;project&lt;/em&gt; Serverless by capitalizing the project.&lt;/p&gt;
 
-&lt;h2 id=&#34;api-gateway:16049c44302f91a3835f9f8afd5f9708&#34;&gt;API Gateway&lt;/h2&gt;
+&lt;h2 id=&#34;api-gateway&#34;&gt;API Gateway&lt;/h2&gt;
 
 &lt;p&gt;In July of 2015 &lt;a href=&#34;https://aws.amazon.com/blogs/aws/amazon-api-gateway-build-and-run-scalable-application-backends/&#34; target=&#34;_blank&#34;&gt;AWS released API
 Gateway&lt;/a&gt;
@@ -1659,7 +1667,7 @@ response in response to a query to a public URL is quite an endeavor:&lt;/p&gt;
 literally accomplish the same thing in 30 seconds. Not only that, you&amp;rsquo;ll be paying every minute
 that your EC2 instance is running, regardless of the load. With API Gateway you pay per call.&lt;/p&gt;
 
-&lt;h2 id=&#34;lambda:16049c44302f91a3835f9f8afd5f9708&#34;&gt;Lambda&lt;/h2&gt;
+&lt;h2 id=&#34;lambda&#34;&gt;Lambda&lt;/h2&gt;
 
 &lt;p&gt;So what is Lambda? &lt;a href=&#34;https://docs.aws.amazon.com/lambda/latest/dg/welcome.html&#34; target=&#34;_blank&#34;&gt;From Amazon&lt;/a&gt;:&lt;/p&gt;
 
@@ -1692,7 +1700,7 @@ it&amp;rsquo;s run. There are several beautiful things about this:&lt;/p&gt;
 &lt;li&gt;Ability to execute a Lambda from various triggers&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h2 id=&#34;api-gateway-lambda-serverless:16049c44302f91a3835f9f8afd5f9708&#34;&gt;API Gateway + Lambda == Serverless&lt;/h2&gt;
+&lt;h2 id=&#34;api-gateway-lambda-serverless&#34;&gt;API Gateway + Lambda == Serverless&lt;/h2&gt;
 
 &lt;p&gt;The confluence of API Gateway and Lambda is what serverless is all about. Above I described how
 easy it is to build a public URL which doesn&amp;rsquo;t do anything. That&amp;rsquo;s not interesting at all, but
@@ -1727,7 +1735,7 @@ single call cost a fraction of a penny. If you look at the &lt;a href=&#34;https
 Lambda&lt;/a&gt; and &lt;a href=&#34;https://aws.amazon.com/api-gateway/pricing/&#34; target=&#34;_blank&#34;&gt;pricing for
 Gateway&lt;/a&gt; you&amp;rsquo;ll get a feel for how cheap this can be.&lt;/p&gt;
 
-&lt;h2 id=&#34;serverless-project:16049c44302f91a3835f9f8afd5f9708&#34;&gt;Serverless project&lt;/h2&gt;
+&lt;h2 id=&#34;serverless-project&#34;&gt;Serverless project&lt;/h2&gt;
 
 &lt;p&gt;One of my big questions was how this fits into the normal development cycle. Sure, this is
 &lt;strong&gt;super&lt;/strong&gt; powerful, but how do I actually &lt;em&gt;use&lt;/em&gt; it in the real world. Other folks are realizing the
