@@ -7,8 +7,399 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2016-2017. All rights reserved.</copyright>
-    <lastBuildDate>Wed, 21 Dec 2016 12:04:30 -0700</lastBuildDate>
+    <lastBuildDate>Tue, 24 Jan 2017 13:05:21 -0700</lastBuildDate>
     <atom:link href="http://blog.brianz.bz/post/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Authoring Alexa Skills with Python and Lazysusan</title>
+      <link>http://blog.brianz.bz/post/alexa-with-lazysusan/</link>
+      <pubDate>Tue, 24 Jan 2017 13:05:21 -0700</pubDate>
+      
+      <guid>http://blog.brianz.bz/post/alexa-with-lazysusan/</guid>
+      <description>
+
+&lt;p&gt;Most recently at my &lt;a href=&#34;http://joinspartan.com&#34; target=&#34;_blank&#34;&gt;day job&lt;/a&gt; we were tasked with building an Amazon Alexa
+app for a client. As soon as I heard rumors that we would be doing an Alexa app I starting raising
+my hand hoping that I&amp;rsquo;d get put on this project.  If you read these blog posts it should become
+quite apparent I&amp;rsquo;m a pretty big AWS fanboy and Alexa has &lt;a href=&#34;https://aws.amazon.com/about-aws/whats-new/2015/06/create-new-voice-driven-capabilities-for-alexa-with-aws-lambda/&#34; target=&#34;_blank&#34;&gt;pretty tight integration with AWS
+Lambda&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;alexa-overview&#34;&gt;Alexa overview&lt;/h2&gt;
+
+&lt;p&gt;If you&amp;rsquo;re completely unfamiliar with Alexa it&amp;rsquo;s really quite simple from a both layperson&amp;rsquo;s and
+technical perspective.&lt;/p&gt;
+
+&lt;p&gt;Alexa is the voice platform behind the Amazon Echo, Dot and other Amazon speech devices. Regardless
+of the Amazon device you&amp;rsquo;re interacting with via speech, it all goes through the &amp;ldquo;Alexa&amp;rdquo; platform
+(as far as I know).&lt;/p&gt;
+
+&lt;p&gt;From a developer&amp;rsquo;s prospective building Alexa apps is really really easy. Alexa apps send &lt;code&gt;json&lt;/code&gt;
+to a given endpoint and expect valid Alexa &lt;code&gt;json&lt;/code&gt; in response. That&amp;rsquo;s it. Of course, there are many
+nuances and details to understand, but from a high level this is it&amp;hellip;&lt;code&gt;json&lt;/code&gt; in and &lt;code&gt;json&lt;/code&gt; out.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Note&lt;/strong&gt;: You&amp;rsquo;ll notice I said that &lt;code&gt;json&lt;/code&gt; is sent to an &amp;ldquo;endpoint&amp;rdquo;. With Alexa applications, you
+have two choices for what that endpoint may be:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;A regular ol&amp;rsquo; https webserver&lt;/li&gt;
+&lt;li&gt;A Lambda function&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;I see absolutely zero advantages to deploying an Alexa application (officially known as &amp;ldquo;Alexa
+Skills&amp;rdquo;) on your own https server. There are many things you&amp;rsquo;ll need to worry about&amp;hellip;ssl certs,
+scaling, high availability, monitoring&amp;hellip;etc. Basically, all of the things any good SAAS
+application developer would worry about when deploying a new system.&lt;/p&gt;
+
+&lt;p&gt;Due to the seamless integration with Lambda, it&amp;rsquo;s going to be the right decision 99% of
+the time when building Alexa Skills.&lt;/p&gt;
+
+&lt;p&gt;The only way I would suggest running your own server to back Alexa Skills is if your application
+code had some pretty heavy dependencies such as &lt;code&gt;numpy&lt;/code&gt; or another big and heavy requirement which
+couldn&amp;rsquo;t fit inside a Lambda function. Since Lambda support Python and Node out of the box, those
+will likely be your two choices for implementation languages/ecosystems. If you&amp;rsquo;re a real masochist
+you can run Java on Lambda. C# was recently released as a supported language as well.&lt;/p&gt;
+
+&lt;h2 id=&#34;lazysusan&#34;&gt;Lazysusan&lt;/h2&gt;
+
+&lt;p&gt;During our client engagement we would up authoring an open source Python library for authoring
+Alexa applications. We call her &lt;a href=&#34;https://github.com/spartansystems/lazysusan&#34; target=&#34;_blank&#34;&gt;Lazysusan&lt;/a&gt;. I&amp;rsquo;ll walk
+you through all of the steps in authoring a very very basic Alexa Skill.&lt;/p&gt;
+
+&lt;p&gt;I find that Python strikes a really nice balance in terms of readability, capabilities and extensibility
+for Lambda functions. There is an existing &lt;code&gt;npm&lt;/code&gt; module for Alexa skills from the Amazon teams. We
+opted to write our own in Python for the main reason that we found Python to be a much nicer and
+easier language to work with.&lt;/p&gt;
+
+&lt;h2 id=&#34;lazysusan-concept-s&#34;&gt;Lazysusan concept(s)&lt;/h2&gt;
+
+&lt;p&gt;Lazysusan has one big concept which is critical to understanding how to build your own skill&amp;hellip;that
+is, application state.&lt;/p&gt;
+
+&lt;p&gt;Lazysusan handles Alexa requests with the current logic/flow:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Look up current state&lt;/li&gt;
+&lt;li&gt;Given the current state and the user&amp;rsquo;s intent, find what the response should be&lt;/li&gt;
+&lt;li&gt;If no response can be found for user&amp;rsquo;s intent given the current state, fallback to the &lt;code&gt;default&lt;/code&gt;
+response&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;In addition to this flow of logic there are a couple of concepts to understand, notably &amp;ldquo;intent&amp;rdquo;
+and &amp;ldquo;state&amp;rdquo;. We&amp;rsquo;ll drill into these concepts below. For now, let&amp;rsquo;s look at this flow of Lazysusan
+logic as a graphic:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://blog.brianz.bz/images/lazysusan/logic-flow.png&#34; height=&#34;600&#34; align=&#34;middle&#34;&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;example-application&#34;&gt;Example application&lt;/h2&gt;
+
+&lt;p&gt;We have an example application in the Lazysusan repository. Have a look at:&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/spartansystems/lazysusan/tree/master/examples/age_difference&#34; target=&#34;_blank&#34;&gt;https://github.com/spartansystems/lazysusan/tree/master/examples/age_difference&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;I&amp;rsquo;ll walk through it fun little Alexa skill and explain how it&amp;rsquo;s built with Lazysusan.&lt;/p&gt;
+
+&lt;h2 id=&#34;state-definition-and-flow&#34;&gt;State definition and flow&lt;/h2&gt;
+
+&lt;p&gt;The key in any Lazysusan app is a yaml file which definite each response and how to handle requests
+from a given state. Remember, when a request comes in Lazysusan will figure out two things:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&amp;ldquo;What state is the user at?&amp;rdquo;&lt;/li&gt;
+&lt;li&gt;&amp;ldquo;Given this state and their intent, how should I responds?&amp;rdquo;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Here is a very simple example of a &lt;code&gt;state.yml&lt;/code&gt; file lifted from our Age Calculator example:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-yaml&#34;&gt;initialState:
+  response:
+    card:
+      type: Simple
+      title: Age Difference
+      content: &amp;gt;
+        When is your birthday?
+    outputSpeech:
+      type: PlainText
+      text: &amp;gt;
+        When is your birthday?
+    shouldEndSession: False
+  branches: &amp;amp;initialStateBranches
+    LaunchRequest: initialState
+    MyAgeIntent: !!python/name:callbacks.calc_difference
+    default: goodBye
+
+missingYear:
+  response:
+    outputSpeech:
+      type: PlainText
+      text: Please say what day, month and year you were born.
+    shouldEndSession: True
+  branches:
+    &amp;lt;&amp;lt;: *initialStateBranches
+    LaunchRequest: initialState
+
+goodBye:
+  response:
+    outputSpeech:
+      type: PlainText
+      text: &amp;gt;
+        Thanks for trying age difference, good bye.
+    shouldEndSession: True
+  branches:
+    &amp;lt;&amp;lt;: *initialStateBranches
+    LaunchRequest: initialState
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;A &amp;ldquo;session&amp;rdquo; in Alexa parlance can be a bit nebulous. By default, when a user launches your skill and
+begins interacting it there is a built-in session which is active.  This &amp;ldquo;session&amp;rdquo; is nothing more
+than some data sent to your Lambda function in the &lt;code&gt;json&lt;/code&gt; payload.
+As long as the user is
+interacting with your skill and the blue light ring on top of the device is illuminated, the
+session is active. If the user doesn&amp;rsquo;t respond at all or reaches the &amp;ldquo;end&amp;rdquo; of the skill, the
+session will be killed.&lt;/p&gt;
+
+&lt;p&gt;Think of an Alexa session as a conversation with a real person&amp;hellip;provided you keep the
+conversation going, the session is active.  Now imagine during a real conversation you simply walk
+out the door leaving your conversational partner standing there alone. Your conversation has ended
+and the session is now over. Or, imagine the other party in the conversation bluntly ends the
+chat&amp;hellip;&amp;ldquo;I&amp;rsquo;m sorry, but I have to go. Goodbye&amp;rdquo;. This is exactly how a session may end with Alexa.
+You may simple decide you&amp;rsquo;re done and not reply or the other party may call it quits.&lt;/p&gt;
+
+&lt;p&gt;So, let&amp;rsquo;s define &lt;code&gt;state&lt;/code&gt; is in Lazysusan parlance.  State is nothing more than a current location
+in your Alexa Skill &amp;ldquo;flow&amp;rdquo;. In concrete terms, &amp;ldquo;state&amp;rdquo; will simple be the name of the top-level
+keys in your &lt;code&gt;states.yml&lt;/code&gt; file. In our example above there are three possible states:
+&lt;code&gt;initialState&lt;/code&gt;, &lt;code&gt;missingYear&lt;/code&gt; and &lt;code&gt;goodBye&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;In our example, we&amp;rsquo;ll ask a simple question to the user and provide a (somewhat) simple response
+given their input intent:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;User: &amp;ldquo;Open age calculator&amp;rdquo;&lt;/li&gt;
+&lt;li&gt;Alexa: &amp;ldquo;When is your birthday?&amp;rdquo;&lt;/li&gt;
+&lt;li&gt;U: Jan 12, 1972&lt;/li&gt;
+&lt;li&gt;A: &amp;ldquo;You are 45 years, 11 days old, &amp;hellip;.&amp;rdquo;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;intents&#34;&gt;Intents&lt;/h3&gt;
+
+&lt;p&gt;I will keep the explanation of &amp;ldquo;intent&amp;rdquo; brief since there is &lt;a href=&#34;https://developer.amazon.com/public/solutions/alexa/alexa-skills-kit/docs/alexa-skills-kit-interaction-model-reference&#34; target=&#34;_blank&#34;&gt;lots of documentation about it on the
+Alexa developer
+site&lt;/a&gt;.
+For this post it&amp;rsquo;s still important to understand it from a high level.&lt;/p&gt;
+
+&lt;p&gt;When defining the interaction model of your Alexa Skill in the Alexa developer portal  you will map
+natural language phrases to intents. For example, &amp;ldquo;My phone number if 555-1212&amp;rdquo; may map to
+something you define as &lt;code&gt;MyPhoneNumberIntent&lt;/code&gt;.  Your Alexa skill will receive a &lt;code&gt;json&lt;/code&gt; payload that
+literally has the &lt;code&gt;MyPhoneNumberIntent&lt;/code&gt; string included in it.  Given you know what the user&amp;rsquo;s
+intent is, you can make some decisions via application code on how to respond.&lt;/p&gt;
+
+&lt;p&gt;Of course there are many details around using and defining intents so I&amp;rsquo;d encourage you to read the
+Amazon docs for more information.&lt;/p&gt;
+
+&lt;h3 id=&#34;initial-state&#34;&gt;Initial state&lt;/h3&gt;
+
+&lt;p&gt;Upon the first request, there is no session to speak of. In that scenario, Lazysusan will look for
+a key in your yaml file named &lt;code&gt;initialState&lt;/code&gt;.  Alexa apps are often launched with a phrase which will
+trigger a &lt;code&gt;LaunchRequest&lt;/code&gt;. This is exactly what we&amp;rsquo;ve done here with the phrase, &lt;code&gt;Open age
+calculator&lt;/code&gt;.  So, we are:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;In &lt;code&gt;initialState&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Receiving a &lt;code&gt;LaunchRequest&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;With those to pieces of information, Lazysusan will look up the &lt;code&gt;LaunchRequest&lt;/code&gt; key in the list of
+&lt;code&gt;branches&lt;/code&gt; in the &lt;code&gt;initialState&lt;/code&gt; block.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-yaml&#34;&gt;initialState:
+  # snip
+  branches: &amp;amp;initialStateBranches
+    LaunchRequest: initialState
+    MyAgeIntent: !!python/name:callbacks.calc_difference
+    default: goodBye
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;As you can see in the yaml above, &lt;code&gt;LaunchRequest&lt;/code&gt; simply points back
+to the &lt;code&gt;initialState&lt;/code&gt; block which contains a fully valid Alexa response in yaml.  Lazysusan will
+take this content verbatim, convert it into json and sent it back to Alexa.&lt;/p&gt;
+
+&lt;h3 id=&#34;response-after-initial-state&#34;&gt;Response after initial state&lt;/h3&gt;
+
+&lt;p&gt;The user has received a question, responded and the session is still active. What happens next?
+The user responded with a date which triggers a &lt;code&gt;MyAgeIntent&lt;/code&gt; from the Alexa platform. So, we are now:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;In &lt;code&gt;initialState&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Receiving a &lt;code&gt;MyAgeIntent&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;With those to pieces of information, Lazysusan will look up the &lt;code&gt;MyAgeIntent&lt;/code&gt; key the list of
+&lt;code&gt;branches&lt;/code&gt; in the &lt;code&gt;initialState&lt;/code&gt; block. Looking at the &lt;code&gt;branches&lt;/code&gt; list above we can see how
+Lazysusan will determine the response.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-yaml&#34;&gt;    MyAgeIntent: !!python/name:callbacks.calc_difference
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This is a magical little part of the &lt;a href=&#34;http://pyyaml.org/wiki/PyYAMLDocumentation&#34; target=&#34;_blank&#34;&gt;PyYAML&lt;/a&gt; package.
+Here, &lt;code&gt;MyAgeIntent&lt;/code&gt; is literally pointing to a Python function. If Lazysusan encounters a callable
+object/function in &lt;code&gt;states.yml&lt;/code&gt; it will call that function with six arguments (you can see those
+arguments &lt;a href=&#34;https://github.com/spartansystems/lazysusan/blob/master/lazysusan/app.py#L70&#34; target=&#34;_blank&#34;&gt;in the &lt;code&gt;app.py&lt;/code&gt;
+file&lt;/a&gt;).&lt;/p&gt;
+
+&lt;p&gt;For the
+purposes of this blog post, it&amp;rsquo;s not super critical to understand all the permutations or arguments
+passed into a callback&amp;hellip;what is important is knowing:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;you can build completely 100% dynamic responses using this callback mechanism&lt;/li&gt;
+&lt;li&gt;you can return either :
+
+&lt;ul&gt;
+&lt;li&gt;the name of the next response key as a string which will be looked up in &lt;code&gt;states.yml&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;an actual response using &lt;code&gt;helpers/build_response&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;If you look at the source code for this example, we are doing a bunch of fancy date math (made
+harder due to leap years, of course) and returning a response with a helper function appropriately
+called, &lt;code&gt;build_response&lt;/code&gt;.&lt;/p&gt;
+
+&lt;h2 id=&#34;walking-through-a-callback&#34;&gt;Walking through a callback&lt;/h2&gt;
+
+&lt;p&gt;Let&amp;rsquo;s take a look at the callback function which Lazysusan invokes when a &lt;code&gt;MyAgeIntent&lt;/code&gt; is
+encountered during an Alexa request:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;def calc_difference(**kwargs):
+    request = kwargs[&amp;quot;request&amp;quot;]
+    session = kwargs[&amp;quot;session&amp;quot;]
+    state_machine = kwargs[&amp;quot;state_machine&amp;quot;]
+    log = get_logger()
+
+    date_string = request.get_slot_value(&amp;quot;dob&amp;quot;)
+    if not date_string:
+        log.error(&amp;quot;Could not find date in slots&amp;quot;)
+        return &amp;quot;goodBye&amp;quot;
+
+    if date_string.startswith(&#39;XXXX-&#39;):
+        return &amp;quot;missingYear&amp;quot;
+
+    now = datetime.now()
+
+    dob = get_dob_from_date_string(date_string)
+    if not is_valid_day(dob):
+        return &amp;quot;invalidDate&amp;quot;
+
+    age = get_age_from_dob(dob, now)
+
+    # First get a breakdown of how old user is in years, months, days
+    msg = age_breakdown(age)
+
+    # next figure out the days until the users next birthday
+    msg += &amp;quot;%s&amp;quot; % (days_until_birthday(dob, now), )
+
+    # finally add whether we&#39;re older or younger than the last user
+    msg += &amp;quot;%s&amp;quot; % (last_user_difference(session, dob), )
+
+    session.set(DOB_KEY, dob.toordinal())
+
+    response_dict = build_response(&amp;quot;ageResponse&amp;quot;, msg, state_machine)
+    return build_response_payload(response_dict, session.get_state_params())
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We won&amp;rsquo;t go through every line, but a few things worth noting:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;There are currently six &lt;code&gt;kwargs&lt;/code&gt; which are passed into a callback from Lazysusan. Here, we really
+only care about three of those and get them out of the &lt;code&gt;kwargs&lt;/code&gt; dictionary.&lt;/li&gt;
+&lt;li&gt;You&amp;rsquo;ll notice three different places where some error checking is performed. If the error
+condition in triggered you&amp;rsquo;ll see some return statements, such as:&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;if date_string.startswith(&#39;XXXX-&#39;):
+    return &amp;quot;missingYear&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;When a string is returned from a callback, Lazysusan assumes this is a key to a response in
+&lt;code&gt;states.yml&lt;/code&gt;. If the error above was triggered the response would be synthesized from the
+&lt;code&gt;missingYear&lt;/code&gt; text above:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-yaml&#34;&gt;text: Please say what day, month and year you were born.
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;As a reminder, the structure of yaml file for responses is completely driven by the required format
+for an alexa response. There is zero translation / mutation done by Lazysusan&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;One of the objects you have access to is a &lt;code&gt;session&lt;/code&gt; object. In the call to &lt;code&gt;session.set&lt;/code&gt; above we
+are shoving a value into the session for the &lt;code&gt;DOB_KEY&lt;/code&gt; value. You may use the session however you
+see fit&amp;hellip;it&amp;rsquo;s simply a key-value store provided for your use.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;deployment-and-management&#34;&gt;Deployment and management&lt;/h2&gt;
+
+&lt;p&gt;It may come as no big surprise that we opted to use &lt;a href=&#34;https://serverless.com&#34; target=&#34;_blank&#34;&gt;Serverless&lt;/a&gt; for
+managing out Lambda functions and other dependencies. This ended up being a really great choice
+since Serverless will manage not only your Lambda functions but anything else that  is supported by
+CloudFormation (which is almost everything).&lt;/p&gt;
+
+&lt;p&gt;During our client engagement an &lt;code&gt;sls deploy&lt;/code&gt; would create, update or manage:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Cloudwatch alarms for DynamoDB&lt;/li&gt;
+&lt;li&gt;Cloudwatch alarms for Lambda function&lt;/li&gt;
+&lt;li&gt;DynamoDB table&lt;/li&gt;
+&lt;li&gt;DynamoDB table IOPs provisioning&lt;/li&gt;
+&lt;li&gt;IAM roles for DynamoDB table access&lt;/li&gt;
+&lt;li&gt;Lambda function for Alexa&lt;/li&gt;
+&lt;li&gt;SNS topic&lt;/li&gt;
+&lt;li&gt;SNS topic subscriptions&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;As of this writing managing Alexa Skills isn&amp;rsquo;t nearly as easy.  The only way to manage your
+interaction model and overall configuration is to fire up developer.amazon.com and plug things in
+manually.  I know that Amazon is working on driving configuration of Alexa Skills programatically
+but it&amp;rsquo;s currently not there.&lt;/p&gt;
+
+&lt;p&gt;We&amp;rsquo;ve published a Docker image which has all of the requirement for writing Lazysusan applications
+and managing them with Serverless:&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://hub.docker.com/r/joinspartan/serverless/&#34; target=&#34;_blank&#34;&gt;https://hub.docker.com/r/joinspartan/serverless/&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;final-results&#34;&gt;Final results&lt;/h2&gt;
+
+&lt;p&gt;Here&amp;rsquo;s a little recording of the demo skill.  As you can hear, there are a lot of calculated valued
+returned from the user&amp;rsquo;s input. This shows the flexibility of the callback mechanism we&amp;rsquo;ve
+implemented.&lt;/p&gt;
+
+&lt;p&gt;&lt;audio controls src=&#34;http://blog.brianz.bz/audio/age-calculator.mp3&#34; type=&#34;audio/mpeg&#34;&gt;
+Your user agent does not support the HTML5 Audio element.
+&lt;/audio&gt;&lt;/p&gt;
+
+&lt;p&gt;Lazysusan provides other options to make building Alexa skills easier and more sophisticated
+including:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Pluggable support for using DynamoDB as a session store. This enables sessions to persist for
+longer than the standard eight seconds&lt;/li&gt;
+&lt;li&gt;TTL support for sessions when using DynamoDB as a session store&lt;/li&gt;
+&lt;li&gt;Support for restarting audio from the last stopped/paused position&lt;/li&gt;
+&lt;li&gt;Marking a location in &lt;code&gt;states.yml&lt;/code&gt; as &lt;strong&gt;not&lt;/strong&gt; being a state to track. This is critical when
+receiving callbacks from Alexa during audio playback.&lt;/li&gt;
+&lt;li&gt;Configurable logging levels to see request/responses in Cloudwatch&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;conclusion&#34;&gt;Conclusion&lt;/h2&gt;
+
+&lt;p&gt;Lazysusan makes building Alexa apps really really simple. In a future post I&amp;rsquo;ll drill into some
+more detail around the apis and things you may need to be aware of.&lt;/p&gt;
+
+&lt;p&gt;We&amp;rsquo;ve developed a few example applications which can be found &lt;a href=&#34;https://github.com/spartansystems/lazysusan/tree/master/examples&#34; target=&#34;_blank&#34;&gt;in the examples directory in our
+Github repository&lt;/a&gt;. These are
+great places to start exploring if you&amp;rsquo;d like to take Lazysusan for a spin or have a better
+understanding of what the application code looks like.  These examples show a somewhat complex
+skill such as the age calculator and some others which are driven almost exclusively from the
+&lt;code&gt;states.yml&lt;/code&gt; file with very very little Python code.&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Serverless 1.x</title>

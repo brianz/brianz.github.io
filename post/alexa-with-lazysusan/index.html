@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>Authoring Alexa Skills with Python and Lazysusan &middot; Brian Zambrano</title>
+        <meta name="description" content="Most recently at my day job we were tasked with building an Amazon Alexa app for a client. As soon as I heard rumors that we would be doing an Alexa app I starting raising my hand hoping that I&rsquo;d get put on this project. If you read these blog posts it should become quite apparent I&rsquo;m a pretty big AWS fanboy and Alexa has pretty tight integration with AWS Lambda">
+        <meta name="HandheldFriendly" content="True">
+        <meta name="MobileOptimized" content="320">
+        <meta name="generator" content="Hugo 0.18.1" />
+        <meta name="robots" content="index,follow">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <link rel="stylesheet" href="http://blog.brianz.bz/css/normalize.css">
+        <link rel="stylesheet" href="http://blog.brianz.bz/css/github-gist.css">
+        <link rel="stylesheet" href="http://blog.brianz.bz/css/style.css">
+        <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,600,700,300&subset=latin,cyrillic-ext,latin-ext,cyrillic">
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    </head>
+    <body>
+        
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-75475240-1', 'auto');
+ga('send', 'pageview');
+</script>
+
+
+        <div id="wrapper">
+            <header class="site-header">
+                <div class="container">
+                    <div class="site-title-wrapper">
+                        
+                            <h1 class="site-title">
+                                <a title="Brian Z" href="http://blog.brianz.bz/">Brian Z</a>
+                            </h1>
+                        
+                        <a class="button-square" href="http://blog.brianz.bz/index.xml"><i class="fa fa-rss"></i></a>
+                        
+                            <a class="button-square button-social hint--top" data-hint="Twitter" title="Twitter" href="https://twitter.com/brianzambrano">
+                                <i class="fa fa-twitter"></i>
+                            </a>
+                        
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="Github" title="Github" href="https://github.com/brianz">
+                                <i class="fa fa-github-alt"></i>
+                            </a>
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="Stack Overflow" title="Stack Overflow" href="http://stackoverflow.com/users/87858/brianz">
+                                <i class="fa fa-stack-overflow"></i>
+                            </a>
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="LinkedIn" title="LinkedIn" href="https://www.linkedin.com/in/brianzambrano">
+                                <i class="fa fa-linkedin"></i>
+                            </a>
+                        
+                        
+                    </div>
+
+                    <ul class="site-nav">
+                        
+    <li class="site-nav-item">
+        <a title="Home" href="http://blog.brianz.bz/">Home</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="About" href="http://blog.brianz.bz/about/">About</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="Posts" href="http://blog.brianz.bz/post/">Posts</a>
+    </li>
+
+                    </ul>
+                </div>
+            </header>
+
+            <div id="container">
+
+
+<div class="container">
+    <article class="post-container" itemscope="" itemtype="http://schema.org/BlogPosting">
+        <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Authoring Alexa Skills with Python and Lazysusan</h1>
+    
+    <p class="post-date">
+        <span>Published <time datetime="2017-01-24" itemprop="datePublished">Tue, Jan 24, 2017</time></span>
+        <span>by</span>
+        <span itemscope="" itemprop="author" itemtype="https://schema.org/Person">
+            <span itemprop="name">
+                <a href="" itemprop="url" rel="author">Brian Zambrano</a>
+            </span>
+        </span>
+    </p>
+</header>
+
+        <div class="post-content clearfix" itemprop="articleBody">
+    
+
+    
+
+<p>Most recently at my <a href="http://joinspartan.com" target="_blank">day job</a> we were tasked with building an Amazon Alexa
+app for a client. As soon as I heard rumors that we would be doing an Alexa app I starting raising
+my hand hoping that I&rsquo;d get put on this project.  If you read these blog posts it should become
+quite apparent I&rsquo;m a pretty big AWS fanboy and Alexa has <a href="https://aws.amazon.com/about-aws/whats-new/2015/06/create-new-voice-driven-capabilities-for-alexa-with-aws-lambda/" target="_blank">pretty tight integration with AWS
+Lambda</a></p>
+
+<h2 id="alexa-overview">Alexa overview</h2>
+
+<p>If you&rsquo;re completely unfamiliar with Alexa it&rsquo;s really quite simple from a both layperson&rsquo;s and
+technical perspective.</p>
+
+<p>Alexa is the voice platform behind the Amazon Echo, Dot and other Amazon speech devices. Regardless
+of the Amazon device you&rsquo;re interacting with via speech, it all goes through the &ldquo;Alexa&rdquo; platform
+(as far as I know).</p>
+
+<p>From a developer&rsquo;s prospective building Alexa apps is really really easy. Alexa apps send <code>json</code>
+to a given endpoint and expect valid Alexa <code>json</code> in response. That&rsquo;s it. Of course, there are many
+nuances and details to understand, but from a high level this is it&hellip;<code>json</code> in and <code>json</code> out.</p>
+
+<p><strong>Note</strong>: You&rsquo;ll notice I said that <code>json</code> is sent to an &ldquo;endpoint&rdquo;. With Alexa applications, you
+have two choices for what that endpoint may be:</p>
+
+<ul>
+<li>A regular ol&rsquo; https webserver</li>
+<li>A Lambda function</li>
+</ul>
+
+<p>I see absolutely zero advantages to deploying an Alexa application (officially known as &ldquo;Alexa
+Skills&rdquo;) on your own https server. There are many things you&rsquo;ll need to worry about&hellip;ssl certs,
+scaling, high availability, monitoring&hellip;etc. Basically, all of the things any good SAAS
+application developer would worry about when deploying a new system.</p>
+
+<p>Due to the seamless integration with Lambda, it&rsquo;s going to be the right decision 99% of
+the time when building Alexa Skills.</p>
+
+<p>The only way I would suggest running your own server to back Alexa Skills is if your application
+code had some pretty heavy dependencies such as <code>numpy</code> or another big and heavy requirement which
+couldn&rsquo;t fit inside a Lambda function. Since Lambda support Python and Node out of the box, those
+will likely be your two choices for implementation languages/ecosystems. If you&rsquo;re a real masochist
+you can run Java on Lambda. C# was recently released as a supported language as well.</p>
+
+<h2 id="lazysusan">Lazysusan</h2>
+
+<p>During our client engagement we would up authoring an open source Python library for authoring
+Alexa applications. We call her <a href="https://github.com/spartansystems/lazysusan" target="_blank">Lazysusan</a>. I&rsquo;ll walk
+you through all of the steps in authoring a very very basic Alexa Skill.</p>
+
+<p>I find that Python strikes a really nice balance in terms of readability, capabilities and extensibility
+for Lambda functions. There is an existing <code>npm</code> module for Alexa skills from the Amazon teams. We
+opted to write our own in Python for the main reason that we found Python to be a much nicer and
+easier language to work with.</p>
+
+<h2 id="lazysusan-concept-s">Lazysusan concept(s)</h2>
+
+<p>Lazysusan has one big concept which is critical to understanding how to build your own skill&hellip;that
+is, application state.</p>
+
+<p>Lazysusan handles Alexa requests with the current logic/flow:</p>
+
+<ul>
+<li>Look up current state</li>
+<li>Given the current state and the user&rsquo;s intent, find what the response should be</li>
+<li>If no response can be found for user&rsquo;s intent given the current state, fallback to the <code>default</code>
+response</li>
+</ul>
+
+<p>In addition to this flow of logic there are a couple of concepts to understand, notably &ldquo;intent&rdquo;
+and &ldquo;state&rdquo;. We&rsquo;ll drill into these concepts below. For now, let&rsquo;s look at this flow of Lazysusan
+logic as a graphic:</p>
+
+<p><img src="http://blog.brianz.bz/images/lazysusan/logic-flow.png" height="600" align="middle"></p>
+
+<h2 id="example-application">Example application</h2>
+
+<p>We have an example application in the Lazysusan repository. Have a look at:</p>
+
+<p><a href="https://github.com/spartansystems/lazysusan/tree/master/examples/age_difference" target="_blank">https://github.com/spartansystems/lazysusan/tree/master/examples/age_difference</a></p>
+
+<p>I&rsquo;ll walk through it fun little Alexa skill and explain how it&rsquo;s built with Lazysusan.</p>
+
+<h2 id="state-definition-and-flow">State definition and flow</h2>
+
+<p>The key in any Lazysusan app is a yaml file which definite each response and how to handle requests
+from a given state. Remember, when a request comes in Lazysusan will figure out two things:</p>
+
+<ul>
+<li>&ldquo;What state is the user at?&rdquo;</li>
+<li>&ldquo;Given this state and their intent, how should I responds?&rdquo;</li>
+</ul>
+
+<p>Here is a very simple example of a <code>state.yml</code> file lifted from our Age Calculator example:</p>
+
+<pre><code class="language-yaml">initialState:
+  response:
+    card:
+      type: Simple
+      title: Age Difference
+      content: &gt;
+        When is your birthday?
+    outputSpeech:
+      type: PlainText
+      text: &gt;
+        When is your birthday?
+    shouldEndSession: False
+  branches: &amp;initialStateBranches
+    LaunchRequest: initialState
+    MyAgeIntent: !!python/name:callbacks.calc_difference
+    default: goodBye
+
+missingYear:
+  response:
+    outputSpeech:
+      type: PlainText
+      text: Please say what day, month and year you were born.
+    shouldEndSession: True
+  branches:
+    &lt;&lt;: *initialStateBranches
+    LaunchRequest: initialState
+
+goodBye:
+  response:
+    outputSpeech:
+      type: PlainText
+      text: &gt;
+        Thanks for trying age difference, good bye.
+    shouldEndSession: True
+  branches:
+    &lt;&lt;: *initialStateBranches
+    LaunchRequest: initialState
+</code></pre>
+
+<p>A &ldquo;session&rdquo; in Alexa parlance can be a bit nebulous. By default, when a user launches your skill and
+begins interacting it there is a built-in session which is active.  This &ldquo;session&rdquo; is nothing more
+than some data sent to your Lambda function in the <code>json</code> payload.
+As long as the user is
+interacting with your skill and the blue light ring on top of the device is illuminated, the
+session is active. If the user doesn&rsquo;t respond at all or reaches the &ldquo;end&rdquo; of the skill, the
+session will be killed.</p>
+
+<p>Think of an Alexa session as a conversation with a real person&hellip;provided you keep the
+conversation going, the session is active.  Now imagine during a real conversation you simply walk
+out the door leaving your conversational partner standing there alone. Your conversation has ended
+and the session is now over. Or, imagine the other party in the conversation bluntly ends the
+chat&hellip;&ldquo;I&rsquo;m sorry, but I have to go. Goodbye&rdquo;. This is exactly how a session may end with Alexa.
+You may simple decide you&rsquo;re done and not reply or the other party may call it quits.</p>
+
+<p>So, let&rsquo;s define <code>state</code> is in Lazysusan parlance.  State is nothing more than a current location
+in your Alexa Skill &ldquo;flow&rdquo;. In concrete terms, &ldquo;state&rdquo; will simple be the name of the top-level
+keys in your <code>states.yml</code> file. In our example above there are three possible states:
+<code>initialState</code>, <code>missingYear</code> and <code>goodBye</code>.</p>
+
+<p>In our example, we&rsquo;ll ask a simple question to the user and provide a (somewhat) simple response
+given their input intent:</p>
+
+<ul>
+<li>User: &ldquo;Open age calculator&rdquo;</li>
+<li>Alexa: &ldquo;When is your birthday?&rdquo;</li>
+<li>U: Jan 12, 1972</li>
+<li>A: &ldquo;You are 45 years, 11 days old, &hellip;.&rdquo;</li>
+</ul>
+
+<h3 id="intents">Intents</h3>
+
+<p>I will keep the explanation of &ldquo;intent&rdquo; brief since there is <a href="https://developer.amazon.com/public/solutions/alexa/alexa-skills-kit/docs/alexa-skills-kit-interaction-model-reference" target="_blank">lots of documentation about it on the
+Alexa developer
+site</a>.
+For this post it&rsquo;s still important to understand it from a high level.</p>
+
+<p>When defining the interaction model of your Alexa Skill in the Alexa developer portal  you will map
+natural language phrases to intents. For example, &ldquo;My phone number if 555-1212&rdquo; may map to
+something you define as <code>MyPhoneNumberIntent</code>.  Your Alexa skill will receive a <code>json</code> payload that
+literally has the <code>MyPhoneNumberIntent</code> string included in it.  Given you know what the user&rsquo;s
+intent is, you can make some decisions via application code on how to respond.</p>
+
+<p>Of course there are many details around using and defining intents so I&rsquo;d encourage you to read the
+Amazon docs for more information.</p>
+
+<h3 id="initial-state">Initial state</h3>
+
+<p>Upon the first request, there is no session to speak of. In that scenario, Lazysusan will look for
+a key in your yaml file named <code>initialState</code>.  Alexa apps are often launched with a phrase which will
+trigger a <code>LaunchRequest</code>. This is exactly what we&rsquo;ve done here with the phrase, <code>Open age
+calculator</code>.  So, we are:</p>
+
+<ul>
+<li>In <code>initialState</code></li>
+<li>Receiving a <code>LaunchRequest</code></li>
+</ul>
+
+<p>With those to pieces of information, Lazysusan will look up the <code>LaunchRequest</code> key in the list of
+<code>branches</code> in the <code>initialState</code> block.</p>
+
+<pre><code class="language-yaml">initialState:
+  # snip
+  branches: &amp;initialStateBranches
+    LaunchRequest: initialState
+    MyAgeIntent: !!python/name:callbacks.calc_difference
+    default: goodBye
+</code></pre>
+
+<p>As you can see in the yaml above, <code>LaunchRequest</code> simply points back
+to the <code>initialState</code> block which contains a fully valid Alexa response in yaml.  Lazysusan will
+take this content verbatim, convert it into json and sent it back to Alexa.</p>
+
+<h3 id="response-after-initial-state">Response after initial state</h3>
+
+<p>The user has received a question, responded and the session is still active. What happens next?
+The user responded with a date which triggers a <code>MyAgeIntent</code> from the Alexa platform. So, we are now:</p>
+
+<ul>
+<li>In <code>initialState</code></li>
+<li>Receiving a <code>MyAgeIntent</code></li>
+</ul>
+
+<p>With those to pieces of information, Lazysusan will look up the <code>MyAgeIntent</code> key the list of
+<code>branches</code> in the <code>initialState</code> block. Looking at the <code>branches</code> list above we can see how
+Lazysusan will determine the response.</p>
+
+<pre><code class="language-yaml">    MyAgeIntent: !!python/name:callbacks.calc_difference
+</code></pre>
+
+<p>This is a magical little part of the <a href="http://pyyaml.org/wiki/PyYAMLDocumentation" target="_blank">PyYAML</a> package.
+Here, <code>MyAgeIntent</code> is literally pointing to a Python function. If Lazysusan encounters a callable
+object/function in <code>states.yml</code> it will call that function with six arguments (you can see those
+arguments <a href="https://github.com/spartansystems/lazysusan/blob/master/lazysusan/app.py#L70" target="_blank">in the <code>app.py</code>
+file</a>).</p>
+
+<p>For the
+purposes of this blog post, it&rsquo;s not super critical to understand all the permutations or arguments
+passed into a callback&hellip;what is important is knowing:</p>
+
+<ul>
+<li>you can build completely 100% dynamic responses using this callback mechanism</li>
+<li>you can return either :
+
+<ul>
+<li>the name of the next response key as a string which will be looked up in <code>states.yml</code></li>
+<li>an actual response using <code>helpers/build_response</code></li>
+</ul></li>
+</ul>
+
+<p>If you look at the source code for this example, we are doing a bunch of fancy date math (made
+harder due to leap years, of course) and returning a response with a helper function appropriately
+called, <code>build_response</code>.</p>
+
+<h2 id="walking-through-a-callback">Walking through a callback</h2>
+
+<p>Let&rsquo;s take a look at the callback function which Lazysusan invokes when a <code>MyAgeIntent</code> is
+encountered during an Alexa request:</p>
+
+<pre><code class="language-python">def calc_difference(**kwargs):
+    request = kwargs[&quot;request&quot;]
+    session = kwargs[&quot;session&quot;]
+    state_machine = kwargs[&quot;state_machine&quot;]
+    log = get_logger()
+
+    date_string = request.get_slot_value(&quot;dob&quot;)
+    if not date_string:
+        log.error(&quot;Could not find date in slots&quot;)
+        return &quot;goodBye&quot;
+
+    if date_string.startswith('XXXX-'):
+        return &quot;missingYear&quot;
+
+    now = datetime.now()
+
+    dob = get_dob_from_date_string(date_string)
+    if not is_valid_day(dob):
+        return &quot;invalidDate&quot;
+
+    age = get_age_from_dob(dob, now)
+
+    # First get a breakdown of how old user is in years, months, days
+    msg = age_breakdown(age)
+
+    # next figure out the days until the users next birthday
+    msg += &quot;%s&quot; % (days_until_birthday(dob, now), )
+
+    # finally add whether we're older or younger than the last user
+    msg += &quot;%s&quot; % (last_user_difference(session, dob), )
+
+    session.set(DOB_KEY, dob.toordinal())
+
+    response_dict = build_response(&quot;ageResponse&quot;, msg, state_machine)
+    return build_response_payload(response_dict, session.get_state_params())
+</code></pre>
+
+<p>We won&rsquo;t go through every line, but a few things worth noting:</p>
+
+<ul>
+<li>There are currently six <code>kwargs</code> which are passed into a callback from Lazysusan. Here, we really
+only care about three of those and get them out of the <code>kwargs</code> dictionary.</li>
+<li>You&rsquo;ll notice three different places where some error checking is performed. If the error
+condition in triggered you&rsquo;ll see some return statements, such as:</li>
+</ul>
+
+<pre><code class="language-python">if date_string.startswith('XXXX-'):
+    return &quot;missingYear&quot;
+</code></pre>
+
+<p>When a string is returned from a callback, Lazysusan assumes this is a key to a response in
+<code>states.yml</code>. If the error above was triggered the response would be synthesized from the
+<code>missingYear</code> text above:</p>
+
+<pre><code class="language-yaml">text: Please say what day, month and year you were born.
+</code></pre>
+
+<p>As a reminder, the structure of yaml file for responses is completely driven by the required format
+for an alexa response. There is zero translation / mutation done by Lazysusan</p>
+
+<ul>
+<li>One of the objects you have access to is a <code>session</code> object. In the call to <code>session.set</code> above we
+are shoving a value into the session for the <code>DOB_KEY</code> value. You may use the session however you
+see fit&hellip;it&rsquo;s simply a key-value store provided for your use.</li>
+</ul>
+
+<h2 id="deployment-and-management">Deployment and management</h2>
+
+<p>It may come as no big surprise that we opted to use <a href="https://serverless.com" target="_blank">Serverless</a> for
+managing out Lambda functions and other dependencies. This ended up being a really great choice
+since Serverless will manage not only your Lambda functions but anything else that  is supported by
+CloudFormation (which is almost everything).</p>
+
+<p>During our client engagement an <code>sls deploy</code> would create, update or manage:</p>
+
+<ul>
+<li>Cloudwatch alarms for DynamoDB</li>
+<li>Cloudwatch alarms for Lambda function</li>
+<li>DynamoDB table</li>
+<li>DynamoDB table IOPs provisioning</li>
+<li>IAM roles for DynamoDB table access</li>
+<li>Lambda function for Alexa</li>
+<li>SNS topic</li>
+<li>SNS topic subscriptions</li>
+</ul>
+
+<p>As of this writing managing Alexa Skills isn&rsquo;t nearly as easy.  The only way to manage your
+interaction model and overall configuration is to fire up developer.amazon.com and plug things in
+manually.  I know that Amazon is working on driving configuration of Alexa Skills programatically
+but it&rsquo;s currently not there.</p>
+
+<p>We&rsquo;ve published a Docker image which has all of the requirement for writing Lazysusan applications
+and managing them with Serverless:</p>
+
+<p><a href="https://hub.docker.com/r/joinspartan/serverless/" target="_blank">https://hub.docker.com/r/joinspartan/serverless/</a></p>
+
+<h2 id="final-results">Final results</h2>
+
+<p>Here&rsquo;s a little recording of the demo skill.  As you can hear, there are a lot of calculated valued
+returned from the user&rsquo;s input. This shows the flexibility of the callback mechanism we&rsquo;ve
+implemented.</p>
+
+<p><audio controls src="http://blog.brianz.bz/audio/age-calculator.mp3" type="audio/mpeg">
+Your user agent does not support the HTML5 Audio element.
+</audio></p>
+
+<p>Lazysusan provides other options to make building Alexa skills easier and more sophisticated
+including:</p>
+
+<ul>
+<li>Pluggable support for using DynamoDB as a session store. This enables sessions to persist for
+longer than the standard eight seconds</li>
+<li>TTL support for sessions when using DynamoDB as a session store</li>
+<li>Support for restarting audio from the last stopped/paused position</li>
+<li>Marking a location in <code>states.yml</code> as <strong>not</strong> being a state to track. This is critical when
+receiving callbacks from Alexa during audio playback.</li>
+<li>Configurable logging levels to see request/responses in Cloudwatch</li>
+</ul>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>Lazysusan makes building Alexa apps really really simple. In a future post I&rsquo;ll drill into some
+more detail around the apis and things you may need to be aware of.</p>
+
+<p>We&rsquo;ve developed a few example applications which can be found <a href="https://github.com/spartansystems/lazysusan/tree/master/examples" target="_blank">in the examples directory in our
+Github repository</a>. These are
+great places to start exploring if you&rsquo;d like to take Lazysusan for a spin or have a better
+understanding of what the application code looks like.  These examples show a somewhat complex
+skill such as the age calculator and some others which are driven almost exclusively from the
+<code>states.yml</code> file with very very little Python code.</p>
+
+</div>
+
+        <footer class="post-footer clearfix">
+    
+        <p class="post-tags">
+            <span>Tagged:</span>
+            
+                 <a href="http://blog.brianz.bz/tags/python/">python</a>
+            
+                 <a href="http://blog.brianz.bz/tags/alexa/">alexa</a>
+            
+                 <a href="http://blog.brianz.bz/tags/serverless/">serverless</a>
+            
+        </p>
+    
+
+    <div class="share">
+        <a class="icon-twitter" href="https://twitter.com/share?text=Authoring%20Alexa%20Skills%20with%20Python%20and%20Lazysusan&url=http%3a%2f%2fblog.brianz.bz%2fpost%2falexa-with-lazysusan%2f"
+            onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+            <i class="fa fa-twitter"></i>
+            <span class="hidden">Twitter</span>
+        </a>
+
+        <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http%3a%2f%2fblog.brianz.bz%2fpost%2falexa-with-lazysusan%2f"
+            onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+            <i class="fa fa-facebook"></i>
+            <span class="hidden">Facebook</span>
+        </a>
+
+        <a class="icon-google-plus" href="https://plus.google.com/share?url=http%3a%2f%2fblog.brianz.bz%2fpost%2falexa-with-lazysusan%2f"
+           onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+           <i class="fa fa-google-plus"></i>
+            <span class="hidden">Google+</span>
+        </a>
+    </div>
+</footer>
+
+        
+    <div class="comments">
+        <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'brianz';
+    var disqus_identifier = 'http:\/\/blog.brianz.bz\/post\/alexa-with-lazysusan\/';
+    var disqus_title = 'Authoring Alexa Skills with Python and Lazysusan';
+    var disqus_url = 'http:\/\/blog.brianz.bz\/post\/alexa-with-lazysusan\/';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    </div>
+
+    </article>
+</div>
+
+            </div>
+        </div>
+
+        <footer class="footer">
+            <div class="container">
+                <div class="site-title-wrapper">
+                    <h1 class="site-title">
+                        <a title="Brian Z" href="http://blog.brianz.bz/">Brian Z</a>
+                    </h1>
+                    <a class="button-square button-jump-top js-jump-top" href="#">
+                        <i class="fa fa-angle-up"></i>
+                    </a>
+                </div>
+
+                <p class="footer-copyright">
+                    <span>&copy; 2017 / Powered by <a href="https://gohugo.io/">Hugo</a></span>
+                </p>
+                <p class="footer-copyright">
+                    <span><a href="https://github.com/roryg/ghostwriter">Ghostwriter theme</a> By <a href="http://jollygoodthemes.com">JollyGoodThemes</a></span>
+                    <span>/ <a href="https://github.com/jbub/ghostwriter">Ported</a> to Hugo By <a href="https://github.com/jbub">jbub</a></span>
+                </p>
+            </div>
+        </footer>
+
+        <script src="http://blog.brianz.bz/js/jquery-1.11.3.min.js"></script>
+        <script src="http://blog.brianz.bz/js/highlight.min.js"></script>
+        <script src="http://blog.brianz.bz/js/jquery.fitvids.js"></script>
+        <script src="http://blog.brianz.bz/js/scripts.js"></script>
+    </body>
+</html>
+
