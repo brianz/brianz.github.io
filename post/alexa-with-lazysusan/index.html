@@ -7,7 +7,7 @@
         <meta name="description" content="Most recently at my day job we were tasked with building an Amazon Alexa app for a client. As soon as I heard rumors that we would be doing an Alexa app I starting raising my hand hoping that I&rsquo;d get put on this project. If you read these blog posts it should become quite apparent I&rsquo;m a pretty big AWS fanboy and Alexa has pretty tight integration with AWS Lambda">
         <meta name="HandheldFriendly" content="True">
         <meta name="MobileOptimized" content="320">
-        <meta name="generator" content="Hugo 0.18.1" />
+        <meta name="generator" content="Hugo 0.18" />
         <meta name="robots" content="index,follow">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         
@@ -121,7 +121,7 @@ technical perspective.</p>
 of the Amazon device you&rsquo;re interacting with via speech, it all goes through the &ldquo;Alexa&rdquo; platform
 (as far as I know).</p>
 
-<p>From a developer&rsquo;s prospective building Alexa apps is really really easy. Alexa apps send <code>json</code>
+<p>From a developer&rsquo;s perspective building Alexa apps is really really easy. Alexa apps send <code>json</code>
 to a given endpoint and expect valid Alexa <code>json</code> in response. That&rsquo;s it. Of course, there are many
 nuances and details to understand, but from a high level this is it&hellip;<code>json</code> in and <code>json</code> out.</p>
 
@@ -143,20 +143,20 @@ the time when building Alexa Skills.</p>
 
 <p>The only way I would suggest running your own server to back Alexa Skills is if your application
 code had some pretty heavy dependencies such as <code>numpy</code> or another big and heavy requirement which
-couldn&rsquo;t fit inside a Lambda function. Since Lambda supports Python and Node out of the box, those
+couldn&rsquo;t fit inside a Lambda function. Since Lambda support Python and Node out of the box, those
 will likely be your two choices for implementation languages/ecosystems. If you&rsquo;re a real masochist
 you can run Java on Lambda. C# was recently released as a supported language as well.</p>
 
 <h2 id="lazysusan">Lazysusan</h2>
 
-<p>During our client engagement we wound up creating an open source Python library for authoring
-Alexa applications. We call her <a href="https://github.com/spartansystems/lazysusan" target="_blank">Lazysusan</a>. Here, I&rsquo;ll try
-to walk you through most of the important parts of authoring a basic Alexa Skill.</p>
+<p>During our client engagement we would up authoring an open source Python library for authoring
+Alexa applications. We call her <a href="https://github.com/spartansystems/lazysusan" target="_blank">Lazysusan</a>. I&rsquo;ll walk
+you through all of the steps in authoring a very very basic Alexa Skill.</p>
 
 <p>I find that Python strikes a really nice balance in terms of readability, capabilities and extensibility
 for Lambda functions. There is an existing <code>npm</code> module for Alexa skills from the Amazon teams. We
 opted to write our own in Python for the main reason that we found Python to be a much nicer and
-easier language to work with with a rich set of libraries to pull from.</p>
+easier language to work with.</p>
 
 <h2 id="lazysusan-concept-s">Lazysusan concept(s)</h2>
 
@@ -172,37 +172,31 @@ is, application state.</p>
 response</li>
 </ul>
 
-<p>While application state is arguably the biggest concept to grasp when working with Lazysusan it&rsquo;s
-also critical to understand how application state and a user&rsquo;s &ldquo;intent&rdquo; work together.</p>
-
-<p>For now, let&rsquo;s look at this flow of Lazysusan logic as a graphic:</p>
+<p>In addition to this flow of logic there are a couple of concepts to understand, notably &ldquo;intent&rdquo;
+and &ldquo;state&rdquo;. We&rsquo;ll drill into these concepts below. For now, let&rsquo;s look at this flow of Lazysusan
+logic as a graphic:</p>
 
 <p><img src="http://blog.brianz.bz/images/lazysusan/logic-flow.png" height="600" align="middle"></p>
 
 <h2 id="example-application">Example application</h2>
 
-<p>We have a few example applications in the Lazysusan repository. I&rsquo;ll be using the &ldquo;Age Calculator&rdquo; using as an example
-here.  Have a look at:</p>
+<p>We have an example application in the Lazysusan repository. Have a look at:</p>
 
 <p><a href="https://github.com/spartansystems/lazysusan/tree/master/examples/age_difference" target="_blank">https://github.com/spartansystems/lazysusan/tree/master/examples/age_difference</a></p>
 
-<p>This Skill asks you for your birthday and responds with your age down the years, months and days.
-Additionally, it will handle the case where it&rsquo;s your birthday, you were born on a leap day, etc.
-Finally, it will tell  you how much older or younger you are from the last person who used the
-Skill.</p>
+<p>I&rsquo;ll walk through it fun little Alexa skill and explain how it&rsquo;s built with Lazysusan.</p>
 
 <h2 id="state-definition-and-flow">State definition and flow</h2>
 
-<p>The starting point in any Lazysusan app is a yaml file which defines each response and how to handle requests
+<p>The key in any Lazysusan app is a yaml file which definite each response and how to handle requests
 from a given state. Remember, when a request comes in Lazysusan will figure out two things:</p>
 
 <ul>
 <li>&ldquo;What state is the user at?&rdquo;</li>
-<li>&ldquo;Given this state and their intent, how should I respond?&rdquo;</li>
+<li>&ldquo;Given this state and their intent, how should I responds?&rdquo;</li>
 </ul>
 
-<p>Here is a snippet from the Age Calculator&rsquo;s
-<a href="https://github.com/spartansystems/lazysusan/blob/master/examples/age_difference/Age/states.yml" target="_blank"><code>states.yml</code></a>:</p>
+<p>Here is a very simple example of a <code>state.yml</code> file lifted from our Age Calculator example:</p>
 
 <pre><code class="language-yaml">initialState:
   response:
@@ -244,14 +238,12 @@ goodBye:
 </code></pre>
 
 <p>A &ldquo;session&rdquo; in Alexa parlance can be a bit nebulous. By default, when a user launches your skill and
-begins interacting with it there is a built-in session which is created.  This &ldquo;session&rdquo; is nothing more
+begins interacting it there is a built-in session which is active.  This &ldquo;session&rdquo; is nothing more
 than some data sent to your Lambda function in the <code>json</code> payload.
 As long as the user is
 interacting with your skill and the blue light ring on top of the device is illuminated, the
 session is active. If the user doesn&rsquo;t respond at all or reaches the &ldquo;end&rdquo; of the skill, the
-session will be killed. As of this writing, users have eight seconds to respond to a Skill before
-the session is killed requiring the user to re-launch your skill with it&rsquo;s invocation name (i.e.,
-&ldquo;Alexa, open age calculator&rdquo;).</p>
+session will be killed.</p>
 
 <p>Think of an Alexa session as a conversation with a real person&hellip;provided you keep the
 conversation going, the session is active.  Now imagine during a real conversation you simply walk
@@ -260,8 +252,8 @@ and the session is now over. Or, imagine the other party in the conversation blu
 chat&hellip;&ldquo;I&rsquo;m sorry, but I have to go. Goodbye&rdquo;. This is exactly how a session may end with Alexa.
 You may simple decide you&rsquo;re done and not reply or the other party may call it quits.</p>
 
-<p>So, let&rsquo;s define what &ldquo;state&rdquo; is in Lazysusan parlance.  State is nothing more than a current location
-in your Alexa Skill&rsquo;s &ldquo;flow&rdquo;. In concrete terms, &ldquo;state&rdquo; will simple be the name of the top-level
+<p>So, let&rsquo;s define <code>state</code> is in Lazysusan parlance.  State is nothing more than a current location
+in your Alexa Skill &ldquo;flow&rdquo;. In concrete terms, &ldquo;state&rdquo; will simple be the name of the top-level
 keys in your <code>states.yml</code> file. In our example above there are three possible states:
 <code>initialState</code>, <code>missingYear</code> and <code>goodBye</code>.</p>
 
@@ -284,8 +276,7 @@ For this post it&rsquo;s still important to understand it from a high level.</p>
 
 <p>When defining the interaction model of your Alexa Skill in the Alexa developer portal  you will map
 natural language phrases to intents. For example, &ldquo;My phone number if 555-1212&rdquo; may map to
-something you define as <code>MyPhoneNumberIntent</code>.  &ldquo;Yes&rdquo; would likely map to a <code>AMAZON.YesIntent</code>
-which is one of the many built-in intents from Amazon. Your Alexa skill will receive a <code>json</code> payload that
+something you define as <code>MyPhoneNumberIntent</code>.  Your Alexa skill will receive a <code>json</code> payload that
 literally has the <code>MyPhoneNumberIntent</code> string included in it.  Given you know what the user&rsquo;s
 intent is, you can make some decisions via application code on how to respond.</p>
 
@@ -347,8 +338,8 @@ purposes of this blog post, it&rsquo;s not super critical to understand all the 
 passed into a callback&hellip;what is important is knowing:</p>
 
 <ul>
-<li>you can build responses which are completely dynamic and calculated at runtime using this callback mechanism</li>
-<li>you can return either
+<li>you can build completely 100% dynamic responses using this callback mechanism</li>
+<li>you can return either :
 
 <ul>
 <li>the name of the next response key as a string which will be looked up in <code>states.yml</code></li>
@@ -423,7 +414,7 @@ condition in triggered you&rsquo;ll see some return statements, such as:</li>
 </code></pre>
 
 <p>As a reminder, the structure of yaml file for responses is completely driven by the required format
-for an alexa response. There is zero translation / mutation done by Lazysusan.</p>
+for an alexa response. There is zero translation / mutation done by Lazysusan</p>
 
 <ul>
 <li>One of the objects you have access to is a <code>session</code> object. In the call to <code>session.set</code> above we
@@ -434,7 +425,7 @@ see fit&hellip;it&rsquo;s simply a key-value store provided for your use.</li>
 <h2 id="deployment-and-management">Deployment and management</h2>
 
 <p>It may come as no big surprise that we opted to use <a href="https://serverless.com" target="_blank">Serverless</a> for
-managing our Lambda functions and other dependencies. This ended up being a really great choice
+managing out Lambda functions and other dependencies. This ended up being a really great choice
 since Serverless will manage not only your Lambda functions but anything else that  is supported by
 CloudFormation (which is almost everything).</p>
 
@@ -463,7 +454,7 @@ and managing them with Serverless:</p>
 
 <h2 id="final-results">Final results</h2>
 
-<p>Here&rsquo;s a little recording of the demo skill.  As you can hear, there are a lot of calculated values
+<p>Here&rsquo;s a little recording of the demo skill.  As you can hear, there are a lot of calculated valued
 returned from the user&rsquo;s input. This shows the flexibility of the callback mechanism we&rsquo;ve
 implemented.</p>
 
@@ -486,7 +477,7 @@ receiving callbacks from Alexa during audio playback.</li>
 
 <h2 id="conclusion">Conclusion</h2>
 
-<p>Lazysusan makes building Alexa apps really really simple and quite fun. In a future post I&rsquo;ll drill into some
+<p>Lazysusan makes building Alexa apps really really simple. In a future post I&rsquo;ll drill into some
 more detail around the apis and things you may need to be aware of.</p>
 
 <p>We&rsquo;ve developed a few example applications which can be found <a href="https://github.com/spartansystems/lazysusan/tree/master/examples" target="_blank">in the examples directory in our
