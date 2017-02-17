@@ -298,7 +298,23 @@ different systems.&lt;/p&gt;
 
 &lt;p&gt;Once that is done, you&amp;rsquo;ll be greeted with the following:&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://blog.brianz.bz/images/api-gateway-ssl/cloudfront-distribution-creating.png&#34; alt=&#34;Cloudfront creation&#34; /&gt;&lt;/p&gt;
+
+&lt;figure &gt;
+    
+        &lt;img src=&#34;http://blog.brianz.bz/images/api-gateway-ssl/cloudfront-distribution-creating.png&#34; alt=&#34;Cloudfront creat&#34; /&gt;
+    
+    
+    &lt;figcaption&gt;
+        &lt;p&gt;
+        Again, note this screen-shot is from when I set up a different Custom Domain Name mapping
+        
+            
+        
+        &lt;/p&gt; 
+    &lt;/figcaption&gt;
+    
+&lt;/figure&gt;
+
 
 &lt;p&gt;This process really can take a long time.  While the message states &amp;ldquo;Up to 40 minutes&amp;rdquo; I&amp;rsquo;ve
 experienced wait times of several hours.&lt;/p&gt;
