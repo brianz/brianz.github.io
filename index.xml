@@ -321,10 +321,15 @@ different systems.&lt;/p&gt;
 &lt;p&gt;This process really can take a long time.  While the message states &amp;ldquo;Up to 40 minutes&amp;rdquo; I&amp;rsquo;ve
 experienced wait times of several hours.&lt;/p&gt;
 
+&lt;h2 id=&#34;point-dns-at-cloudfront&#34;&gt;Point DNS at Cloudfront&lt;/h2&gt;
+
 &lt;p&gt;While you&amp;rsquo;re waiting on that to finishing there&amp;rsquo;s one final thing to do: add a &lt;code&gt;CNAME&lt;/code&gt; record in
-your &lt;code&gt;DNS&lt;/code&gt; zone file to point your public subdomain (&lt;code&gt;dilbert.brianz.bz&lt;/code&gt; in this example`) to the
-crazy Cloudfront URL created on your behalf. Note, your DNS will likely propagate faster than the
-Cloudfront distribution takes to actually set up.&lt;/p&gt;
+your &lt;code&gt;DNS&lt;/code&gt; zone file to point your public subdomain (&lt;code&gt;dilbert.brianz.bz&lt;/code&gt; in this example) to the
+Cloudfront URL created on your behalf.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://blog.brianz.bz/images/api-gateway-ssl/point-subdomain-at-cloudfront.png&#34; alt=&#34;Point domain at Cloudfront&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Note, your DNS will likely propagate faster than the Cloudfront distribution takes to actually set up.&lt;/p&gt;
 
 &lt;p&gt;After the wait is over and the Cloudfront distribution is created, we now have a perfectly
 valid SSL certificate which I can use for my API.  Hitting &lt;a href=&#34;https://dilbert.brianz.bz&#34; target=&#34;_blank&#34;&gt;https://dilbert.brianz.bz&lt;/a&gt; from Slack
