@@ -66,6 +66,7 @@ Foundation.&lt;/p&gt;
 &lt;li&gt;Run &lt;code&gt;certbot&lt;/code&gt; in container&lt;/li&gt;
 &lt;li&gt;Change DNS records as instructed by &lt;code&gt;certbot&lt;/code&gt; to verify domain&lt;/li&gt;
 &lt;li&gt;Create a &amp;ldquo;Custom Domain&amp;rdquo; in API Gateway and Install certificate files&lt;/li&gt;
+&lt;li&gt;Update your DNS records to point to your new Cloudfront distribution&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;p&gt;To be clear, there are definitely other ways to accomplish this. This is actually my second
@@ -319,7 +320,12 @@ different systems.&lt;/p&gt;
 &lt;p&gt;This process really can take a long time.  While the message states &amp;ldquo;Up to 40 minutes&amp;rdquo; I&amp;rsquo;ve
 experienced wait times of several hours.&lt;/p&gt;
 
-&lt;p&gt;However, after the wait is over and the Cloudfront distribution is created, we now have a perfectly
+&lt;p&gt;While you&amp;rsquo;re waiting on that to finishing there&amp;rsquo;s one final thing to do: add a &lt;code&gt;CNAME&lt;/code&gt; record in
+your &lt;code&gt;DNS&lt;/code&gt; zone file to point your public subdomain (&lt;code&gt;dilbert.brianz.bz&lt;/code&gt; in this example`) to the
+crazy Cloudfront URL created on your behalf. Note, your DNS will likely propagate faster than the
+Cloudfront distribution takes to actually set up.&lt;/p&gt;
+
+&lt;p&gt;After the wait is over and the Cloudfront distribution is created, we now have a perfectly
 valid SSL certificate which I can use for my API.  Hitting &lt;a href=&#34;https://dilbert.brianz.bz&#34; target=&#34;_blank&#34;&gt;https://dilbert.brianz.bz&lt;/a&gt; from Slack
 works as expected.&lt;/p&gt;
 
