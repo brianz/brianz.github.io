@@ -48,9 +48,12 @@ which had these things in common:&lt;/p&gt;
 &lt;p&gt;Where I landed many months ago was being unhappy and unsatisfied with Django and all of the
 wrong decisions which are easy to make when using it to build a web application. I don&amp;rsquo;t think
 this is necessarily a problem with Python or
-Django themselves, however I do feel that both Python and Django make it really easy to make the
-poor decisions when architecting a web application. If anything, Django is an enabler (and guilt by
-association, Python).  Node and JavaScript are probably even worse and more enabling at bad
+Django themselves, however I do feel that both Python and Django enable developers to make
+poor decisions when architecting a web application. Maybe to frame this in a more positive light,
+it&amp;rsquo;s &lt;em&gt;hard&lt;/em&gt; to make &lt;em&gt;good&lt;/em&gt; decisions when writing a large Django application.
+If anything, Django is an enabler (and guilt by association, Python).&lt;/p&gt;
+
+&lt;p&gt;Node and JavaScript are probably even worse and more enabling at bad
 patterns.  Rails and Ruby, yes&amp;hellip;although with Rails there are such strong conventions around the
 &amp;ldquo;Rails way&amp;rdquo; that at least people don&amp;rsquo;t have to look very far to figure out the &amp;ldquo;right&amp;rdquo; way of doing
 something (don&amp;rsquo;t take this as an endorsement&amp;hellip;I believe this creates a community which freaks out
@@ -60,7 +63,8 @@ if they don&amp;rsquo;t have an existing pattern to copy/paste).&lt;/p&gt;
 different parts of your application together, in spite of your best intentions.  I would venture
 to say that most of this comes down to the ORM.  Want to import some models from a completely
 different part of your application and start firing off queries?  No problem.  Want to write a
-triple nested loop over a queryset and fire off 1M+ DB statements? Sure! (Note, I &lt;em&gt;have&lt;/em&gt; seen
+triple nested loop over a queryset and fire off 1M+ DB statements for related records? Sure!
+(Note, I &lt;em&gt;have&lt;/em&gt; seen
 this done and spent weeks fixing it). Need some data in your template?  Just shove an &lt;code&gt;all()&lt;/code&gt;
 queryset in your template and iterate to your hearts content.  This works &lt;em&gt;great&lt;/em&gt; when you have 10
 rows in your table, not so much when you have 1M rows.&lt;/p&gt;
