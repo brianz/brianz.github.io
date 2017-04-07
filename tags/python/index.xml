@@ -10,6 +10,269 @@
     <atom:link href="http://blog.brianz.bz/tags/python/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
+      <title>Elixir for Pythonistas part I</title>
+      <link>http://blog.brianz.bz/post/elixir-for-pythonistas-i/</link>
+      <pubDate>Fri, 07 Apr 2017 16:02:32 -0600</pubDate>
+      
+      <guid>http://blog.brianz.bz/post/elixir-for-pythonistas-i/</guid>
+      <description>
+
+&lt;p&gt;For the past many &lt;em&gt;many&lt;/em&gt; years my goto language has been Python. I&amp;rsquo;ve written all sorts of
+applications using Python:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Django web apps&lt;/li&gt;
+&lt;li&gt;Client side GUI applications with PyQt&lt;/li&gt;
+&lt;li&gt;Data science stuff with numpy, pandas, etc.&lt;/li&gt;
+&lt;li&gt;Alexa applications&lt;/li&gt;
+&lt;li&gt;Serverless systems and web APIs&lt;/li&gt;
+&lt;li&gt;Microservices and a &lt;a href=&#34;https://github.com/brianz/servant&#34; target=&#34;_blank&#34;&gt;microservice library&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Many backend services to power various SAAS and non-SAAS applications&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Whenever there is some type of problem I need to solve programatically, I reach for Python. Sure,
+I can be effective in other languages, but by and large, I&amp;rsquo;m a Python guy.&lt;/p&gt;
+
+&lt;h2 id=&#34;the-problem&#34;&gt;The problem&lt;/h2&gt;
+
+&lt;p&gt;Not too long ago I counted it up&amp;hellip;over the past seven years I&amp;rsquo;ve worked at three companies all
+which had these things in common:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Python web stacks&lt;/li&gt;
+&lt;li&gt;Django&lt;/li&gt;
+&lt;li&gt;Spaghetti code which is (extremely) hard to reason about and evolve&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Where I landed many months ago was being unhappy and unsatisfied with Django and all of the
+wrong decisions which are easy to make when using it to build a web application. I don&amp;rsquo;t think
+this is necessarily a problem with Python or
+Django themselves, however I do feel that both Python and Django make it really easy to make the
+poor decisions when architecting a web application. If anything, Django is an enabler (and guilt by
+association, Python).  Node and JavaScript are probably even worse and more enabling at bad
+patterns.  Rails and Ruby, yes&amp;hellip;although with Rails there are such strong conventions around the
+&amp;ldquo;Rails way&amp;rdquo; that at least people don&amp;rsquo;t have to look very far to figure out the &amp;ldquo;right&amp;rdquo; way of doing
+something (don&amp;rsquo;t take this as an endorsement&amp;hellip;I believe this creates a community which freaks out
+if they don&amp;rsquo;t have an existing pattern to copy/paste).&lt;/p&gt;
+
+&lt;p&gt;Django makes it very easy to couple
+different parts of your application together, in spite of your best intentions.  I would venture
+to say that most of this comes down to the ORM.  Want to import some models from a completely
+different part of your application and start firing off queries?  No problem.  Want to write a
+triple nested loop over a queryset and fire off 1M+ DB statements? Sure! (Note, I &lt;em&gt;have&lt;/em&gt; seen
+this done and spent weeks fixing it). Need some data in your template?  Just shove an &lt;code&gt;all()&lt;/code&gt;
+queryset in your template and iterate to your hearts content.  This works &lt;em&gt;great&lt;/em&gt; when you have 10
+rows in your table, not so much when you have 1M rows.&lt;/p&gt;
+
+&lt;p&gt;Where I&amp;rsquo;m going is that I said to myself&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;There must be a better way&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&#34;the-possible-solution&#34;&gt;The (possible) solution&lt;/h2&gt;
+
+&lt;p&gt;Slowly, I&amp;rsquo;ve been digging into Elixir. Why?  I wanted to learn and use a functional language to see
+if it would solve some of the problems I&amp;rsquo;ve hit with imperative languages like Python. Here are a
+few other things which helped point me in the Elixir direction:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Erlang VM (BEAM)
+
+&lt;ul&gt;
+&lt;li&gt;Ability for some massive concurrency&lt;/li&gt;
+&lt;li&gt;Built-in messaging (hello microservices)&lt;/li&gt;
+&lt;li&gt;Possibility of hot-loading new code&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;Picking up lots of steam mostly from the Rails community. But the bottom line is that the &amp;ldquo;there
+must be a better way&amp;rdquo; theme is shared from different communities&lt;/li&gt;
+&lt;li&gt;Ringing endorsements from &lt;a href=&#34;https://pragprog.com/book/elixir/programming-elixir&#34; target=&#34;_blank&#34;&gt;other web influencers&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Of course, I could be wrong&amp;hellip;Elixir could &lt;em&gt;not&lt;/em&gt; be the solution I&amp;rsquo;m looking for.  However, I do
+know that I &lt;del&gt;want&lt;/del&gt; need a new way of building web applications and microservices. Here, I&amp;rsquo;d like to
+do a series of posts about exploring and learning Elixir from the perspective of a Python
+developer.&lt;/p&gt;
+
+&lt;h2 id=&#34;elixir-for-pythonistas&#34;&gt;Elixir for Pythonistas&lt;/h2&gt;
+
+&lt;p&gt;I would rather not do a series on Elixir syntax, but it&amp;rsquo;s inevitable that I&amp;rsquo;ll need to cover some
+things.  There are plenty of resources online about Elixir syntax&amp;hellip;the official docs are quite
+good. I&amp;rsquo;ll recommend the following if you&amp;rsquo;d like to start from zero:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://elixir-lang.org/crash-course.html&#34; target=&#34;_blank&#34;&gt;http://elixir-lang.org/crash-course.html&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;My &lt;a href=&#34;https://speakerdeck.com/brianz/elixir-fundamentals&#34; target=&#34;_blank&#34;&gt;Elixir Fundamentals talk from the Boulder Exile
+Meetup&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://pragprog.com/book/elixir/programming-elixir&#34; target=&#34;_blank&#34;&gt;Programming Elixir by Dave Thomas&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Very quickly I&amp;rsquo;d like to get rolling into the distributed nature of Elixir/Erlang, which I currently
+don&amp;rsquo;t know many details about. Let&amp;rsquo;s start with some basics.&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;NOTE&lt;/em&gt;: I will say things like, &amp;ldquo;unlike Python&amp;hellip;&amp;rdquo; due to the fact that I&amp;rsquo;m writing from the
+Pythonistas perspective. In reality, these comparisons should be made with procedural or OO
+languages. Here, I&amp;rsquo;ll just use Python to represent that class of languages unless I&amp;rsquo;m discussing
+something truly unique to Python.&lt;/p&gt;
+
+&lt;h2 id=&#34;immutability-and-variables&#34;&gt;Immutability and Variables&lt;/h2&gt;
+
+&lt;p&gt;Unlike Python, variables are immutable.  For example:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;&amp;gt;&amp;gt;&amp;gt; d = {&#39;name&#39;: &#39;bz&#39;, &#39;height&#39;: 67}
+&amp;gt;&amp;gt;&amp;gt; some_function(d)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Now, what is the value of &lt;code&gt;d&lt;/code&gt; without knowing the details of &lt;code&gt;some_function&lt;/code&gt;? It&amp;rsquo;s impossible to
+answer this. The reason is that you&amp;rsquo;re passing the &lt;code&gt;d&lt;/code&gt; dictionary &lt;em&gt;by reference&lt;/em&gt;, which means
+&lt;code&gt;some_function&lt;/code&gt; can mutate any mutable object it&amp;rsquo;s given (lists, sets, class, instances, etc.)&lt;/p&gt;
+
+&lt;p&gt;What about Elixir:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-elixir&#34;&gt;iex&amp;gt; d = %{name: &amp;quot;brian&amp;quot;, height: 67}
+%{height: 67, name: &amp;quot;brian&amp;quot;}    
+iex&amp;gt; some_function.(d)
+%{height: 67, name: &amp;quot;Fred&amp;quot;}  
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;You&amp;rsquo;ll notice that the Elixir shell spits out values while it&amp;rsquo;s evaluating commands. Here, we can
+see that &lt;code&gt;some_function&lt;/code&gt; is replacing the &lt;code&gt;name&lt;/code&gt; key with &lt;code&gt;&amp;quot;Fred&amp;quot;&lt;/code&gt;. But, look at &lt;code&gt;d&lt;/code&gt; after all of
+this.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-elixir&#34;&gt;iex&amp;gt; d
+%{height: 67, name: &amp;quot;brian&amp;quot;} 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;That&amp;rsquo;s right&amp;hellip;our original map (&lt;code&gt;dict&lt;/code&gt; in Python terms) is unchanged. That&amp;rsquo;s pretty great. All of
+a sudden it become &lt;em&gt;much&lt;/em&gt; easier to reason about what your program is doing since we&amp;rsquo;re dealing
+with &lt;em&gt;data&lt;/em&gt; rather than &lt;em&gt;behavior&lt;/em&gt;.&lt;/p&gt;
+
+&lt;p&gt;So, if we really did want to update our map, how would we handle this? We&amp;rsquo;ll simply &lt;em&gt;reassign&lt;/em&gt; the
+&lt;code&gt;d&lt;/code&gt; variable to the &lt;em&gt;results&lt;/em&gt; returned from &lt;code&gt;some_function&lt;/code&gt;:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-elixir&#34;&gt;iex&amp;gt; d = some_function.(d)                                                     │:yes
+%{height: 67, name: &amp;quot;Fred&amp;quot;}
+iex&amp;gt; d
+%{height: 67, name: &amp;quot;Fred&amp;quot;}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Let&amp;rsquo;s just try to manhandle this thing:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-elixir&#34;&gt;iex&amp;gt; Map.put(d, :name, &amp;quot;sam&amp;quot;)
+%{height: 67, name: &amp;quot;sam&amp;quot;}  
+iex&amp;gt; d
+%{height: 67, name: &amp;quot;Fred&amp;quot;}  
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Doh! You cannot mutate an existing object. You will always be &lt;em&gt;creating new&lt;/em&gt; objects. What you do
+with those is up to you.&lt;/p&gt;
+
+&lt;p&gt;I like this very much. Tracing code is now a matter of looking at what is occurring to the data,
+rather than trying to track down what code is changing this class instance, dict, etc from under me.
+There are other implications and advantages to immutable data types I won&amp;rsquo;t cover here.&lt;/p&gt;
+
+&lt;h2 id=&#34;pattern-matching&#34;&gt;Pattern matching&lt;/h2&gt;
+
+&lt;p&gt;You&amp;rsquo;ll hear the term &amp;ldquo;pattern matching&amp;rdquo; a lot with Elixir (and I&amp;rsquo;d guess, with Erlang). This will
+likely be the biggest shift in thinking when coming from Python to Elixir, but I think it&amp;rsquo;s easy to
+understand as you work with it.&lt;/p&gt;
+
+&lt;p&gt;Above, we seemingly assigned a map to a variable &lt;code&gt;d&lt;/code&gt;. Don&amp;rsquo;t be fooled here&amp;hellip;what we did was
+pattern match the left side of the equality operator with the right side. What does that mean
+exactly?&lt;/p&gt;
+
+&lt;p&gt;Elixir will take an expression and attempt to match whatever is on the left side of the equals sign
+with that is on the right side, in this case, what is happening is that Elixir is matching the
+variable &lt;code&gt;d&lt;/code&gt; with the map on the right:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-elixir&#34;&gt;iex&amp;gt; d = %{name: &amp;quot;brian&amp;quot;, height: 67}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;There is one item on the left, &lt;code&gt;d&lt;/code&gt; and one on the right, &lt;code&gt;%{name: &amp;quot;brian&amp;quot;, height: 67}&lt;/code&gt;&amp;hellip;so &lt;code&gt;d&lt;/code&gt;
+ends up being pointed at this map.&lt;/p&gt;
+
+&lt;p&gt;Let&amp;rsquo;s look an Elixir tuple:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-elixir&#34;&gt;iex&amp;gt; tup = {1, 2, 3}
+{1, 2, 3}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Makes sense.  But we can also do this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-elixir&#34;&gt;iex&amp;gt; {a, b, c} = {1, 2, 3}
+{1, 2, 3}
+iex&amp;gt; a
+1
+iex&amp;gt; b
+2
+iex&amp;gt; c
+3
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;What is happening here is that Elixir attempt to match the left and right side. Because we have the
+same number of arguments, the right side values are assigned to the left side variables. This is
+&amp;ldquo;unpacking&amp;rdquo; in Python&amp;hellip;we can do the same thing so you may not be very impressed (yet):&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;&amp;gt;&amp;gt;&amp;gt; tup = (1, 2, 3)
+&amp;gt;&amp;gt;&amp;gt; (a, b, c) = tup
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Going back to our Map / dict, how would you extract the value of a dictionary key and assign it
+into a variable?&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;&amp;gt;&amp;gt;&amp;gt; d
+{&#39;name&#39;: &#39;bz&#39;, &#39;height&#39;: 67}
+&amp;gt;&amp;gt;&amp;gt; myheight = d.get(&#39;height&#39;)
+&amp;gt;&amp;gt;&amp;gt; myheight
+67
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;With Elixir, we can extract a value by matching a key on the left with the right:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-elixir&#34;&gt;iex&amp;gt; %{height: myheight} = d
+%{height: 67, name: &amp;quot;Fred&amp;quot;}
+iex&amp;gt; myheight
+67
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Wow&amp;hellip;so we&amp;rsquo;re saying, &amp;ldquo;Elixir, please match a Map with a key of &amp;ldquo;height&amp;rdquo; on the left with whatever
+is on the right. If that matches, assign the variable &lt;code&gt;myheight&lt;/code&gt; to whatever the value is on the
+right side&amp;rdquo;&lt;/p&gt;
+
+&lt;p&gt;That may seem trivial now, but it&amp;rsquo;s the underpinning of Elixir and helps preventing code like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;def view_function(request, user, reports=None):
+    reports = reports or {}
+    for key, f in reports.items():
+        perm_key = &#39;user.can_view_%s_report&#39; % key 
+        if key == &#39;unsigned&#39; and not user.sig_on:
+            continue
+        if key in (&#39;foo&#39;, &#39;br&#39;) and not user.new_user:
+            continue
+        if key in (&#39;payments&#39;, &#39;all&#39;, &#39;client&#39;) and not user.track:
+            continue
+        if key == &#39;authorizations&#39; and not user.cms_user:
+            continue
+        if key == &#39;totalcostof&#39; and not user.is_foobar:
+            continue
+        if key == &#39;premiums&#39; and not \
+                (user.some_attribute and request.user.admin and request.user.admin.is_manager):
+            continue
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;In Elixir, all of these conditionals could be handled with pattern matching, resulting in multiple functions
+that handle some specific part of our domain logic. The code above becomes very very hard to reason
+about, test and debug. Sure, this can be refactored, but to my previous points because it&amp;rsquo;s
+&lt;em&gt;possible&lt;/em&gt; to write code like this, it&amp;rsquo;s inevitable that people will.&lt;/p&gt;
+
+&lt;h2 id=&#34;conclusion&#34;&gt;Conclusion&lt;/h2&gt;
+
+&lt;p&gt;That&amp;rsquo;s it for now. I hope to continue on this path of exploring Elixir and writing about the
+highlights I find interesting.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
       <title>Authoring Alexa Skills with Python and Lazysusan</title>
       <link>http://blog.brianz.bz/post/alexa-with-lazysusan/</link>
       <pubDate>Tue, 24 Jan 2017 13:05:21 -0700</pubDate>

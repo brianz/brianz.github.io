@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>Elixir for Pythonistas part I &middot; Brian Zambrano</title>
+        <meta name="description" content="For the past many many years my goto language has been Python. I&rsquo;ve written all sorts of applications using Python:
+ Django web apps Client side GUI applications with PyQt Data science stuff with numpy, pandas, etc. Alexa applications Serverless systems and web APIs Microservices and a microservice library Many backend services to power various SAAS and non-SAAS applications  Whenever there is some type of problem I need to solve programatically, I reach for Python.">
+        <meta name="HandheldFriendly" content="True">
+        <meta name="MobileOptimized" content="320">
+        <meta name="generator" content="Hugo 0.18" />
+        <meta name="robots" content="index,follow">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <link rel="stylesheet" href="http://blog.brianz.bz/css/normalize.css">
+        <link rel="stylesheet" href="http://blog.brianz.bz/css/github-gist.css">
+        <link rel="stylesheet" href="http://blog.brianz.bz/css/style.css">
+        <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,600,700,300&subset=latin,cyrillic-ext,latin-ext,cyrillic">
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    </head>
+    <body>
+        
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-75475240-1', 'auto');
+ga('send', 'pageview');
+</script>
+
+
+        <div id="wrapper">
+            <header class="site-header">
+                <div class="container">
+                    <div class="site-title-wrapper">
+                        
+                            <h1 class="site-title">
+                                <a title="Brian Z" href="http://blog.brianz.bz/">Brian Z</a>
+                            </h1>
+                        
+                        <a class="button-square" href="http://blog.brianz.bz/index.xml"><i class="fa fa-rss"></i></a>
+                        
+                            <a class="button-square button-social hint--top" data-hint="Twitter" title="Twitter" href="https://twitter.com/brianzambrano">
+                                <i class="fa fa-twitter"></i>
+                            </a>
+                        
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="Github" title="Github" href="https://github.com/brianz">
+                                <i class="fa fa-github-alt"></i>
+                            </a>
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="Stack Overflow" title="Stack Overflow" href="http://stackoverflow.com/users/87858/brianz">
+                                <i class="fa fa-stack-overflow"></i>
+                            </a>
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="LinkedIn" title="LinkedIn" href="https://www.linkedin.com/in/brianzambrano">
+                                <i class="fa fa-linkedin"></i>
+                            </a>
+                        
+                        
+                    </div>
+
+                    <ul class="site-nav">
+                        
+    <li class="site-nav-item">
+        <a title="Home" href="http://blog.brianz.bz/">Home</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="About" href="http://blog.brianz.bz/about/">About</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="Posts" href="http://blog.brianz.bz/post/">Posts</a>
+    </li>
+
+                    </ul>
+                </div>
+            </header>
+
+            <div id="container">
+
+
+<div class="container">
+    <article class="post-container" itemscope="" itemtype="http://schema.org/BlogPosting">
+        <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Elixir for Pythonistas part I</h1>
+    
+    <p class="post-date">
+        <span>Published <time datetime="2017-04-07" itemprop="datePublished">Fri, Apr 7, 2017</time></span>
+        <span>by</span>
+        <span itemscope="" itemprop="author" itemtype="https://schema.org/Person">
+            <span itemprop="name">
+                <a href="" itemprop="url" rel="author">Brian Zambrano</a>
+            </span>
+        </span>
+    </p>
+</header>
+
+        <div class="post-content clearfix" itemprop="articleBody">
+    
+
+    
+
+<p>For the past many <em>many</em> years my goto language has been Python. I&rsquo;ve written all sorts of
+applications using Python:</p>
+
+<ul>
+<li>Django web apps</li>
+<li>Client side GUI applications with PyQt</li>
+<li>Data science stuff with numpy, pandas, etc.</li>
+<li>Alexa applications</li>
+<li>Serverless systems and web APIs</li>
+<li>Microservices and a <a href="https://github.com/brianz/servant" target="_blank">microservice library</a></li>
+<li>Many backend services to power various SAAS and non-SAAS applications</li>
+</ul>
+
+<p>Whenever there is some type of problem I need to solve programatically, I reach for Python. Sure,
+I can be effective in other languages, but by and large, I&rsquo;m a Python guy.</p>
+
+<h2 id="the-problem">The problem</h2>
+
+<p>Not too long ago I counted it up&hellip;over the past seven years I&rsquo;ve worked at three companies all
+which had these things in common:</p>
+
+<ul>
+<li>Python web stacks</li>
+<li>Django</li>
+<li>Spaghetti code which is (extremely) hard to reason about and evolve</li>
+</ul>
+
+<p>Where I landed many months ago was being unhappy and unsatisfied with Django and all of the
+wrong decisions which are easy to make when using it to build a web application. I don&rsquo;t think
+this is necessarily a problem with Python or
+Django themselves, however I do feel that both Python and Django make it really easy to make the
+poor decisions when architecting a web application. If anything, Django is an enabler (and guilt by
+association, Python).  Node and JavaScript are probably even worse and more enabling at bad
+patterns.  Rails and Ruby, yes&hellip;although with Rails there are such strong conventions around the
+&ldquo;Rails way&rdquo; that at least people don&rsquo;t have to look very far to figure out the &ldquo;right&rdquo; way of doing
+something (don&rsquo;t take this as an endorsement&hellip;I believe this creates a community which freaks out
+if they don&rsquo;t have an existing pattern to copy/paste).</p>
+
+<p>Django makes it very easy to couple
+different parts of your application together, in spite of your best intentions.  I would venture
+to say that most of this comes down to the ORM.  Want to import some models from a completely
+different part of your application and start firing off queries?  No problem.  Want to write a
+triple nested loop over a queryset and fire off 1M+ DB statements? Sure! (Note, I <em>have</em> seen
+this done and spent weeks fixing it). Need some data in your template?  Just shove an <code>all()</code>
+queryset in your template and iterate to your hearts content.  This works <em>great</em> when you have 10
+rows in your table, not so much when you have 1M rows.</p>
+
+<p>Where I&rsquo;m going is that I said to myself</p>
+
+<blockquote>
+<p>There must be a better way</p>
+</blockquote>
+
+<h2 id="the-possible-solution">The (possible) solution</h2>
+
+<p>Slowly, I&rsquo;ve been digging into Elixir. Why?  I wanted to learn and use a functional language to see
+if it would solve some of the problems I&rsquo;ve hit with imperative languages like Python. Here are a
+few other things which helped point me in the Elixir direction:</p>
+
+<ul>
+<li>Erlang VM (BEAM)
+
+<ul>
+<li>Ability for some massive concurrency</li>
+<li>Built-in messaging (hello microservices)</li>
+<li>Possibility of hot-loading new code</li>
+</ul></li>
+<li>Picking up lots of steam mostly from the Rails community. But the bottom line is that the &ldquo;there
+must be a better way&rdquo; theme is shared from different communities</li>
+<li>Ringing endorsements from <a href="https://pragprog.com/book/elixir/programming-elixir" target="_blank">other web influencers</a></li>
+</ul>
+
+<p>Of course, I could be wrong&hellip;Elixir could <em>not</em> be the solution I&rsquo;m looking for.  However, I do
+know that I <del>want</del> need a new way of building web applications and microservices. Here, I&rsquo;d like to
+do a series of posts about exploring and learning Elixir from the perspective of a Python
+developer.</p>
+
+<h2 id="elixir-for-pythonistas">Elixir for Pythonistas</h2>
+
+<p>I would rather not do a series on Elixir syntax, but it&rsquo;s inevitable that I&rsquo;ll need to cover some
+things.  There are plenty of resources online about Elixir syntax&hellip;the official docs are quite
+good. I&rsquo;ll recommend the following if you&rsquo;d like to start from zero:</p>
+
+<ul>
+<li><a href="http://elixir-lang.org/crash-course.html" target="_blank">http://elixir-lang.org/crash-course.html</a></li>
+<li>My <a href="https://speakerdeck.com/brianz/elixir-fundamentals" target="_blank">Elixir Fundamentals talk from the Boulder Exile
+Meetup</a></li>
+<li><a href="https://pragprog.com/book/elixir/programming-elixir" target="_blank">Programming Elixir by Dave Thomas</a></li>
+</ul>
+
+<p>Very quickly I&rsquo;d like to get rolling into the distributed nature of Elixir/Erlang, which I currently
+don&rsquo;t know many details about. Let&rsquo;s start with some basics.</p>
+
+<p><em>NOTE</em>: I will say things like, &ldquo;unlike Python&hellip;&rdquo; due to the fact that I&rsquo;m writing from the
+Pythonistas perspective. In reality, these comparisons should be made with procedural or OO
+languages. Here, I&rsquo;ll just use Python to represent that class of languages unless I&rsquo;m discussing
+something truly unique to Python.</p>
+
+<h2 id="immutability-and-variables">Immutability and Variables</h2>
+
+<p>Unlike Python, variables are immutable.  For example:</p>
+
+<pre><code class="language-python">&gt;&gt;&gt; d = {'name': 'bz', 'height': 67}
+&gt;&gt;&gt; some_function(d)
+</code></pre>
+
+<p>Now, what is the value of <code>d</code> without knowing the details of <code>some_function</code>? It&rsquo;s impossible to
+answer this. The reason is that you&rsquo;re passing the <code>d</code> dictionary <em>by reference</em>, which means
+<code>some_function</code> can mutate any mutable object it&rsquo;s given (lists, sets, class, instances, etc.)</p>
+
+<p>What about Elixir:</p>
+
+<pre><code class="language-elixir">iex&gt; d = %{name: &quot;brian&quot;, height: 67}
+%{height: 67, name: &quot;brian&quot;}    
+iex&gt; some_function.(d)
+%{height: 67, name: &quot;Fred&quot;}  
+</code></pre>
+
+<p>You&rsquo;ll notice that the Elixir shell spits out values while it&rsquo;s evaluating commands. Here, we can
+see that <code>some_function</code> is replacing the <code>name</code> key with <code>&quot;Fred&quot;</code>. But, look at <code>d</code> after all of
+this.</p>
+
+<pre><code class="language-elixir">iex&gt; d
+%{height: 67, name: &quot;brian&quot;} 
+</code></pre>
+
+<p>That&rsquo;s right&hellip;our original map (<code>dict</code> in Python terms) is unchanged. That&rsquo;s pretty great. All of
+a sudden it become <em>much</em> easier to reason about what your program is doing since we&rsquo;re dealing
+with <em>data</em> rather than <em>behavior</em>.</p>
+
+<p>So, if we really did want to update our map, how would we handle this? We&rsquo;ll simply <em>reassign</em> the
+<code>d</code> variable to the <em>results</em> returned from <code>some_function</code>:</p>
+
+<pre><code class="language-elixir">iex&gt; d = some_function.(d)                                                     │:yes
+%{height: 67, name: &quot;Fred&quot;}
+iex&gt; d
+%{height: 67, name: &quot;Fred&quot;}
+</code></pre>
+
+<p>Let&rsquo;s just try to manhandle this thing:</p>
+
+<pre><code class="language-elixir">iex&gt; Map.put(d, :name, &quot;sam&quot;)
+%{height: 67, name: &quot;sam&quot;}  
+iex&gt; d
+%{height: 67, name: &quot;Fred&quot;}  
+</code></pre>
+
+<p>Doh! You cannot mutate an existing object. You will always be <em>creating new</em> objects. What you do
+with those is up to you.</p>
+
+<p>I like this very much. Tracing code is now a matter of looking at what is occurring to the data,
+rather than trying to track down what code is changing this class instance, dict, etc from under me.
+There are other implications and advantages to immutable data types I won&rsquo;t cover here.</p>
+
+<h2 id="pattern-matching">Pattern matching</h2>
+
+<p>You&rsquo;ll hear the term &ldquo;pattern matching&rdquo; a lot with Elixir (and I&rsquo;d guess, with Erlang). This will
+likely be the biggest shift in thinking when coming from Python to Elixir, but I think it&rsquo;s easy to
+understand as you work with it.</p>
+
+<p>Above, we seemingly assigned a map to a variable <code>d</code>. Don&rsquo;t be fooled here&hellip;what we did was
+pattern match the left side of the equality operator with the right side. What does that mean
+exactly?</p>
+
+<p>Elixir will take an expression and attempt to match whatever is on the left side of the equals sign
+with that is on the right side, in this case, what is happening is that Elixir is matching the
+variable <code>d</code> with the map on the right:</p>
+
+<pre><code class="language-elixir">iex&gt; d = %{name: &quot;brian&quot;, height: 67}
+</code></pre>
+
+<p>There is one item on the left, <code>d</code> and one on the right, <code>%{name: &quot;brian&quot;, height: 67}</code>&hellip;so <code>d</code>
+ends up being pointed at this map.</p>
+
+<p>Let&rsquo;s look an Elixir tuple:</p>
+
+<pre><code class="language-elixir">iex&gt; tup = {1, 2, 3}
+{1, 2, 3}
+</code></pre>
+
+<p>Makes sense.  But we can also do this:</p>
+
+<pre><code class="language-elixir">iex&gt; {a, b, c} = {1, 2, 3}
+{1, 2, 3}
+iex&gt; a
+1
+iex&gt; b
+2
+iex&gt; c
+3
+</code></pre>
+
+<p>What is happening here is that Elixir attempt to match the left and right side. Because we have the
+same number of arguments, the right side values are assigned to the left side variables. This is
+&ldquo;unpacking&rdquo; in Python&hellip;we can do the same thing so you may not be very impressed (yet):</p>
+
+<pre><code class="language-python">&gt;&gt;&gt; tup = (1, 2, 3)
+&gt;&gt;&gt; (a, b, c) = tup
+</code></pre>
+
+<p>Going back to our Map / dict, how would you extract the value of a dictionary key and assign it
+into a variable?</p>
+
+<pre><code class="language-python">&gt;&gt;&gt; d
+{'name': 'bz', 'height': 67}
+&gt;&gt;&gt; myheight = d.get('height')
+&gt;&gt;&gt; myheight
+67
+</code></pre>
+
+<p>With Elixir, we can extract a value by matching a key on the left with the right:</p>
+
+<pre><code class="language-elixir">iex&gt; %{height: myheight} = d
+%{height: 67, name: &quot;Fred&quot;}
+iex&gt; myheight
+67
+</code></pre>
+
+<p>Wow&hellip;so we&rsquo;re saying, &ldquo;Elixir, please match a Map with a key of &ldquo;height&rdquo; on the left with whatever
+is on the right. If that matches, assign the variable <code>myheight</code> to whatever the value is on the
+right side&rdquo;</p>
+
+<p>That may seem trivial now, but it&rsquo;s the underpinning of Elixir and helps preventing code like this:</p>
+
+<pre><code class="language-python">def view_function(request, user, reports=None):
+    reports = reports or {}
+    for key, f in reports.items():
+        perm_key = 'user.can_view_%s_report' % key 
+        if key == 'unsigned' and not user.sig_on:
+            continue
+        if key in ('foo', 'br') and not user.new_user:
+            continue
+        if key in ('payments', 'all', 'client') and not user.track:
+            continue
+        if key == 'authorizations' and not user.cms_user:
+            continue
+        if key == 'totalcostof' and not user.is_foobar:
+            continue
+        if key == 'premiums' and not \
+                (user.some_attribute and request.user.admin and request.user.admin.is_manager):
+            continue
+</code></pre>
+
+<p>In Elixir, all of these conditionals could be handled with pattern matching, resulting in multiple functions
+that handle some specific part of our domain logic. The code above becomes very very hard to reason
+about, test and debug. Sure, this can be refactored, but to my previous points because it&rsquo;s
+<em>possible</em> to write code like this, it&rsquo;s inevitable that people will.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>That&rsquo;s it for now. I hope to continue on this path of exploring Elixir and writing about the
+highlights I find interesting.</p>
+
+</div>
+
+        <footer class="post-footer clearfix">
+    
+        <p class="post-tags">
+            <span>Tagged:</span>
+            
+                 <a href="http://blog.brianz.bz/tags/elixir/">elixir</a>
+            
+                 <a href="http://blog.brianz.bz/tags/python/">python</a>
+            
+        </p>
+    
+
+    <div class="share">
+        <a class="icon-twitter" href="https://twitter.com/share?text=Elixir%20for%20Pythonistas%20part%20I&url=http%3a%2f%2fblog.brianz.bz%2fpost%2felixir-for-pythonistas-i%2f"
+            onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+            <i class="fa fa-twitter"></i>
+            <span class="hidden">Twitter</span>
+        </a>
+
+        <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http%3a%2f%2fblog.brianz.bz%2fpost%2felixir-for-pythonistas-i%2f"
+            onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+            <i class="fa fa-facebook"></i>
+            <span class="hidden">Facebook</span>
+        </a>
+
+        <a class="icon-google-plus" href="https://plus.google.com/share?url=http%3a%2f%2fblog.brianz.bz%2fpost%2felixir-for-pythonistas-i%2f"
+           onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+           <i class="fa fa-google-plus"></i>
+            <span class="hidden">Google+</span>
+        </a>
+    </div>
+</footer>
+
+        
+    <div class="comments">
+        <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'brianz';
+    var disqus_identifier = 'http:\/\/blog.brianz.bz\/post\/elixir-for-pythonistas-i\/';
+    var disqus_title = 'Elixir for Pythonistas part I';
+    var disqus_url = 'http:\/\/blog.brianz.bz\/post\/elixir-for-pythonistas-i\/';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    </div>
+
+    </article>
+</div>
+
+            </div>
+        </div>
+
+        <footer class="footer">
+            <div class="container">
+                <div class="site-title-wrapper">
+                    <h1 class="site-title">
+                        <a title="Brian Z" href="http://blog.brianz.bz/">Brian Z</a>
+                    </h1>
+                    <a class="button-square button-jump-top js-jump-top" href="#">
+                        <i class="fa fa-angle-up"></i>
+                    </a>
+                </div>
+
+                <p class="footer-copyright">
+                    <span>&copy; 2017 / Powered by <a href="https://gohugo.io/">Hugo</a></span>
+                </p>
+                <p class="footer-copyright">
+                    <span><a href="https://github.com/roryg/ghostwriter">Ghostwriter theme</a> By <a href="http://jollygoodthemes.com">JollyGoodThemes</a></span>
+                    <span>/ <a href="https://github.com/jbub/ghostwriter">Ported</a> to Hugo By <a href="https://github.com/jbub">jbub</a></span>
+                </p>
+            </div>
+        </footer>
+
+        <script src="http://blog.brianz.bz/js/jquery-1.11.3.min.js"></script>
+        <script src="http://blog.brianz.bz/js/highlight.min.js"></script>
+        <script src="http://blog.brianz.bz/js/jquery.fitvids.js"></script>
+        <script src="http://blog.brianz.bz/js/scripts.js"></script>
+    </body>
+</html>
+
