@@ -101,12 +101,12 @@ developer.&lt;/p&gt;
 &lt;h2 id=&#34;elixir-for-pythonistas&#34;&gt;Elixir for Pythonistas&lt;/h2&gt;
 
 &lt;p&gt;I would rather not do a series on Elixir syntax, but it&amp;rsquo;s inevitable that I&amp;rsquo;ll need to cover some
-things.  There are plenty of resources online about Elixir syntax&amp;hellip;the official docs are quite
+things.  There are plenty of resources online about the Elixir language itself&amp;hellip;the official docs are quite
 good. I&amp;rsquo;ll recommend the following if you&amp;rsquo;d like to start from zero:&lt;/p&gt;
 
 &lt;ul&gt;
 &lt;li&gt;&lt;a href=&#34;http://elixir-lang.org/crash-course.html&#34; target=&#34;_blank&#34;&gt;http://elixir-lang.org/crash-course.html&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;My &lt;a href=&#34;https://speakerdeck.com/brianz/elixir-fundamentals&#34; target=&#34;_blank&#34;&gt;Elixir Fundamentals talk from the Boulder Exile
+&lt;li&gt;My &lt;a href=&#34;https://speakerdeck.com/brianz/elixir-fundamentals&#34; target=&#34;_blank&#34;&gt;Elixir Fundamentals talk from the Boulder Elixir
 Meetup&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;https://pragprog.com/book/elixir/programming-elixir&#34; target=&#34;_blank&#34;&gt;Programming Elixir by Dave Thomas&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
