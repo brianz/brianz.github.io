@@ -18,8 +18,9 @@
       <pubDate>Thu, 16 Feb 2017 21:21:10 -0700</pubDate>
       
       <guid>http://blog.brianz.bz/post/custom-https-domains-with-serverless/</guid>
-      <description>If you&amp;rsquo;re reading this blog it will become very obvious I&amp;rsquo;m a big fan of the Serverless framework to power AWS Lambda and API Gateway integration.
-When building real APIs that you&amp;rsquo;d like to deploy publicly one thing you&amp;rsquo;ll run into eventually is that of setting up a custom domain name. API Gateway is fantastic and you can get up and running in a hurry, exposing a publicly facing API running over SSL.</description>
+      <description>NOTE!!!
+ As of March 2017 this post is no longer relevant. AWS has updated API Gateway so that you can get a free certificate using AWS Certificate Manager. I&amp;rsquo;m leaving this up for historical purposes but if you need SSL for API Gateway on your own domain please have a look at the Certificate Manager integration&amp;hellip;it&amp;rsquo;s quite easy!
+ If you&amp;rsquo;re reading this blog it will become very obvious I&amp;rsquo;m a big fan of the Serverless framework to power AWS Lambda and API Gateway integration.</description>
     </item>
     
     <item>
