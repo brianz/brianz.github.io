@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Tags on Brian Z</title>
+    <link>http://blog.brianz.bz/tags/</link>
+    <description>Recent content in Tags on Brian Z</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>&amp;copy; 2016-2017. All rights reserved.</copyright>
+    <lastBuildDate>Tue, 24 Jan 2017 13:05:21 -0700</lastBuildDate>
+    
+	<atom:link href="http://blog.brianz.bz/tags/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Alexa</title>
+      <link>http://blog.brianz.bz/tags/alexa/</link>
+      <pubDate>Tue, 24 Jan 2017 13:05:21 -0700</pubDate>
+      
+      <guid>http://blog.brianz.bz/tags/alexa/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Architecture</title>
+      <link>http://blog.brianz.bz/tags/architecture/</link>
+      <pubDate>Thu, 16 Feb 2017 21:21:10 -0700</pubDate>
+      
+      <guid>http://blog.brianz.bz/tags/architecture/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Aws</title>
+      <link>http://blog.brianz.bz/tags/aws/</link>
+      <pubDate>Thu, 16 Feb 2017 21:21:10 -0700</pubDate>
+      
+      <guid>http://blog.brianz.bz/tags/aws/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Career Development</title>
+      <link>http://blog.brianz.bz/tags/career-development/</link>
+      <pubDate>Thu, 07 Apr 2016 18:41:18 -0600</pubDate>
+      
+      <guid>http://blog.brianz.bz/tags/career-development/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Certbot</title>
+      <link>http://blog.brianz.bz/tags/certbot/</link>
+      <pubDate>Thu, 16 Feb 2017 21:21:10 -0700</pubDate>
+      
+      <guid>http://blog.brianz.bz/tags/certbot/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Docker</title>
+      <link>http://blog.brianz.bz/tags/docker/</link>
+      <pubDate>Wed, 13 Apr 2016 07:24:44 -0600</pubDate>
+      
+      <guid>http://blog.brianz.bz/tags/docker/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Elixir</title>
+      <link>http://blog.brianz.bz/tags/elixir/</link>
+      <pubDate>Fri, 07 Apr 2017 16:02:32 -0600</pubDate>
+      
+      <guid>http://blog.brianz.bz/tags/elixir/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Hugo</title>
+      <link>http://blog.brianz.bz/tags/hugo/</link>
+      <pubDate>Mon, 21 Mar 2016 15:45:26 -0600</pubDate>
+      
+      <guid>http://blog.brianz.bz/tags/hugo/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Microservices</title>
+      <link>http://blog.brianz.bz/tags/microservices/</link>
+      <pubDate>Thu, 15 Sep 2016 17:41:39 -0400</pubDate>
+      
+      <guid>http://blog.brianz.bz/tags/microservices/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Python</title>
+      <link>http://blog.brianz.bz/tags/python/</link>
+      <pubDate>Fri, 07 Apr 2017 16:02:32 -0600</pubDate>
+      
+      <guid>http://blog.brianz.bz/tags/python/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Servant</title>
+      <link>http://blog.brianz.bz/tags/servant/</link>
+      <pubDate>Thu, 15 Sep 2016 17:41:39 -0400</pubDate>
+      
+      <guid>http://blog.brianz.bz/tags/servant/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Serverless</title>
+      <link>http://blog.brianz.bz/tags/serverless/</link>
+      <pubDate>Thu, 16 Feb 2017 21:21:10 -0700</pubDate>
+      
+      <guid>http://blog.brianz.bz/tags/serverless/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Sonmez</title>
+      <link>http://blog.brianz.bz/tags/sonmez/</link>
+      <pubDate>Thu, 07 Apr 2016 18:41:18 -0600</pubDate>
+      
+      <guid>http://blog.brianz.bz/tags/sonmez/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>
