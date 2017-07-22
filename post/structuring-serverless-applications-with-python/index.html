@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>Structuring Serverless Applications with Python &middot; Brian Zambrano</title>
+        <meta name="description" content="In spite of my intentions to get more involved in Elixir I&rsquo;ve been stuck in the Python tractor beam.
+For all of the issues that may arise in large Python web applications, Python really is a fantastic do-it-all language. As one of my colleagues recently said:
+ Python is the second best language for everything.
+ I&rsquo;m still a very big fan of the Serverless framework and have been using it almost constantly at work.">
+        <meta name="HandheldFriendly" content="True">
+        <meta name="MobileOptimized" content="320">
+        <meta name="generator" content="Hugo 0.22" />
+        <meta name="robots" content="index,follow">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <link rel="stylesheet" href="http://blog.brianz.bz/css/normalize.css">
+        <link rel="stylesheet" href="http://blog.brianz.bz/css/github-gist.css">
+        <link rel="stylesheet" href="http://blog.brianz.bz/css/style.css">
+        <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,600,700,300&subset=latin,cyrillic-ext,latin-ext,cyrillic">
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    </head>
+    <body>
+        
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-75475240-1', 'auto');
+ga('send', 'pageview');
+</script>
+
+
+        <div id="wrapper">
+            <header class="site-header">
+                <div class="container">
+                    <div class="site-title-wrapper">
+                        
+                            <h1 class="site-title">
+                                <a title="Brian Z" href="http://blog.brianz.bz/">Brian Z</a>
+                            </h1>
+                        
+                        <a class="button-square" href="http://blog.brianz.bz/index.xml"><i class="fa fa-rss"></i></a>
+                        
+                            <a class="button-square button-social hint--top" data-hint="Twitter" title="Twitter" href="https://twitter.com/brianzambrano">
+                                <i class="fa fa-twitter"></i>
+                            </a>
+                        
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="Github" title="Github" href="https://github.com/brianz">
+                                <i class="fa fa-github-alt"></i>
+                            </a>
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="Stack Overflow" title="Stack Overflow" href="http://stackoverflow.com/users/87858/brianz">
+                                <i class="fa fa-stack-overflow"></i>
+                            </a>
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="LinkedIn" title="LinkedIn" href="https://www.linkedin.com/in/brianzambrano">
+                                <i class="fa fa-linkedin"></i>
+                            </a>
+                        
+                        
+                    </div>
+
+                    <ul class="site-nav">
+                        
+    <li class="site-nav-item">
+        <a title="About" href="http://blog.brianz.bz/about/">About</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="Posts" href="http://blog.brianz.bz/post/">Posts</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="Home" href="http://blog.brianz.bz/">Home</a>
+    </li>
+
+                    </ul>
+                </div>
+            </header>
+
+            <div id="container">
+
+
+<div class="container">
+    <article class="post-container" itemscope="" itemtype="http://schema.org/BlogPosting">
+        <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Structuring Serverless Applications with Python</h1>
+    
+    <p class="post-date">
+        <span>Published <time datetime="2017-07-21" itemprop="datePublished">Fri, Jul 21, 2017</time></span>
+        <span>by</span>
+        <span itemscope="" itemprop="author" itemtype="https://schema.org/Person">
+            <span itemprop="name">
+                <a href="" itemprop="url" rel="author">Brian Zambrano</a>
+            </span>
+        </span>
+    </p>
+</header>
+
+        <div class="post-content clearfix" itemprop="articleBody">
+    
+
+    
+
+<p>In spite of <a href="http://blog.brianz.bz/post/elixir-for-pythonistas-i/" target="_blank">my intentions to get more involved in Elixir</a>
+I&rsquo;ve been stuck in the Python tractor beam.<br />
+For all of the issues that may arise in large Python web applications, Python really is a fantastic
+do-it-all language.  As one of my colleagues recently said:</p>
+
+<blockquote>
+<p>Python is the second best language for <em>everything</em>.</p>
+</blockquote>
+
+<p>I&rsquo;m still a very big fan of the <a href="https://serverless.com" target="_blank">Serverless</a> framework and have been using it
+almost constantly at <a href="https://verypossible.com" target="_blank">work</a>.  So far, I&rsquo;ve written fairly substantial
+Serverless systems for a variety of projects:</p>
+
+<ul>
+<li>ETL jobs synchronizing Shopify orders with 3rd party fulfillment centers</li>
+<li>Data pipeline / ETL process for Strava data</li>
+<li>REST APIs</li>
+<li>Alexa skill</li>
+</ul>
+
+<p>There is a pattern which I&rsquo;ve come up with that has been working out quite well, which is the
+subject of this post.</p>
+
+<h2 id="the-problems">The problems</h2>
+
+<p>There are two main problems with Python code on Lambda which stem from including extra packages in
+your project. In the real world, you are very likely going to want or need some packages beyond the
+standard library.</p>
+
+<ol>
+<li>Python packages which have <code>C</code> bindings need to be built using a machine with the same
+architecture as that which Lambda functions run (i.e., Linux).</li>
+<li>With Lambda, you are responsible for managing Python&rsquo;s path so it can find your dependencies.</li>
+</ol>
+
+<p>I&rsquo;ll walk through my setup and discuss how these problems are solved.</p>
+
+<h2 id="the-solutions">The solutions</h2>
+
+<ol>
+<li>Docker</li>
+<li>Add 4 lines of code at the top of <code>handler.py</code> to add a director to your <code>sys.path</code></li>
+</ol>
+
+<h2 id="docker">Docker</h2>
+
+<p>We&rsquo;re not using Docker for anything other than as a utility.  The Docker image
+I&rsquo;m using is the official Python 2 image with the Serverless framework installed globally.<br />
+This image is <a href="https://hub.docker.com/r/verypossible/serverless/" target="_blank">on Docker hub</a> and is maintained
+by me, updated whenever there is a new version of Serverless. You can see the
+<a href="https://github.com/verypossible/serverless/blob/master/Dockerfile" target="_blank">Dockerfile</a> as well since it&rsquo;s all
+open source.</p>
+
+<p>If you&rsquo;re running Linux on your host system, you won&rsquo;t need to deal with this at all.
+Rather, this tip is for the OS X and Windows folks out there.</p>
+
+<h2 id="structure">Structure</h2>
+
+<p>I structure all my Serverless project as so:</p>
+
+<pre><code>├── Makefile
+├── envs
+│   └── dev
+├── requirements.txt
+└── serverless
+    ├── handler.py
+    ├── lib
+    └── serverless.yml
+</code></pre>
+
+<p>The important bits:</p>
+
+<ul>
+<li>Makefile is used as a controller to lessen the burden of remembering a bunch of commands and to
+allow you to type less.  We&rsquo;ll go through this in more detail.</li>
+<li><code>envs</code> will hold one or more environment variable files.  You may have different files in here
+for your different stacks&hellip;<code>dev</code>, <code>test</code>, <code>production</code>.  This allows us to easily switch between
+environments.</li>
+<li><code>requirements.txt</code> should be self explanatory</li>
+<li><code>serverless</code> is the root of your serverless project</li>
+</ul>
+
+<h2 id="makefile-and-envs">Makefile and envs</h2>
+
+<p>It may be better to show and example of what&rsquo;s needed to deploy a new stack.  Using the <code>Makefile</code>
+I can simply do:</p>
+
+<pre><code>$ ENV=dev make shell
+docker run --rm -it -v `pwd`:/code --env ENV=dev --env-file envs/dev --name=supersecret-serverless-dev &quot;verypossible/serverless:1.17&quot; bash
+root@f513331941bc:/code# 
+root@f513331941bc:/code# make deploy
+</code></pre>
+
+<p>Breaking that down:</p>
+
+<p><code>ENV=dev make shell</code> launches the container with the variable <code>ENV</code> set to <code>dev</code>.  The value
+for this variable needs to map to a file in your <code>envs</code> directory. Provided you are getting
+configuration from the environment in your Python code (and you should be) this makes is trivial to
+change the stack which you&rsquo;re working with.</p>
+
+<p>Imagine you also have <code>envs/test</code> and <code>envs/production</code> files which hold key-value pairs for
+configuration.  In order to launch your <code>test</code> stack you would do:</p>
+
+<pre><code>$ ENV=test make shell
+</code></pre>
+
+<p>How is this working?  The baseline <code>Makefile</code> is shown below.  You will see a command called <code>run</code>
+which is executed using the <code>ENV</code> variable when the <code>make shell</code> is called. Using the docker
+<code>--env-file</code> argument, we inject those variables into the Docker container.</p>
+
+<pre><code>NAME = &quot;verypossible/serverless:1.17&quot;
+
+ENVDIR=envs
+LIBS_DIR=serverless/lib
+PROJECT=supersecret
+
+.PHONY: clean \
+    deploy \
+    env-dir \
+    shell \
+    test \
+    test-watch \
+    libs
+
+run = docker run --rm -it \
+        -v `pwd`:/code \
+        --env ENV=$(ENV) \
+        --env-file envs/$2 \
+        --name=$(PROJECT)-serverless-$(ENV) $(NAME) $1
+
+shell : check-env env-dir
+    $(call run,bash,$(ENV))
+
+env-dir :
+    @test -d $(ENVDIR) || mkdir -p $(ENVDIR)
+
+clean :
+    @test -d $(LIBS_DIR) || mkdir -p $(LIBS_DIR)
+    rm -rf $(LIBS_DIR)/*
+
+# make libs should be run from inside the container
+libs :
+    @test -d $(LIBS_DIR) || mkdir -p $(LIBS_DIR)
+    pip install -t $(LIBS_DIR) -r requirements.txt
+    rm -rf $(LIBS_DIR)/*.dist-info
+    find $(LIBS_DIR) -name '*.pyc' | xargs rm
+    find $(LIBS_DIR) -name tests | xargs rm -rf
+
+# NOTE:
+#
+#   Deployments assume you are already running inside the docker container
+#
+deploy : check-env
+    cd serverless &amp;&amp; sls deploy -s $(ENV)
+
+# Note the ifndef must be unindented
+check-env:
+ifndef ENV
+    $(error ENV is undefined)
+endif
+</code></pre>
+
+<p>I should note that in order to deploy your serverless project you will need AWS credentials.  Each
+<code>envs</code> file you create will need to have the following:</p>
+
+<pre><code>AWS_DEFAULT_REGION=us-west-2
+AWS_SECRET_ACCESS_KEY=ASFASDFASFASFASFDSADF
+AWS_ACCESS_KEY_ID=1234ABCDEF
+</code></pre>
+
+<p><strong><code>envs</code> should be in your <code>.gitignore</code></strong> You really don&rsquo;t want to be committing sensitive
+variables into source control&hellip;so please ensure you have added <code>envs</code> into your <code>.gitignore</code>.</p>
+
+<p>Now that we have a bash shell open in our container, the deployment is simply <code>make deploy</code>.
+Looking above you can see there isn&rsquo;t much magic there.  The only trick is that we&rsquo;re taking the
+value for <code>ENV</code> (which also gets injected as a variable into the container) and us that as the
+Serverless <code>stage</code> using the <code>-s</code> argument. With that, you can now work on completely separate
+stacks using the exact same code.</p>
+
+<h2 id="libraries">Libraries</h2>
+
+<p>Now that the hard work it out of the way we&rsquo;re all clear to install some libraries. Common
+libraries which have <code>C</code> bindings that you may want to use are <code>psycopg2</code>, <code>python-mysql</code>, <code>yaml</code>, and all
+or most of the data science packages (<code>numpy</code>, etc.).</p>
+
+<p>Add whatever you need into <code>requirements.txt</code>. From <strong>within the container</strong> in the same directory
+as the <code>Makefile</code> (which happens to be <code>/code</code> run:</p>
+
+<pre><code>root@f513331941bc:/code# make libs
+</code></pre>
+
+<p>Looking at the <code>Makefile</code> you&rsquo;ll see again there isn&rsquo;t much magic to this. The key here is that we
+are building our <code>C</code> bindings <em>on the same architecture that Lambda uses to run your functions</em>,
+that is, Linux.</p>
+
+<p>If you shut down your container you will notice that your <code>libs</code> directory is still there. This is
+nice and on purpose&hellip;using the <code>-v</code> (volume) argument to <code>docker run</code> we&rsquo;re able to map our host&rsquo;s
+directory into the container.  Any packages we install will be built from within the Linux
+container but will ultimately be written to our host&rsquo;s file-system. You&rsquo;ll only need to <code>make libs</code>
+when you add or update your <code>requirements.txt</code> files.  There is also a <code>make clean</code> command which can be
+used to start over.</p>
+
+<h2 id="handler-py">handler.py</h2>
+
+<p>Now that we have all of our libraries we need to tell our Python code how to find them.  At the top of
+<code>handler.py</code>, I <em>always</em> have these 4 lines:</p>
+
+<pre><code>import os
+import sys
+
+CWD = os.path.dirname(os.path.realpath(__file__))
+sys.path.insert(0, os.path.join(CWD, &quot;lib&quot;))
+
+# now it's ok to import extra libraries
+import numpy as np
+
+def handler(event, context):
+    pass
+</code></pre>
+
+<p>Another very useful convention I&rsquo;ve come to settle on is using a single <code>handler.py</code> function as the
+entrypoint for all of my functions.  The handler does nothing more than the basic bootstrapping of
+the path, importing my own modules and handing off the work to those other modules.  In the end,
+the file structure looks something like this:</p>
+
+<pre><code>$ tree -L 2
+.
+├── Dockerfile
+├── Makefile
+├── envs
+│   ├── dev
+│   └── production
+├── requirements.txt
+├── serverless
+│   ├── handler.py
+│   ├── lib
+│   ├── serverless.yml
+│   └── very
+│       ├── aws.py
+│       ├── constants.py
+│       └── feed.py
+└── tests
+    ├── __init__.py
+    ├── conftest.py
+    ├── test_aws.py
+    └── test_feed.py
+</code></pre>
+
+<p><code>handler.py</code> will import my other modules which happen to be inside the <code>very</code> directory in this
+example and rely on them to execute my business logic. Using convention you can be sure that the
+system path is already set up so that importing your extra modules will work as you&rsquo;d expect,
+<em>without</em> needing to alter the path again.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>Lambda and Serverless make is extremely easy to become production and to iterate on your code.
+Still, there are a few gotchas which take a little time to learn and master.  This setup has saved
+me quite a bit of time and I can spin up a new project in a matter of a copule of minutes.
+Hopefully this will help you too.</p>
+
+<p>If you try this out and it works or you see some improvments please let me know!</p>
+
+</div>
+
+        <footer class="post-footer clearfix">
+    
+        <p class="post-tags">
+            <span>Tagged:</span>
+            
+                 <a href="http://blog.brianz.bz/tags/docker/">docker</a>
+            
+                 <a href="http://blog.brianz.bz/tags/python/">python</a>
+            
+                 <a href="http://blog.brianz.bz/tags/serverless/">serverless</a>
+            
+        </p>
+    
+
+    <div class="share">
+        <a class="icon-twitter" href="https://twitter.com/share?text=Structuring%20Serverless%20Applications%20with%20Python&url=http%3a%2f%2fblog.brianz.bz%2fpost%2fstructuring-serverless-applications-with-python%2f"
+            onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+            <i class="fa fa-twitter"></i>
+            <span class="hidden">Twitter</span>
+        </a>
+
+        <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http%3a%2f%2fblog.brianz.bz%2fpost%2fstructuring-serverless-applications-with-python%2f"
+            onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+            <i class="fa fa-facebook"></i>
+            <span class="hidden">Facebook</span>
+        </a>
+
+        <a class="icon-google-plus" href="https://plus.google.com/share?url=http%3a%2f%2fblog.brianz.bz%2fpost%2fstructuring-serverless-applications-with-python%2f"
+           onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+           <i class="fa fa-google-plus"></i>
+            <span class="hidden">Google+</span>
+        </a>
+    </div>
+</footer>
+
+        
+    <div class="comments">
+        <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'brianz';
+    var disqus_identifier = 'http:\/\/blog.brianz.bz\/post\/structuring-serverless-applications-with-python\/';
+    var disqus_title = 'Structuring Serverless Applications with Python';
+    var disqus_url = 'http:\/\/blog.brianz.bz\/post\/structuring-serverless-applications-with-python\/';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    </div>
+
+    </article>
+</div>
+
+            </div>
+        </div>
+
+        <footer class="footer">
+            <div class="container">
+                <div class="site-title-wrapper">
+                    <h1 class="site-title">
+                        <a title="Brian Z" href="http://blog.brianz.bz/">Brian Z</a>
+                    </h1>
+                    <a class="button-square button-jump-top js-jump-top" href="#">
+                        <i class="fa fa-angle-up"></i>
+                    </a>
+                </div>
+
+                <p class="footer-copyright">
+                    <span>&copy; 2017 / Powered by <a href="https://gohugo.io/">Hugo</a></span>
+                </p>
+                <p class="footer-copyright">
+                    <span><a href="https://github.com/roryg/ghostwriter">Ghostwriter theme</a> By <a href="http://jollygoodthemes.com">JollyGoodThemes</a></span>
+                    <span>/ <a href="https://github.com/jbub/ghostwriter">Ported</a> to Hugo By <a href="https://github.com/jbub">jbub</a></span>
+                </p>
+            </div>
+        </footer>
+
+        <script src="http://blog.brianz.bz/js/jquery-1.11.3.min.js"></script>
+        <script src="http://blog.brianz.bz/js/highlight.min.js"></script>
+        <script src="http://blog.brianz.bz/js/jquery.fitvids.js"></script>
+        <script src="http://blog.brianz.bz/js/scripts.js"></script>
+    </body>
+</html>
+

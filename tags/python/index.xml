@@ -7,10 +7,22 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2016-2017. All rights reserved.</copyright>
-    <lastBuildDate>Fri, 07 Apr 2017 16:02:32 -0600</lastBuildDate>
+    <lastBuildDate>Fri, 21 Jul 2017 23:09:49 -0600</lastBuildDate>
     
 	<atom:link href="http://blog.brianz.bz/tags/python/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Structuring Serverless Applications with Python</title>
+      <link>http://blog.brianz.bz/post/structuring-serverless-applications-with-python/</link>
+      <pubDate>Fri, 21 Jul 2017 23:09:49 -0600</pubDate>
+      
+      <guid>http://blog.brianz.bz/post/structuring-serverless-applications-with-python/</guid>
+      <description>In spite of my intentions to get more involved in Elixir I&amp;rsquo;ve been stuck in the Python tractor beam.
+For all of the issues that may arise in large Python web applications, Python really is a fantastic do-it-all language. As one of my colleagues recently said:
+ Python is the second best language for everything.
+ I&amp;rsquo;m still a very big fan of the Serverless framework and have been using it almost constantly at work.</description>
+    </item>
     
     <item>
       <title>Elixir for Pythonistas part I</title>
