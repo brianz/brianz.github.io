@@ -150,12 +150,12 @@ architecture as that which Lambda functions run (i.e., Linux).</li>
 
 <ol>
 <li>Docker</li>
-<li>Add 4 lines of code at the top of <code>handler.py</code> to add a director to your <code>sys.path</code></li>
+<li>Add 4 lines of code at the top of <code>handler.py</code> to add a directory to your <code>sys.path</code></li>
 </ol>
 
 <h2 id="docker">Docker</h2>
 
-<p>We&rsquo;re not using Docker for anything other than as a utility.  The Docker image
+<p>In this setup, we&rsquo;re using Docker as a utility.  The Docker image
 I&rsquo;m using is the official Python 2 image with the Serverless framework installed globally.<br />
 This image is <a href="https://hub.docker.com/r/verypossible/serverless/" target="_blank">on Docker hub</a> and is maintained
 by me, updated whenever there is a new version of Serverless. You can see the
@@ -314,13 +314,16 @@ used to start over.</p>
 <h2 id="handler-py">handler.py</h2>
 
 <p>Now that we have all of our libraries we need to tell our Python code how to find them.  At the top of
-<code>handler.py</code>, I <em>always</em> have these 4 lines:</p>
+<code>handler.py</code>, I <em>always</em> have these first four lines of code (two imports + two lines to deal with
+<code>sys.path</code>):</p>
 
-<pre><code>import os
+<pre><code># begin magic four lines
+import os
 import sys
 
 CWD = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(0, os.path.join(CWD, &quot;lib&quot;))
+# end magic four lines
 
 # now it's ok to import extra libraries
 import numpy as np
@@ -364,10 +367,13 @@ system path is already set up so that importing your extra modules will work as 
 
 <h2 id="conclusion">Conclusion</h2>
 
-<p>Lambda and Serverless make is extremely easy to become production and to iterate on your code.
-Still, there are a few gotchas which take a little time to learn and master.  This setup has saved
-me quite a bit of time and I can spin up a new project in a matter of a copule of minutes.
-Hopefully this will help you too.</p>
+<p>Docker along with this <code>Makefile</code> make is extremely easy to manage different deployments of your Serverless
+stack and facilitate quickly iterating on your code.
+Still, there are a few gotchas which take a little time to learn and master.  Organizing my
+Serverless projects like this has saved
+me quite a bit of time. I can spin up a new project in a matter of minutes and deploy code changes
+within seconds, all while keeping my host system clean and free of any installations of the
+Serverless framework.  Changing versions of Serverless is a one-line change in the <code>Makefile</code>.</p>
 
 <p>If you try this out and it works or you see some improvments please let me know!</p>
 
