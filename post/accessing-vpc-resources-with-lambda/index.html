@@ -9,7 +9,7 @@ While writing and whipping out tons of examples is quite a bit of work, and I so
 The first three chapters in the book cover different patterns for web applications. In two of these three sections, the logical layer of a 3-tier web application (Presentation, Data, and Logical layers) is, of course, Serverless.">
         <meta name="HandheldFriendly" content="True">
         <meta name="MobileOptimized" content="320">
-        <meta name="generator" content="Hugo 0.30.2" />
+        <meta name="generator" content="Hugo 0.22" />
         <meta name="robots" content="index,follow">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         
@@ -187,9 +187,9 @@ accessible.  The subnets which it&rsquo;s connected to is just one part of that 
 
 <p>Creating one of these in CloudFormation/<code>serverless.yml</code> is pretty simple.  I pick three subnets in
 my VPC and set them as environment variables.  Using this technique makes it trivial to switch
-between projects, regions or AWS accounts.  If you haven&rsquo;t read
-http://blog.brianz.bz/post/structuring-serverless-applications-with-python/ I encourage you to do so to
-appreciate environment variables fully.</p>
+between projects, regions or AWS accounts.  If you haven&rsquo;t read my
+<a href="http://blog.brianz.bz/post/structuring-serverless-applications-with-python/" target="_blank">Structuring Serverless Applications</a>
+I encourage you to do so to appreciate environment variables fully.</p>
 
 <pre><code>    RDSSubnetGroup:
       Type: AWS::RDS::DBSubnetGroup
@@ -478,25 +478,20 @@ resources:
         
     <div class="comments">
         <div id="disqus_thread"></div>
-<script>
-    var disqus_config = function () {
-    
-    
-    
-    };
+<script type="text/javascript">
+    var disqus_shortname = 'brianz';
+    var disqus_identifier = 'http:\/\/blog.brianz.bz\/post\/accessing-vpc-resources-with-lambda\/';
+    var disqus_title = 'Accessing VPC Resources from AWS Lambda';
+    var disqus_url = 'http:\/\/blog.brianz.bz\/post\/accessing-vpc-resources-with-lambda\/';
+
     (function() {
-        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
-            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
-            return;
-        }
-        var d = document, s = d.createElement('script'); s.async = true;
-        s.src = '//' + "brianz" + '.disqus.com/embed.js';
-        s.setAttribute('data-timestamp', +new Date());
-        (d.head || d.body).appendChild(s);
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
     })();
 </script>
-<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
     </div>
 
     </article>
