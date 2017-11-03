@@ -8,15 +8,16 @@
 ">
         <meta name="HandheldFriendly" content="True">
         <meta name="MobileOptimized" content="320">
-        <meta name="generator" content="Hugo 0.22" />
+        <meta name="generator" content="Hugo 0.30.2" />
         <meta name="robots" content="index,follow">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         
-        <link rel="stylesheet" href="http://blog.brianz.bz/css/normalize.css">
-        <link rel="stylesheet" href="http://blog.brianz.bz/css/github-gist.css">
-        <link rel="stylesheet" href="http://blog.brianz.bz/css/style.css">
-        <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,600,700,300&subset=latin,cyrillic-ext,latin-ext,cyrillic">
-        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="http://blog.brianz.bz/dist/styles.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,600,700,300&subset=latin,cyrillic-ext,latin-ext,cyrillic">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+        
+            <link href="http://blog.brianz.bz/post/index.xml" rel="alternate" type="application/rss+xml">
+        
     </head>
     <body>
         
@@ -63,6 +64,7 @@ ga('send', 'pageview');
                             </a>
                         
                         
+                        
                     </div>
 
                     <ul class="site-nav">
@@ -89,19 +91,28 @@ ga('send', 'pageview');
 <div id="post-index" class="container">
     
     <header class="post-header">
-        <h1 class="post-title">Brian Z</h1>
+        <h1 class="post-title" itemprop="name">Brian Z</h1>
         <p>A SAAS application architecture blog. Current topics include Docker, Python microservices,  Serverless and (coming soon) Elixir.
 </p>
     </header>
+
 
 
     <ol class="post-list">
         
         
             <li class="post-stub" itemprop="blogPost" itemscope="" itemtype="https://schema.org/BlogPosting">
+    <a href="http://blog.brianz.bz/post/serverless-part-i/" itemprop="url" title="Go to post detail">
+        <h4 class="post-stub-title" itemprop="name">Serverless part I</h4>
+        <time class="post-stub-date" datetime="2016-04-20">Published 20 Apr 2016, 16:08</time>
+        
+    </a>
+</li>
+        
+            <li class="post-stub" itemprop="blogPost" itemscope="" itemtype="https://schema.org/BlogPosting">
     <a href="http://blog.brianz.bz/post/if-youre-not-using-docker-you-should-be/" itemprop="url" title="Go to post detail">
         <h4 class="post-stub-title" itemprop="name">If you&#39;re not using Docker you should be</h4>
-        <time class="post-stub-date" datetime="2016-04-13">Published Wed, Apr 13, 2016</time>
+        <time class="post-stub-date" datetime="2016-04-13">Published 13 Apr 2016, 07:24</time>
         
     </a>
 </li>
@@ -109,7 +120,7 @@ ga('send', 'pageview');
             <li class="post-stub" itemprop="blogPost" itemscope="" itemtype="https://schema.org/BlogPosting">
     <a href="http://blog.brianz.bz/post/on-technical-blogging/" itemprop="url" title="Go to post detail">
         <h4 class="post-stub-title" itemprop="name">On technical blogging</h4>
-        <time class="post-stub-date" datetime="2016-04-07">Published Thu, Apr 7, 2016</time>
+        <time class="post-stub-date" datetime="2016-04-07">Published 07 Apr 2016, 18:41</time>
         
     </a>
 </li>
@@ -117,7 +128,7 @@ ga('send', 'pageview');
             <li class="post-stub" itemprop="blogPost" itemscope="" itemtype="https://schema.org/BlogPosting">
     <a href="http://blog.brianz.bz/post/introducing-servant/" itemprop="url" title="Go to post detail">
         <h4 class="post-stub-title" itemprop="name">Introducing servant</h4>
-        <time class="post-stub-date" datetime="2016-04-04">Published Mon, Apr 4, 2016</time>
+        <time class="post-stub-date" datetime="2016-04-04">Published 04 Apr 2016, 17:26</time>
         
     </a>
 </li>
@@ -125,7 +136,7 @@ ga('send', 'pageview');
             <li class="post-stub" itemprop="blogPost" itemscope="" itemtype="https://schema.org/BlogPosting">
     <a href="http://blog.brianz.bz/post/blog-theme/" itemprop="url" title="Go to post detail">
         <h4 class="post-stub-title" itemprop="name">Blog theme</h4>
-        <time class="post-stub-date" datetime="2016-03-23">Published Wed, Mar 23, 2016</time>
+        <time class="post-stub-date" datetime="2016-03-23">Published 23 Mar 2016, 11:02</time>
         
     </a>
 </li>
@@ -133,7 +144,7 @@ ga('send', 'pageview');
             <li class="post-stub" itemprop="blogPost" itemscope="" itemtype="https://schema.org/BlogPosting">
     <a href="http://blog.brianz.bz/post/getting-started-with-hugo/" itemprop="url" title="Go to post detail">
         <h4 class="post-stub-title" itemprop="name">Getting started with hugo</h4>
-        <time class="post-stub-date" datetime="2016-03-21">Published Mon, Mar 21, 2016</time>
+        <time class="post-stub-date" datetime="2016-03-21">Published 21 Mar 2016, 15:45</time>
         
     </a>
 </li>
@@ -179,8 +190,12 @@ ga('send', 'pageview');
         </footer>
 
         <script src="http://blog.brianz.bz/js/jquery-1.11.3.min.js"></script>
-        <script src="http://blog.brianz.bz/js/highlight.min.js"></script>
         <script src="http://blog.brianz.bz/js/jquery.fitvids.js"></script>
+
+        
+            <script src="http://blog.brianz.bz/js/highlight.pack.js"></script>
+        
+
         <script src="http://blog.brianz.bz/js/scripts.js"></script>
     </body>
 </html>

@@ -7,10 +7,21 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2016-2017. All rights reserved.</copyright>
-    <lastBuildDate>Fri, 21 Jul 2017 23:09:49 -0600</lastBuildDate>
+    <lastBuildDate>Thu, 02 Nov 2017 22:49:30 -0600</lastBuildDate>
     
 	<atom:link href="http://blog.brianz.bz/tags/serverless/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Accessing VPC Resources from AWS Lambda</title>
+      <link>http://blog.brianz.bz/post/accessing-vpc-resources-with-lambda/</link>
+      <pubDate>Thu, 02 Nov 2017 22:49:30 -0600</pubDate>
+      
+      <guid>http://blog.brianz.bz/post/accessing-vpc-resources-with-lambda/</guid>
+      <description>I&amp;rsquo;m currently working on a book for Packt publishing titled Serverless Design Patterns and Best Practices.
+While writing and whipping out tons of examples is quite a bit of work, and I sometimes curse myself for agreeing to this, I&amp;rsquo;m quite excited as I work through the chapters and as it comes together.
+The first three chapters in the book cover different patterns for web applications. In two of these three sections, the logical layer of a 3-tier web application (Presentation, Data, and Logical layers) is, of course, Serverless.</description>
+    </item>
     
     <item>
       <title>Structuring Serverless Applications with Python</title>

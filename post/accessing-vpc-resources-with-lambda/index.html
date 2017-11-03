@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>Accessing VPC Resources from AWS Lambda &middot; Brian Zambrano</title>
+        <meta name="description" content="I&rsquo;m currently working on a book for Packt publishing titled Serverless Design Patterns and Best Practices.
+While writing and whipping out tons of examples is quite a bit of work, and I sometimes curse myself for agreeing to this, I&rsquo;m quite excited as I work through the chapters and as it comes together.
+The first three chapters in the book cover different patterns for web applications. In two of these three sections, the logical layer of a 3-tier web application (Presentation, Data, and Logical layers) is, of course, Serverless.">
+        <meta name="HandheldFriendly" content="True">
+        <meta name="MobileOptimized" content="320">
+        <meta name="generator" content="Hugo 0.30.2" />
+        <meta name="robots" content="index,follow">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <link rel="stylesheet" href="http://blog.brianz.bz/dist/styles.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,600,700,300&subset=latin,cyrillic-ext,latin-ext,cyrillic">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+        
+    </head>
+    <body>
+        
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-75475240-1', 'auto');
+ga('send', 'pageview');
+</script>
+
+
+        <div id="wrapper">
+            <header class="site-header">
+                <div class="container">
+                    <div class="site-title-wrapper">
+                        
+                            <h1 class="site-title">
+                                <a title="Brian Z" href="http://blog.brianz.bz/">Brian Z</a>
+                            </h1>
+                        
+                        <a class="button-square" href="http://blog.brianz.bz/index.xml"><i class="fa fa-rss"></i></a>
+                        
+                            <a class="button-square button-social hint--top" data-hint="Twitter" title="Twitter" href="https://twitter.com/brianzambrano">
+                                <i class="fa fa-twitter"></i>
+                            </a>
+                        
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="Github" title="Github" href="https://github.com/brianz">
+                                <i class="fa fa-github-alt"></i>
+                            </a>
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="Stack Overflow" title="Stack Overflow" href="http://stackoverflow.com/users/87858/brianz">
+                                <i class="fa fa-stack-overflow"></i>
+                            </a>
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="LinkedIn" title="LinkedIn" href="https://www.linkedin.com/in/brianzambrano">
+                                <i class="fa fa-linkedin"></i>
+                            </a>
+                        
+                        
+                        
+                    </div>
+
+                    <ul class="site-nav">
+                        
+    <li class="site-nav-item">
+        <a title="About" href="http://blog.brianz.bz/about/">About</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="Posts" href="http://blog.brianz.bz/post/">Posts</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="Home" href="http://blog.brianz.bz/">Home</a>
+    </li>
+
+                    </ul>
+                </div>
+            </header>
+
+            <div id="container">
+
+
+<div class="container">
+    <article class="post-container" itemscope="" itemtype="http://schema.org/BlogPosting">
+        <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Accessing VPC Resources from AWS Lambda</h1>
+    
+    <p class="post-date">
+        <span>Published <time datetime="2017-11-02" itemprop="datePublished">02 Nov 2017, 22:49</time></span>
+        <span>by</span>
+        <span itemscope="" itemprop="author" itemtype="https://schema.org/Person">
+            <span itemprop="name">
+                <a href="" itemprop="url" rel="author">Brian Zambrano</a>
+            </span>
+        </span>
+    </p>
+</header>
+
+        <div class="post-content clearfix" itemprop="articleBody">
+    
+
+    
+
+<p>I&rsquo;m currently working on a book for Packt publishing titled <strong>Serverless Design Patterns and Best Practices</strong>.<br />
+While writing and whipping out tons of
+examples is quite a bit of work, and I sometimes curse myself for agreeing to this, I&rsquo;m quite
+excited as I work through the chapters and as it comes together.</p>
+
+<p>The first three chapters in the book cover different patterns for web applications.  In two of
+these three sections, the logical layer of a 3-tier web application (Presentation, Data, and Logical
+layers) is, of course, Serverless. Unsurprisingly, the Lambda functions talk to a database (i.e.,
+the Data Layer).  Also unsurprisingly, the database is PostgreSQL via RDS.</p>
+
+<p>Accessing RDS from Lambda is a very very common pattern.  Of course, some Lambda functions will
+need to talk to an RDS instance.  It may surprise you to learn that getting Lambda functions connected to
+RDS instances is not as easy as you may think.</p>
+
+<h2 id="create-the-rds-instance">Create the RDS instance</h2>
+
+<p>Serverless via CloudFormation makes it quite easy to create an RDS instance along with the rest of
+your stack.  And, when I say &ldquo;easy&rdquo; I mean, &ldquo;easy after you dig through all of the
+CloudFormation docs for the resources you are working with and understand the interplay between
+resources, and learn what <code>Fn::GetAtt</code> and <code>Ref</code> are and how they work in detail.&rdquo;</p>
+
+<p>Let&rsquo;s work through the process of creating a PostgreSQL RDS instance via <code>serverless.yml</code> /
+CloudFormation.  The <code>resources</code> YAML code in <code>serverless.yml</code> is verbatim CloudFormation.  To
+determine how to create a particular resource, it&rsquo;s a matter of wading through the
+CloudFormation docs.  Taking a look at the
+<a href="http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-rds-database-instance.html" target="_blank">AWS::RDS::DBInstance</a>
+docs, we&rsquo;ll put in the bare minimum:</p>
+
+<pre><code class="language-yaml">resources:
+  Resources:
+    RDSPostgresInstance:
+      Type: AWS::RDS::DBInstance
+      Properties:
+        AllocatedStorage: 100
+        AutoMinorVersionUpgrade: true
+        AvailabilityZone: ${self:provider.region}a
+        DBInstanceClass: db.t2.micro
+        DBName: serverless
+        DBSubnetGroupName: ?????
+        Engine: postgres
+        EngineVersion: 9.6.2
+        MasterUsername: root
+        MasterUserPassword: supersecret
+        PubliclyAccessible: false
+        VPCSecurityGroups:
+          - ?????
+</code></pre>
+
+<p>Very quickly we find there are a couple of fields which are mysterious and call out for more
+CloudFormation code.  What are <code>DBSubnetGroup</code> and <code>VPCSecurityGroups</code>?  These are <em>required</em>, even
+though the CloudFormation docs say they are conditional.  I
+believe they&rsquo;re not <em>officially</em> required b/c at some point in time RDS instances could be created
+without a VPC.  Nowadays, RDS instances must be part of some VPC, either your default VPC or
+another.  I&rsquo;m sure there are edge cases which I don&rsquo;t know about, but this whole post is about
+access resources in a VPC&hellip;so these fields are required.</p>
+
+<p>So, what are these two things and why do we need them?</p>
+
+<h3 id="dbsubnetgroup">DBSubnetGroup</h3>
+
+<p>As I understand it, the <code>DBSubnetGroup</code> is a resource which groups together two or more VPC subnets
+and provides the RDS instance the ability to be a part of the VPC.  At least two subnets are
+required since <code>DBSubnetGroup</code>s require a subnet in at least two availability zones.</p>
+
+<p>Subnets come in two flavors, either public or private.  Public subnets in a VPC allow for
+connections in/out of the public network (the internet).  Private subnets do not.  Most
+<code>DBSubnetGroup</code>s group
+together <em>private</em> subnets, because who on earth wants to expose a database to the outside world?
+Of course, if you&rsquo;re just playing around, you may want to do just this.  But, don&rsquo;t expose your DB
+to the world, if you care about it. You&rsquo;ve been warned.</p>
+
+<blockquote>
+<p>Note, there is much more to it when discussing making an RDS instance publically
+accessible.  The subnets which it&rsquo;s connected to is just one part of that discussion.</p>
+</blockquote>
+
+<p>Creating one of these in CloudFormation/<code>serverless.yml</code> is pretty simple.  I pick three subnets in
+my VPC and set them as environment variables.  Using this technique makes it trivial to switch
+between projects, regions or AWS accounts.  If you haven&rsquo;t read
+http://blog.brianz.bz/post/structuring-serverless-applications-with-python/ I encourage you to do so to
+appreciate environment variables fully.</p>
+
+<pre><code>    RDSSubnetGroup:
+      Type: AWS::RDS::DBSubnetGroup
+      Properties:
+        DBSubnetGroupDescription: RDS Subnet Group
+        SubnetIds:
+          - ${env:SUBNET_ID_A}
+          - ${env:SUBNET_ID_B}
+          - ${env:SUBNET_ID_C}
+</code></pre>
+
+<h3 id="vpcsecuritygroups">VPCSecurityGroups</h3>
+
+<p>Next, we turn our attention to the <code>VPCSecurityGroups</code> field.  This one is pretty straightforward
+if you&rsquo;ve spent any time with EC2 Security Groups.  All it is is a vanilla
+<a href="http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-security-group.html" target="_blank">AWS::EC2::SecurityGroup</a>.
+We&rsquo;re working with PostgreSQL, so we need to open up port <code>5432</code> or whatever port you decide to
+use. This one will also need a reference to the <code>VpcId</code>&hellip;just like the subnet ids, this one is
+pulled from the environment.</p>
+
+<p>For Security Groups to be effective gatekeepers, one needs to attach inbound rules which state who
+is allowed to connect and over what port.  In this scenario, we&rsquo;ll permit incoming traffic to port
+<code>5432</code> where the <em>source</em> is <em>another</em> security group.  Using another Security Group as the allowed
+resource is necessary since Lambda will be the
+inbound actor, and there&rsquo;s no way we&rsquo;ll know what IP addresses Lambda will be coming in.
+Additionally, this is simply a best practice for the dark art of Security Group management.</p>
+
+<pre><code>    RDSSecurityGroup:
+      Type: AWS::EC2::SecurityGroup
+      Properties:
+        GroupDescription: Ingress for RDS Instance
+        VpcId: ${env:VPC_ID}
+        SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '5432'
+          ToPort: '5432'
+          SourceSecurityGroupId:
+            Ref: ServerlessSecurityGroup
+</code></pre>
+
+<p>Down the rabbit hole we go.  We now have our <code>RDSSecurityGroup</code>, but we&rsquo;ve created a dependency on
+yet <em>another</em> resource which is the inbound security group&hellip;.<code>ServerlessSecurityGroup</code>.</p>
+
+<p>Before moving on, notice that in the <code>SourceSecurityGroupId</code> field above the value is
+<code>Ref: ServerlessSecurityGroup</code>.  <code>Ref</code> is a CloudFormation function.  Each CloudFormation resource
+returns something different when it&rsquo;s passed as an argument to <code>Ref</code>.  Look at the
+<a href="http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-security-group.html#w2ab2c21c10d416c15" target="_blank">AWS::EC2::SecurityGroup docs about <code>Ref</code></a>
+and you&rsquo;ll see what it returns:</p>
+
+<blockquote>
+<p>When you specify an AWS::EC2::SecurityGroup type as an argument to the Ref function, AWS
+CloudFormation returns the security group name or the security group ID (for EC2-VPC security
+groups that are not in a default VPC).</p>
+</blockquote>
+
+<p>I honestly don&rsquo;t know what the statement in the parenthesis is referring to.  However, the <code>Ref:</code>
+above works. :&gt;)</p>
+
+<h3 id="serverlesssecuritygroup">ServerlessSecurityGroup</h3>
+
+<p>This security group will not need any rules.  Why is that?  We will merely attach this SG to our
+Lambda functions.  Because our Lambda functions are associated with this SG, and because this SG
+is allowed inbound access to port <code>5432</code>, our Lambdas will have network access to RDS (almost)!</p>
+
+<pre><code class="language-yaml">    ServerlessSecurityGroup:
+      Type: AWS::EC2::SecurityGroup
+      Properties:
+        GroupDescription: SecurityGroup for Serverless Functions
+        VpcId: ${env:VPC_ID}
+</code></pre>
+
+<h3 id="finalizing-rdspostgresinstance">Finalizing RDSPostgresInstance</h3>
+
+<p>With that, we have created the necessary resources to update the CFN <code>RDSPostgresInstance</code>
+section.  Here, I will only show the updates needed.</p>
+
+<pre><code class="language-yaml">    RDSPostgresInstance:
+      Type: AWS::RDS::DBInstance
+      Properties:
+        DBSubnetGroupName:
+          Ref: RDSSubnetGroup
+        VPCSecurityGroups:
+          - Fn::GetAtt: RDSSecurityGroup.GroupId
+</code></pre>
+
+<p>Again, you&rsquo;ll notice the use of <code>Ref:</code> and there is now a new one, <code>FN::GetAtt</code>.  <code>GetAtt</code> stands
+for &ldquo;get attribute.&rdquo;  Each resource in a CloudFormation template has output attributes which can be
+looked up dynamically at runtime. Just as with <code>Ref</code>, each resource has various attributes which
+may be looked up with this function.  In the CloudFormation docs simply scroll down toward the
+bottom, and you&rsquo;ll find what is available to you.</p>
+
+<h2 id="updating-lambda-functions">Updating Lambda functions</h2>
+
+<p>At this point, things still wouldn&rsquo;t work.  The reason for this is that our RDS instance is inside
+of a VPC and our Lambda functions are not.  Our final steps include:</p>
+
+<ul>
+<li>Putting our Lambda functions inside the same VPC</li>
+<li>Attaching <code>ServerlessSecurityGroup</code> to the Lambda functions</li>
+<li>Updating <code>iamRoleStatements</code> to enable the Lambda functions to create EINs, which is a
+prerequisite for Lambdas to live in a VPC</li>
+</ul>
+
+<pre><code class="language-yaml">provider:
+  name: aws
+  runtime: python3.6
+  memorySize: 128
+  region: ${env:AWS_REGION}
+  timeout: 5
+  environment:
+    DB_USERNAME: ${env:DB_USERNAME}
+    DB_PASSWORD: ${env:DB_PASSWORD}
+    DB_NAME: ${env:DB_NAME}
+    DB_HOST:
+      Fn::GetAtt:
+        - RDSPostgresInstance
+        - Endpoint.Address
+  vpc:
+    securityGroupIds:
+      - Fn::GetAtt: ServerlessSecurityGroup.GroupId
+    subnetIds:
+      - ${env:SUBNET_ID_A}
+      - ${env:SUBNET_ID_B}
+      - ${env:SUBNET_ID_C}
+  iamRoleStatements:
+    # Allow the lambda function permission to create EINs, which is part of the
+    # AWSLambdaVPCAccessExecutionRole
+    - Effect: &quot;Allow&quot;
+      Action:
+        - &quot;ec2:CreateNetworkInterface&quot;
+        - &quot;ec2:DescribeNetworkInterfaces&quot;
+        - &quot;ec2:DeleteNetworkInterface&quot;
+      Resource: &quot;*&quot;
+</code></pre>
+
+<p>The <code>vpc</code> section accomplished the first two tasks.  By putting this <code>vpc</code> section in the
+<code>provider</code> section, it&rsquo;s applied to <em>all</em> Lambda functions.  If you don&rsquo;t need all Lambdas talking
+to RDS, then you should attach this <code>vpc</code> to only those functions which need access.</p>
+
+<p>The last part is adding three permissions in the <code>iamRoleStatements</code> section.  Adding these three
+permissions appends the permissions to the IAM Lamba policy which Serverless creates for us
+automatically.</p>
+
+<p>You may also notice how the <code>DB_HOST</code> environment variable is set using the same <code>GetAtt</code> function
+above.  Using this method is quite lovely since application code can get the correct db host value
+from the environment without us even needing to know about it or write it down anywhere.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>Phew!  That&rsquo;s a lot of work to get Lambda functions talking to RDS or any other AWS resource which
+lives inside of VPCs.  If you use ElastiCache or other systems in private VPC subnets, you&rsquo;ll need
+to do the same dance.  Fortunately, it&rsquo;s the same pattern.</p>
+
+<p>What is craziest of all is that while we&rsquo;ve allowed for network access to RDS, our Lamda functions
+now <em>cannot</em> access AWS resources which are <em>outside</em> of this VPC.  For example, SNS cannot be used
+since it&rsquo;s a VPC-agnostic service.  S3 is another one.  This can be solved as well using NAT
+Gateways, which will be a topic for another time.</p>
+
+<p>Happy VPC-ing!</p>
+
+<p>For completeness, the final <code>serverless.yml</code> file is below, minus the Lamba functions section:</p>
+
+<pre><code class="language-yaml">service: rds-vpc
+
+provider:
+  name: aws
+  runtime: python3.6
+  memorySize: 128
+  region: ${env:AWS_REGION}
+  timeout: 5
+  environment:
+    DB_USERNAME: ${env:DB_USERNAME}
+    DB_PASSWORD: ${env:DB_PASSWORD}
+    DB_NAME: ${env:DB_NAME}
+    DB_HOST:
+      Fn::GetAtt:
+        - RDSPostgresInstance
+        - Endpoint.Address
+  vpc:
+    securityGroupIds:
+      - Fn::GetAtt: ServerlessSecurityGroup.GroupId
+    subnetIds:
+      - ${env:SUBNET_ID_A}
+      - ${env:SUBNET_ID_B}
+      - ${env:SUBNET_ID_C}
+  iamRoleStatements:
+    # Allow the lambda function permission to create EINs, which is part of the
+    # AWSLambdaVPCAccessExecutionRole
+    - Effect: &quot;Allow&quot;
+      Action:
+        - &quot;ec2:CreateNetworkInterface&quot;
+        - &quot;ec2:DescribeNetworkInterfaces&quot;
+        - &quot;ec2:DeleteNetworkInterface&quot;
+      Resource: &quot;*&quot;
+
+resources:
+  Resources:
+    ServerlessSecurityGroup:
+      Type: AWS::EC2::SecurityGroup
+      Properties:
+        GroupDescription: SecurityGroup for Serverless Functions
+        VpcId: ${env:VPC_ID}
+    RDSSecurityGroup:
+      Type: AWS::EC2::SecurityGroup
+      Properties:
+        GroupDescription: Ingress for RDS Instance
+        VpcId: ${env:VPC_ID}
+        SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '5432'
+          ToPort: '5432'
+          SourceSecurityGroupId:
+            Ref: ServerlessSecurityGroup
+    RDSSubnetGroup:
+      Type: AWS::RDS::DBSubnetGroup
+      Properties:
+        DBSubnetGroupDescription: RDS Subnet Group
+        SubnetIds:
+          - ${env:SUBNET_ID_A}
+          - ${env:SUBNET_ID_B}
+          - ${env:SUBNET_ID_C}
+    RDSPostgresInstance:
+      Type: AWS::RDS::DBInstance
+      Properties:
+        AllocatedStorage: 100
+        AutoMinorVersionUpgrade: true
+        AvailabilityZone: ${self:provider.region}a
+        DBInstanceClass: db.t2.micro
+        DBName: ${env:DB_NAME}
+        DBSubnetGroupName:
+          Ref: RDSSubnetGroup
+        Engine: postgres
+        EngineVersion: 9.6.2
+        MasterUsername: ${env:DB_USERNAME}
+        MasterUserPassword: ${env:DB_PASSWORD}
+        PubliclyAccessible: false
+        VPCSecurityGroups:
+          - Fn::GetAtt: RDSSecurityGroup.GroupId
+</code></pre>
+
+</div>
+
+        <footer class="post-footer clearfix">
+    
+        <p class="post-tags">
+            <span>Tagged:</span>
+            
+            
+                <a href="http://blog.brianz.bz/tags/serverless/">serverless</a>, 
+            
+                <a href="http://blog.brianz.bz/tags/aws/">aws</a>, 
+            
+                <a href="http://blog.brianz.bz/tags/vpc/">vpc</a>
+            
+        </p>
+    
+
+    <div class="share">
+        
+            <a class="icon-twitter" href="https://twitter.com/share?text=Accessing%20VPC%20Resources%20from%20AWS%20Lambda&url=http%3a%2f%2fblog.brianz.bz%2fpost%2faccessing-vpc-resources-with-lambda%2f"
+                onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                <i class="fa fa-twitter"></i>
+                <span class="hidden">Twitter</span>
+            </a>
+        
+
+        
+            <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http%3a%2f%2fblog.brianz.bz%2fpost%2faccessing-vpc-resources-with-lambda%2f"
+                onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+                <i class="fa fa-facebook"></i>
+                <span class="hidden">Facebook</span>
+            </a>
+        
+
+        
+            <a class="icon-google-plus" href="https://plus.google.com/share?url=http%3a%2f%2fblog.brianz.bz%2fpost%2faccessing-vpc-resources-with-lambda%2f"
+              onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+              <i class="fa fa-google-plus"></i>
+                <span class="hidden">Google+</span>
+            </a>
+        
+        
+    </div>
+</footer>
+
+        
+    <div class="comments">
+        <div id="disqus_thread"></div>
+<script>
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "brianz" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    </div>
+
+    </article>
+</div>
+
+            </div>
+        </div>
+
+        <footer class="footer">
+            <div class="container">
+                <div class="site-title-wrapper">
+                    <h1 class="site-title">
+                        <a title="Brian Z" href="http://blog.brianz.bz/">Brian Z</a>
+                    </h1>
+                    <a class="button-square button-jump-top js-jump-top" href="#">
+                        <i class="fa fa-angle-up"></i>
+                    </a>
+                </div>
+
+                <p class="footer-copyright">
+                    <span>&copy; 2017 / Powered by <a href="https://gohugo.io/">Hugo</a></span>
+                </p>
+                <p class="footer-copyright">
+                    <span><a href="https://github.com/roryg/ghostwriter">Ghostwriter theme</a> By <a href="http://jollygoodthemes.com">JollyGoodThemes</a></span>
+                    <span>/ <a href="https://github.com/jbub/ghostwriter">Ported</a> to Hugo By <a href="https://github.com/jbub">jbub</a></span>
+                </p>
+            </div>
+        </footer>
+
+        <script src="http://blog.brianz.bz/js/jquery-1.11.3.min.js"></script>
+        <script src="http://blog.brianz.bz/js/jquery.fitvids.js"></script>
+
+        
+            <script src="http://blog.brianz.bz/js/highlight.pack.js"></script>
+        
+
+        <script src="http://blog.brianz.bz/js/scripts.js"></script>
+    </body>
+</html>
+
