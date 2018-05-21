@@ -7,7 +7,7 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2016-2017. All rights reserved.</copyright>
-    <lastBuildDate>Sat, 12 May 2018 10:49:15 -0600</lastBuildDate>
+    <lastBuildDate>Sun, 20 May 2018 22:26:15 -0600</lastBuildDate>
     
 	<atom:link href="http://blog.brianz.bz/tags/vpc/index.xml" rel="self" type="application/rss+xml" />
     
@@ -15,7 +15,7 @@
     <item>
       <title>The Dark Art of AWS VPC Networking</title>
       <link>http://blog.brianz.bz/post/dark-art-of-vpc-networking/</link>
-      <pubDate>Sat, 12 May 2018 10:49:15 -0600</pubDate>
+      <pubDate>Sun, 20 May 2018 22:26:15 -0600</pubDate>
       
       <guid>http://blog.brianz.bz/post/dark-art-of-vpc-networking/</guid>
       <description>It&amp;rsquo;s been quite some time since a blog post went up here. The reason for this is mainly due to my book with Packt Publishing, Serverless Design Patterns and Best Practices. Happily I can say that it&amp;rsquo;s published and I can turn my technical attention to other things.
