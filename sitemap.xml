@@ -3,6 +3,11 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>http://blog.brianz.bz/post/dark-art-of-vpc-networking/</loc>
+    <lastmod>2018-05-12T10:49:15-06:00</lastmod>
+  </url>
+  
+  <url>
     <loc>http://blog.brianz.bz/post/accessing-vpc-resources-with-lambda/</loc>
     <lastmod>2017-11-02T22:49:30-06:00</lastmod>
   </url>
@@ -101,13 +106,13 @@
   
   <url>
     <loc>http://blog.brianz.bz/tags/aws/</loc>
-    <lastmod>2017-11-02T22:49:30-06:00</lastmod>
+    <lastmod>2018-05-12T10:49:15-06:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>http://blog.brianz.bz/</loc>
-    <lastmod>2017-11-02T22:49:30-06:00</lastmod>
+    <lastmod>2018-05-12T10:49:15-06:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -149,7 +154,7 @@
   
   <url>
     <loc>http://blog.brianz.bz/post/</loc>
-    <lastmod>2017-11-02T22:49:30-06:00</lastmod>
+    <lastmod>2018-05-12T10:49:15-06:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -167,7 +172,7 @@
   
   <url>
     <loc>http://blog.brianz.bz/tags/serverless/</loc>
-    <lastmod>2017-11-02T22:49:30-06:00</lastmod>
+    <lastmod>2018-05-12T10:49:15-06:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -190,7 +195,7 @@
   
   <url>
     <loc>http://blog.brianz.bz/tags/vpc/</loc>
-    <lastmod>2017-11-02T22:49:30-06:00</lastmod>
+    <lastmod>2018-05-12T10:49:15-06:00</lastmod>
     <priority>0</priority>
   </url>
   

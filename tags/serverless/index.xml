@@ -7,10 +7,20 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2016-2017. All rights reserved.</copyright>
-    <lastBuildDate>Thu, 02 Nov 2017 22:49:30 -0600</lastBuildDate>
+    <lastBuildDate>Sat, 12 May 2018 10:49:15 -0600</lastBuildDate>
     
 	<atom:link href="http://blog.brianz.bz/tags/serverless/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>The Dark Art of AWS VPC Networking</title>
+      <link>http://blog.brianz.bz/post/dark-art-of-vpc-networking/</link>
+      <pubDate>Sat, 12 May 2018 10:49:15 -0600</pubDate>
+      
+      <guid>http://blog.brianz.bz/post/dark-art-of-vpc-networking/</guid>
+      <description>It&amp;rsquo;s been quite some time since a blog post went up here. The reason for this is mainly due to my book with Packt Publishing, Serverless Design Patterns and Best Practices. Happily I can say that it&amp;rsquo;s published and I can turn my technical attention to other things.
+In chapters 2 and 3, I walk through setting up serverless REST and GraphQL APIs, respectively. Both patterns use RDS as a backend datastore.</description>
+    </item>
     
     <item>
       <title>Accessing VPC Resources from AWS Lambda</title>

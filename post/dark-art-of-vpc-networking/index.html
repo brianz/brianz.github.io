@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>The Dark Art of AWS VPC Networking &middot; Brian Zambrano</title>
+        <meta name="description" content="It&rsquo;s been quite some time since a blog post went up here. The reason for this is mainly due to my book with Packt Publishing, Serverless Design Patterns and Best Practices. Happily I can say that it&rsquo;s published and I can turn my technical attention to other things.
+In chapters 2 and 3, I walk through setting up serverless REST and GraphQL APIs, respectively. Both patterns use RDS as a backend datastore.">
+        <meta name="HandheldFriendly" content="True">
+        <meta name="MobileOptimized" content="320">
+        <meta name="generator" content="Hugo 0.36.1" />
+        <meta name="robots" content="index,follow">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <link rel="stylesheet" href="http://blog.brianz.bz/dist/styles.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,600,700,300&subset=latin,cyrillic-ext,latin-ext,cyrillic">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+        
+        
+    </head>
+    <body>
+        
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-75475240-1', 'auto');
+ga('send', 'pageview');
+</script>
+
+
+        <div id="wrapper">
+            <header class="site-header">
+                <div class="container">
+                    <div class="site-title-wrapper">
+                        
+                            <h1 class="site-title">
+                                <a title="Brian Z" href="http://blog.brianz.bz/">Brian Z</a>
+                            </h1>
+                        
+                        <a class="button-square" href="http://blog.brianz.bz/index.xml"><i class="fa fa-rss"></i></a>
+                        
+                            <a class="button-square button-social hint--top" data-hint="Twitter" title="Twitter" href="https://twitter.com/brianzambrano">
+                                <i class="fa fa-twitter"></i>
+                            </a>
+                        
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="Github" title="Github" href="https://github.com/brianz">
+                                <i class="fa fa-github-alt"></i>
+                            </a>
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="Stack Overflow" title="Stack Overflow" href="http://stackoverflow.com/users/87858/brianz">
+                                <i class="fa fa-stack-overflow"></i>
+                            </a>
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="LinkedIn" title="LinkedIn" href="https://www.linkedin.com/in/brianzambrano">
+                                <i class="fa fa-linkedin"></i>
+                            </a>
+                        
+                        
+                        
+                    </div>
+
+                    <ul class="site-nav">
+                        
+    <li class="site-nav-item">
+        <a title="About" href="http://blog.brianz.bz/about/">About</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="Posts" href="http://blog.brianz.bz/post/">Posts</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="Home" href="http://blog.brianz.bz/">Home</a>
+    </li>
+
+                    </ul>
+                </div>
+            </header>
+
+            <div id="container">
+
+
+<div class="container">
+    <article class="post-container" itemscope="" itemtype="http://schema.org/BlogPosting">
+        <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">The Dark Art of AWS VPC Networking</h1>
+    
+    <p class="post-date">
+        <span>Published <time datetime="2018-05-12" itemprop="datePublished">12 May 2018, 10:49</time></span>
+        <span>by</span>
+        <span itemscope="" itemprop="author" itemtype="https://schema.org/Person">
+            <span itemprop="name">
+                <a href="#" itemprop="url" rel="author">Brian Zambrano</a>
+            </span>
+        </span>
+    </p>
+</header>
+
+        <div class="post-content clearfix" itemprop="articleBody">
+    
+
+    
+
+<p>It&rsquo;s been quite some time since a blog post went up here. The reason for this is mainly due to my
+book with Packt Publishing,
+<a href="https://www.packtpub.com/application-development/serverless-design-patterns-and-best-practices" target="_blank">Serverless Design Patterns and Best Practices</a>.
+Happily I can say that it&rsquo;s published and I can turn my technical attention to other things.</p>
+
+<p>In chapters <a href="https://github.com/brianz/serverless-design-patterns/tree/master/ch2" target="_blank">2</a> and
+<a href="https://github.com/brianz/serverless-design-patterns/tree/master/ch3" target="_blank">3</a>, I walk
+through setting up serverless REST and GraphQL APIs, respectively. Both patterns use RDS as a
+backend datastore. One thing which is arguably overly complex with this setup is granting your Lambda
+functions network access to RDS. I covered the details of this in
+<a href="http://blog.brianz.bz/post/accessing-vpc-resources-with-lambda/" target="_blank">a previous post</a>. If you follow along in
+that post you&rsquo;ll learn how to allow inbound network access to an RDS Postgres instance on port 5432. In the
+<a href="http://blog.brianz.bz/post/accessing-vpc-resources-with-lambda/#conclusion" target="_blank">Conclusion</a> I make a note:</p>
+
+<blockquote>
+<p>Also, if your Lambda function needed to speak to an external API on the public internet it would
+not work. This can be solved as well using NAT gateways, which will be a topic for another time.</p>
+</blockquote>
+
+<p>In this post I&rsquo;d like to walk through an entire setup focused around VPC networking, private/public
+subnets and NAT gateways. The focus will be using my previous scenario, where a Lambda function
+needs access to an RDS instance <em>as well as</em> the public internet.
+At the end of all this you should have a good understanding of why all of
+this complexity exists. There are tons of details I won&rsquo;t be
+able to cover, but this exact scenario is quite common and one worth explaining in detail.</p>
+
+<p>In my next post, I hope to cover how to create all of this complex networking via CloudFormation
+and <a href="http://stacker.readthedocs.io/en/latest/" target="_blank">Stacker</a>, which is a great tool for managing your AWS infrastructure.</p>
+
+<p><strong>Note:</strong> <em>I am not a networking expert! Most of the nuts and bolts of networking which I know
+come from setting up VPCs on AWS. Advanced networking topics get quite complex in a hurry and
+this is meant as an intro for developers so that they can work effectively on AWS, specifically
+when building serverless systems.</em></p>
+
+<h2 id="vpcs">VPCs</h2>
+
+<p>What exactly is a Virtual Private Cloud from AWS and why do you care about it? In short, a VPC is a
+virtual network for your AWS resources which lays the foundation for any type of system you&rsquo;re
+building. Other hosting providers by default will open your VMs or other resources to the world,
+meaning if you create a virtual machine all port may be open to the entire internet.
+Throw up some virtual machine, ssh into
+it, access a MySQL database, etc. When all ports are open and a machine is exposed to the public
+internet, development is easy. While this is very simple, it&rsquo;s also very dangerous from a security
+perspective. With a VM or other machine exposed to public internet, you&rsquo;re relying solely on
+credentials for protection and hoping there are no security vulnerabilities in the software which
+you&rsquo;re running.</p>
+
+<p><strong>Note:</strong> <em>I haven&rsquo;t used other hosting providers in a long time, so this may or may not be true
+for various providers. I know with Rackspace Cloud Servers this used to be the case. A Rackspace
+Cloud Server would, by default, be exposed to the public internet and allow all ports to be exposed
+to the outside world. It was an exercise for the developer to use something like <code>iptables</code> to lock
+down their system tighter.</em></p>
+
+<p>VPCs are a core component of practically any architecture you&rsquo;ll build with AWS. If you <em>don&rsquo;t</em>
+know the basics of VPCs, designing any system which is non-trivial will be an exercise in
+frustration. I highly recommend understanding VPC networking thoroughly before embarking on any
+type of AWS design. The good news is that the concepts in this post are enough to cover the vast
+majority of the cases you&rsquo;ll run into.</p>
+
+<p>Any new AWS account will come pre-configured with what is called a &ldquo;default VPC&rdquo;. Default VPCs
+come with a myriad of components which are required to make any VPC useful. You may read all about
+your <a href="https://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/default-vpc.html" target="_blank">Default VPC here</a>.</p>
+
+<p>If you are working with a brand new AWS account and launch an EC2 instance, it&rsquo;s deployed within
+your default VPC. Many people who are new to AWS have no idea this is happening. Later, when
+deploying other resources which need a VPC, such as an RDS instance, they will again use the default
+VPC, which is natural. This comes in handy, since you can quickly get up and running. However, when it&rsquo;s time to
+deploy something for <em>real</em>, you can get into trouble. For example, it&rsquo;s a bad idea to setup a
+production system using your default VPC, simply for the fact that any other resource you deployed
+would go into the same VPC and possibly interfere with your production system. If you need to make
+changes to your Default VPC to support your production system, you&rsquo;ll be affecting any other
+resource from now and into the future, including one-off EC2 instances which you may want to simply
+play around with.</p>
+
+<p>OK, so that still doesn&rsquo;t explain what a VPC is. A VPC is a virtual network which will
+allocate private IP address for resources deployed in it, among other things. If you&rsquo;ve deployed an
+EC2 instance and noticed that they usually come with both a public and private IP address, it&rsquo;s the
+VPC which is determining the private IP address.
+You can configure resources in a VPC to
+have <em>public</em> IP addresses as well. There are several advantages to using VPCs. The most important
+for this discussion are:</p>
+
+<ul>
+<li>Inter-VPC traffic can be routed on the private address space. Because traffic doesn&rsquo;t travel
+across the public Internet it&rsquo;s faster, more secure, and free.</li>
+<li>You may deploy resources in a VPC such that they are completely isolated from the public
+Internet. This is good for security reasons.</li>
+</ul>
+
+<p>A VPC requires a range of IP address from which it will allocate IPs to any system deployed within
+it. This range is configured via a a network CIDR, when you create your VPC. With a CIDR of
+<code>10.0.0.0/16</code> any system deployed in the
+VPC will get an IP address in the range of <code>10.0.0.1</code> to <code>10.0.255.255</code>. That equates to
+<code>65,534</code> unique IP4 addresses, which is a lot of AWS resources. Since you define this CIDR, you can
+adjust it to fit your needs. For this post, I&rsquo;ll use an example VPC with a CIDR of <code>10.0.0.0/16</code></p>
+
+<p><strong>VPCs span Availability Zones and are defined in a single Region.</strong>
+When you create a VPC, you will be deploying it to a single geographical AWS Region
+(i.e., <code>us-west-2</code>, <code>us-east-1</code>, etc.) Your VPCs will, by default, span all of the Availability
+Zones within the region which it&rsquo;s deployed.
+This is important to keep in mind as we
+discuss subnets, high availability an general architecture with AWS VPCs. Availability Zones
+themselves are stand-alone physical systems in a given geographical region which are networked together.
+They are designed such that if one AZ goes down, other AZs in the same geographical region will not
+be affected. That is the promise from AWS, at least. &#x1F601;</p>
+
+<p>With that in mind, any production-level system should be deployed to more than one AZ. More about
+this later.</p>
+
+<h2 id="subnets-public-vs-private">Subnets, public vs. private</h2>
+
+<p>Within a VPC, you may define sub-regions of the network. These are subnets. Subnets also use CIDRs
+to define the range of IP addresses which they will use to when something new is deployed within
+them. Using the example from above, a VPC with a CIDR of <code>10.0.0.0/16</code> would need subnets which have
+the form:</p>
+
+<ul>
+<li><code>10.0.1.0/24</code></li>
+<li><code>10.0.2.0/24</code></li>
+<li><code>10.0.8.0/22</code></li>
+</ul>
+
+<p>These are just examples&hellip;there are many may more examples. The mask at the end of a CIDR
+(i.e., <code>/8</code>, <code>/16</code>, <code>/22</code>, <code>24</code>) determines the range of your
+subnet&rsquo;s IP addresses and ultimately how many resources may fit into a subnet. CIDRs are really
+just bit math, which I&rsquo;ll skip.</p>
+
+<p>There are two flavors of subnets, private and public. There isn&rsquo;t any thing special about the IP
+range and public vs. private&hellip;it&rsquo;s entirely up to you to configure these. So, what exactly are
+the differences? This definition come straight from the <a href="https://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_Subnets.html#vpc-subnet-basics" target="_blank">AWS docs about VPCs and
+Subnets</a>.</p>
+
+<blockquote>
+<p>If a subnet&rsquo;s traffic is routed to an internet gateway, the subnet is known as a public subnet.</p>
+
+<p>If a subnet doesn&rsquo;t have a route to the internet gateway, the subnet is known as a private subnet.</p>
+</blockquote>
+
+<p>Let&rsquo;s drill into that.</p>
+
+<h3 id="public-subnet-routing">Public subnet routing</h3>
+
+<p>A public subnet routes public outbound traffic through an
+<a href="https://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_Internet_Gateway.html" target="_blank">Internet Gateway</a>,
+which is a system
+that AWS manages for you. Any traffic with a destination of <code>10.0.0.0/16</code> will be routed
+locally, using VPC-internal routing. For traffic with any other destination, routing will go
+through the Internet Gateway. This routing is transparent to you and allows your resource to contact
+the public internet.</p>
+
+<p>If we were to look at the Routing Table for a public subnet, it would look like this:</p>
+
+<table>
+<thead>
+<tr>
+<th>Destination</th>
+<th>Target</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>10.0.0.0/16</td>
+<td>local</td>
+</tr>
+
+<tr>
+<td>0.0.0.0/0</td>
+<td>igw-794bb61d</td>
+</tr>
+</tbody>
+</table>
+
+<p>One important thing to note here is that any resource in a public subnet can reach external
+resourced <em>provided they have a public IP address</em>. This is noted right alongside the <a href="https://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_Subnets.html#vpc-subnet-basics" target="_blank">docs
+referenced above</a>:</p>
+
+<blockquote>
+<p>If you want your instance in a public subnet to communicate with the internet over IPv4, it must have
+a public IPv4 address or an Elastic IP address (IPv4).</p>
+</blockquote>
+
+<p>So, if you launch an EC2 instance in a public
+subnet, and that instance <strong>doesn&rsquo;t</strong> have a public IP address, it won&rsquo;t be able to communicate with
+the public internet.</p>
+
+<h3 id="private-subnet-routing">Private subnet routing</h3>
+
+<p>A private subnet doesn&rsquo;t route traffic through an internet gateway, which means that it cannot
+connect to any external resources. It&rsquo;s entirely possible for you to create a subnet which routes
+<code>10.0.0.0/16</code> traffic within your VPC without any problems, using the internal networking. However,
+if a system on this subnet wanted to connect to the outside world, there would be no route for it
+to get out.</p>
+
+<p>The route table for a private subnet <em>without</em> network access would look like the following:</p>
+
+<table>
+<thead>
+<tr>
+<th>Destination</th>
+<th>Target</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>10.0.0.0/16</td>
+<td>local</td>
+</tr>
+</tbody>
+</table>
+
+<p>Just as a private subnet resource can&rsquo;t get <em>out</em>, nothing from the outside world can
+get <em>in</em>. Worried about something hacking into your Postgres RDS instance or your Redis
+cluster? A best practice is to put systems like this in your private subnets. Now, you needn&rsquo;t worry
+(as much) about someone hacking into them from the outside. Placing resources into a private subnet means
+that there is practically no risk of someone hacking directly into your database from the outside
+world. From a networking perspective, it&rsquo;s impossible to connect to private subnet systems from <em>outside</em>
+your VPC.</p>
+
+<p>So, given the case that we have an RDS instance on private subnets and a Lambda function which
+needs to communicate with it, what do we do? My
+<a href="http://blog.brianz.bz/post/accessing-vpc-resources-with-lambda/" target="_blank">previous post</a> discusses how to set that up.
+But what do we do when our Lambda function needs to communicate with RDS <em>and</em> the public internet?
+That&rsquo;s the whole point of this post. It took a while to get here, but the background story is
+necessary!</p>
+
+<p>The answer is, change the route table to route outbound traffic through a
+<a href="https://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/vpc-nat-gateway.html" target="_blank">NAT Gateway</a>.</p>
+
+<h2 id="nat-gateways">NAT Gateways</h2>
+
+<p>A NAT gateway is a resource managed by AWS which does Network Address Translation (NAT) for us, and also
+provides a public Elastic IP address. Once we have a NAT gateway for a given AZ, we need to setup
+our private subnets to use them. This change consists of adding an entry to our private subnet&rsquo;s
+route table, to route any non-internal traffic through the NAT:</p>
+
+<table>
+<thead>
+<tr>
+<th>Destination</th>
+<th>Target</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>10.0.0.0/16</td>
+<td>local</td>
+</tr>
+
+<tr>
+<td>0.0.0.0/0</td>
+<td>nat-2351837b46c56b865</td>
+</tr>
+</tbody>
+</table>
+
+<p>With this small change, anything in our private subnets can:</p>
+
+<ul>
+<li>Communicate within our VPC&rsquo;s Private <em>or</em> public subnets resources on the local network using
+private IPs</li>
+<li>Communicate with the outside world via the NAT gateway</li>
+</ul>
+
+<p>For example, something on this private subnet needs to talk to the host with a private IP of
+10.0.1.23. Looking at the route table, we can see that it can go directly to that host since it has
+a direct connection via local networking. Next, the same system needs to go out and make an API
+call to github.com. Since github.com is not on the <code>10.0.0.0/16</code> network, the packets are routed to
+the NAT gateway. On our behalf, the NAT will route our packets to github.com, and when GitHub
+responds, it will route the response packets back to us. There are <strong>many</strong> details which make this
+work which are not important for this discussion. Just know what the NAT gateway is doing for you
+and you&rsquo;ll be good.</p>
+
+<p>Another interesting result of this change is that our Lambda functions will have a fixed <em>inbound</em>
+IP address when connected to external resources. That IP address will be the IP of our NAT gateway,
+which typically is an Elastic IP.  This has the added benefit
+of giving our Lambda functions (mostly) static IPs if you even face the situation where IPs need to
+be white listed.</p>
+
+<p><strong>Note:</strong> <em>I&rsquo;m working on a project now where we need to talk to the Salesforce API. Every IP we connect
+from needs to be white listed. NAT gateways is our solution to this when talking to Salesforce via
+Lambda functions.</em></p>
+
+<h2 id="vpc-and-subnet-design">VPC and Subnet Design</h2>
+
+<p>With any sort of system where you care about uptime, it&rsquo;s crucial to set your network up across
+availability zones. Rather than deploying all of your systems into, say, <code>us-west-2a</code>, you would
+need to deploy <em>across</em> AZs, including at least one more of <code>us-west-2b</code> or <code>us-west-2c</code>. Why?
+Remember back when I told you that AZs are independent physical systems (buildings, I presume) that
+AWS manages for you, and that if one AZ goes down, the others should still function? Well, if
+you&rsquo;ve deployed your entire infrastructure to <code>us-west-2a</code> and that AZ goes down, so to does your
+entire system.</p>
+
+<p>A standard practice for real system is to create public/private subnets across multiple AZs and
+then deploy resources across these AZs. My nifty little diagram attempts to illustrate this. This
+diagram shows a single VPC with a CIDR of <code>10.0.0.0/16</code> deployed in the Oregon region, which is
+<code>us-west-2</code>. This VPC contains three pairs of public/private subnets, one in each of the three
+availability zones.</p>
+
+
+<figure >
+    
+        <img src="http://blog.brianz.bz/images/vpc-arch.png" alt="Example VPC design for high availability" />
+    
+    
+</figure>
+
+
+<p>In this scenario, a single RDS instance is deployed across all three of the private subnets.
+Honestly, I don&rsquo;t know the details on how this is handled, but deploying RDS across three AZs
+ensures our database will stay up even when an AZ goes down.</p>
+
+<p>Alongside RDS is a Lambda function, which is also deployed across three AZs. In the public subnet
+are three EC2 instances which we&rsquo;ll assume are all doing the same thing. We deploy three of them to
+cover ourselves in the case that an AZ goes down.</p>
+
+<p>In order to allow our Lambda functions outbound internet access, we need to create a NAT gateway
+<em>in each AZ</em>. That is important to remember&hellip;VPCs may span AZs, but NAT gateways do not. There is
+a 1-to-1 mapping with NAT gateways and availability zones, or more accurately, private subnets.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>Phew&hellip;that&rsquo;s a lot. I can promise you that if you intend to stick with AWS architecture,
+knowledge of VPCs is a must. What I covered above will get you a very long way, especially when
+dealing with serverless systems and/or a typical SaaS application.</p>
+
+<p>Once armed with this knowledge, the next hurdle is learning how to exactly create and manage all of
+these pieces. Each piece on it&rsquo;s own isn&rsquo;t terribly complex, but when it&rsquo;s time to create a VPC
+from scratch there are a <em>lot</em> of pieces to the puzzle, all of which must fit together properly in
+order for your system to work.</p>
+
+<p>In my next post I&rsquo;d like to cover <a href="http://stacker.readthedocs.io/en/latest/" target="_blank">Stacker</a>, which is Python application
+which helps manage CloudFormation scripts. Stacker has several built-in &ldquo;blueprints&rdquo; for common
+systems like VPCs. Creating a new VPC from scratch isn&rsquo;t for the faint of heart if you&rsquo;re new to
+it, but Stacker can do pretty much all of the hard work.</p>
+
+</div>
+
+        <footer class="post-footer clearfix">
+    
+        <p class="post-tags">
+            <span>Tagged:</span>
+            
+            
+                <a href="http://blog.brianz.bz/tags/aws/">aws</a>, 
+            
+                <a href="http://blog.brianz.bz/tags/serverless/">serverless</a>, 
+            
+                <a href="http://blog.brianz.bz/tags/vpc/">vpc</a>
+            
+        </p>
+    
+
+    <div class="share">
+        
+            <a class="icon-twitter" href="https://twitter.com/share?text=The%20Dark%20Art%20of%20AWS%20VPC%20Networking&url=http%3a%2f%2fblog.brianz.bz%2fpost%2fdark-art-of-vpc-networking%2f"
+                onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                <i class="fa fa-twitter"></i>
+                <span class="hidden">Twitter</span>
+            </a>
+        
+
+        
+            <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http%3a%2f%2fblog.brianz.bz%2fpost%2fdark-art-of-vpc-networking%2f"
+                onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+                <i class="fa fa-facebook"></i>
+                <span class="hidden">Facebook</span>
+            </a>
+        
+
+        
+            <a class="icon-google-plus" href="https://plus.google.com/share?url=http%3a%2f%2fblog.brianz.bz%2fpost%2fdark-art-of-vpc-networking%2f"
+              onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+              <i class="fa fa-google-plus"></i>
+                <span class="hidden">Google+</span>
+            </a>
+        
+        
+    </div>
+</footer>
+
+        
+    <div class="comments">
+        <div id="disqus_thread"></div>
+<script>
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "brianz" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    </div>
+
+    </article>
+</div>
+
+            </div>
+        </div>
+
+        <footer class="footer">
+            <div class="container">
+                <div class="site-title-wrapper">
+                    <h1 class="site-title">
+                        <a title="Brian Z" href="http://blog.brianz.bz/">Brian Z</a>
+                    </h1>
+                    <a class="button-square button-jump-top js-jump-top" href="#">
+                        <i class="fa fa-angle-up"></i>
+                    </a>
+                </div>
+
+                <p class="footer-copyright">
+                    <span>&copy; 2018 / Powered by <a href="https://gohugo.io/">Hugo</a></span>
+                </p>
+                <p class="footer-copyright">
+                    <span><a href="https://github.com/roryg/ghostwriter">Ghostwriter theme</a> By <a href="http://jollygoodthemes.com">JollyGoodThemes</a></span>
+                    <span>/ <a href="https://github.com/jbub/ghostwriter">Ported</a> to Hugo By <a href="https://github.com/jbub">jbub</a></span>
+                </p>
+            </div>
+        </footer>
+
+        <script src="http://blog.brianz.bz/js/jquery-1.11.3.min.js"></script>
+        <script src="http://blog.brianz.bz/js/jquery.fitvids.js"></script>
+
+        
+            <script src="http://blog.brianz.bz/js/highlight.pack.js"></script>
+        
+
+        <script src="http://blog.brianz.bz/js/scripts.js"></script>
+    </body>
+</html>
+
