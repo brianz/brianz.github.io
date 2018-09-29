@@ -7,10 +7,19 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2016-2017. All rights reserved.</copyright>
-    <lastBuildDate>Sun, 20 May 2018 22:26:15 -0600</lastBuildDate>
+    <lastBuildDate>Fri, 17 Aug 2018 16:02:53 -0600</lastBuildDate>
     
 	<atom:link href="http://blog.brianz.bz/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Managing SQLAlchemy Transactions with Serverless</title>
+      <link>http://blog.brianz.bz/post/serverless-how-to-handle-db-transactions/</link>
+      <pubDate>Fri, 17 Aug 2018 16:02:53 -0600</pubDate>
+      
+      <guid>http://blog.brianz.bz/post/serverless-how-to-handle-db-transactions/</guid>
+      <description>For quite some time, SQLAlchemy has been my go-to database toolkit and ORM for Python microservices and Serverless projects. SQLAlchemy is very powerful and has given me the ability to do pretty much anything I need to do with Postgres, my database of choice nowadays. Of course, the trade off of great power and flexibility is increased complexity. Since SQLAlchemy is a bit more low-level than other ORMs (such as Django, or even Flask&amp;rsquo;s layer on top of SQLAlchemy) you&amp;rsquo;re on the hook for dealing with some details that these other ORMs handle automatically.</description>
+    </item>
     
     <item>
       <title>The Dark Art of AWS VPC Networking</title>

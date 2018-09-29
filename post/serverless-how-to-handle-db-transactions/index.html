@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Managing SQLAlchemy Transactions with Serverless &middot; Brian Zambrano</title>
+        <meta name="description" content="For quite some time, SQLAlchemy has been my go-to database toolkit and ORM for Python microservices and Serverless projects. SQLAlchemy is very powerful and has given me the ability to do pretty much anything I need to do with Postgres, my database of choice nowadays. Of course, the trade off of great power and flexibility is increased complexity. Since SQLAlchemy is a bit more low-level than other ORMs (such as Django, or even Flask&rsquo;s layer on top of SQLAlchemy) you&rsquo;re on the hook for dealing with some details that these other ORMs handle automatically.">
+        <meta name="HandheldFriendly" content="True">
+        <meta name="MobileOptimized" content="320">
+        <meta name="generator" content="Hugo 0.40.3" />
+        <meta name="robots" content="index,follow">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <link rel="stylesheet" href="http://blog.brianz.bz/dist/styles.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,600,700,300&subset=latin,cyrillic-ext,latin-ext,cyrillic">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+        
+        
+    </head>
+    <body>
+        
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-75475240-1', 'auto');
+ga('send', 'pageview');
+</script>
+
+
+        <div id="wrapper">
+            <header class="site-header">
+                <div class="container">
+                    <div class="site-title-wrapper">
+                        
+                            <h1 class="site-title">
+                                <a title="Brian Z" href="http://blog.brianz.bz/">Brian Z</a>
+                            </h1>
+                        
+                        <a class="button-square" href="http://blog.brianz.bz/index.xml"><i class="fa fa-rss"></i></a>
+                        
+                            <a class="button-square button-social hint--top" data-hint="Twitter" title="Twitter" href="https://twitter.com/brianzambrano">
+                                <i class="fa fa-twitter"></i>
+                            </a>
+                        
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="Github" title="Github" href="https://github.com/brianz">
+                                <i class="fa fa-github-alt"></i>
+                            </a>
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="Stack Overflow" title="Stack Overflow" href="http://stackoverflow.com/users/87858/brianz">
+                                <i class="fa fa-stack-overflow"></i>
+                            </a>
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="LinkedIn" title="LinkedIn" href="https://www.linkedin.com/in/brianzambrano">
+                                <i class="fa fa-linkedin"></i>
+                            </a>
+                        
+                        
+                        
+                    </div>
+
+                    <ul class="site-nav">
+                        
+    <li class="site-nav-item">
+        <a title="About" href="http://blog.brianz.bz/about/">About</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="Posts" href="http://blog.brianz.bz/post/">Posts</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="Home" href="http://blog.brianz.bz/">Home</a>
+    </li>
+
+                    </ul>
+                </div>
+            </header>
+
+            <div id="container">
+
+
+<div class="container">
+    <article class="post-container" itemscope="" itemtype="http://schema.org/BlogPosting">
+        <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Managing SQLAlchemy Transactions with Serverless</h1>
+    
+    <p class="post-date">
+        <span>Published <time datetime="2018-08-17" itemprop="datePublished">17 Aug 2018, 16:02</time></span>
+        <span>by</span>
+        <span itemscope="" itemprop="author" itemtype="https://schema.org/Person">
+            <span itemprop="name">
+                <a href="#" itemprop="url" rel="author">Brian Zambrano</a>
+            </span>
+        </span>
+    </p>
+</header>
+
+        <div class="post-content clearfix" itemprop="articleBody">
+    
+
+    
+
+<p>For quite some time, <a href="https://www.sqlalchemy.org" target="_blank">SQLAlchemy</a> has been my go-to database toolkit and ORM for Python microservices
+and <a href="https://serverless.com" target="_blank">Serverless</a> projects. SQLAlchemy is very powerful and has given me the ability to do pretty much
+anything I need to do with Postgres, my database of choice nowadays. Of course, the trade off of
+great power and flexibility is increased complexity. Since SQLAlchemy is a bit more low-level than
+other ORMs (such as Django, or even Flask&rsquo;s layer on top of SQLAlchemy) you&rsquo;re on the hook for
+dealing with some details that these other ORMs handle automatically.</p>
+
+<p><strong>In this post, I’m going to discuss how to manage database transactions in a serverless
+environment using SQLAlchemy correctly.</strong></p>
+
+<p>I&rsquo;m not going to go into great detail about DB transactions themselves. However, I will remind readers that it’s
+crucial to close transactions by either executing a DB <code>COMMIT</code> or <code>ROLLBACK</code> statement. If either of these is not
+performed after a transaction is started, a database connection will wind up in an idle state and can block other
+types of DB operations. I’ll go into more detail below.</p>
+
+<h2 id="transactions-in-web-frameworks">Transactions in Web Frameworks</h2>
+
+<p>Serverless architectures present new challenges and force us to think
+about problems differently since the environment is so much different than a typical request/response
+web context. Traditional web frameworks have a clear and well-defined lifecycle for each request,
+which could be something like:</p>
+
+<ol>
+<li><code>pre-request</code></li>
+<li><code>process-request</code></li>
+<li><code>post-request</code></li>
+<li><code>pre-response</code></li>
+<li><code>send-response</code></li>
+<li><code>post-response</code></li>
+</ol>
+
+<blockquote>
+<p>As a concrete example, you can read about Flask&rsquo;s hooks such as <code>before_request()</code>, <code>after_request()</code>
+<a href="http://flask.pocoo.org/docs/1.0/reqcontext/#callbacks-and-errors" target="_blank">at this link</a></p>
+</blockquote>
+
+<p>Because web frameworks are designed to deal with the web, they can depend on this request/response
+cycle and offer hooks to us engineers. As a simple example, when a database is brought into the
+picture, we can connect and disconnect in logical places such as <code>pre-request</code> and <code>post-response</code>,
+respectively. Any database connection setup would, of course, be started early on in the request
+pipeline, and tasks such as closing a connection or putting a connection back into a pool would be
+near or at the very end. A <code>post-response</code> hook is a fantastic place to also commit
+transactions, or perform a <code>rollback</code> in the case of errors. Either way, it&rsquo;s a logical place to
+tidy up DB transactions and connections so that the DB is left is a &ldquo;clean&rdquo; state at the end of an
+HTTP request/response cycle.</p>
+
+<p>Serverless architectures do not provide us with these simple hooks. The problem lies in the fact
+that functions-as-a-service (such as AWS Lambda) are so simple. What I mean here is that web
+frameworks do quite a bit of work for us and are relatively complicated pieces of software. Lambda
+functions or other FaaS are much more straightforward and provide next to nothing out of the box.
+In a genuine sense, they are small functions which execute on our behalf in response to some event.
+This event may or may not be an HTTP request.</p>
+
+<blockquote>
+<p><strong>When a Lambda function executes in response to an HTTP
+event, all of a sudden we&rsquo;re in a situation where it&rsquo;d be pretty nice to have some of the
+typical lifecycle hooks found in modern web frameworks so that we can clean up DB connections and
+transactions.</strong></p>
+</blockquote>
+
+<p>The problem is, we don&rsquo;t have these hooks. HTTP is merely one way to execute our
+functions. Lambda functions are extremely useful outside of a web request (think data pipelines,
+triggers from other microservices, triggers from S3 events, etc.)</p>
+
+<p><strong>How do you properly use SQLAlchemy
+when you <em>don&rsquo;t</em> have lifecycle hooks to setup and tear-down/close your database connections and
+commit/rollback transactions?</strong></p>
+
+<h2 id="consequences-of-doing-it-wrong">Consequences of doing it wrong</h2>
+
+<p>Before answering that question, let&rsquo;s look at what happens when you mishandle DB transactions.</p>
+
+<p>It took me quite a while to figure out that I was managing my DB transactions incorrectly in all
+of my serverless projects. The reason has to do with both the way I structured my code for
+transaction management in combination with SQLAlchemy&rsquo;s design. I&rsquo;m not at all blaming
+SQLAlchemy&hellip;my code was simply assuming a particular behavior that SQLAlchemy doesn&rsquo;t conform to.</p>
+
+<p>The code and pattern below is something I’ve been using for years, across serverless and
+non-serverless projects. It’s critical to understand that <em>SQLAlchemy will implicitly start a
+transaction whenever you starting making ORM queries or statements</em>. As such, you need to commit or
+rollback these transactions yourself.</p>
+
+<p>I have a mixin class which adds a <code>save()</code> method that will do the work of committing the
+transaction.</p>
+
+<p>The definition and usage look like this:</p>
+
+<pre><code class="language-python">from . import get_session
+
+class ModelMixin:
+
+    def save(self, *, commit=True):
+        session = get_session()
+        session.add(self)
+        if commit:
+            commit_session()
+
+class User(BaseModel, Base):
+      &quot;&quot;&quot;Model for the clients table.&quot;&quot;&quot;
+      email = Column(String(128), nullable=False)
+      name = Column(String(128), nullable=False)
+</code></pre>
+
+<blockquote>
+<p><strong>Note:</strong> <code>Base</code>, in the example above, is merely the <code>declaritive_base</code> instance
+<a href="https://docs.sqlalchemy.org/en/latest/orm/extensions/declarative/basic_use.html" target="_blank">as you can read about here</a></p>
+</blockquote>
+
+<p>To use this, I can first create a <code>User</code> and call the save method to get the object/record committed
+to the DB. The following would start and commit a transaction just fine.</p>
+
+<pre><code>user = User(email='test@bar.com', name='Brian Zambrano')
+user.save()
+</code></pre>
+
+<p>Now, all is well. However, if you add one more line after the save, a <em>new</em> transaction would be
+started. Follow the common scenario below of writing something to the DB, then immediately using
+the ORM object which was written.</p>
+
+<pre><code class="language-python"># Instantiate a new `User`. DB isn't touched
+user = User(email='test@bar.com', name='Brian Zambrano')
+
+# Save will open up a connection via my get_session helper, then commit it with the 
+# commit_session # helper. Life is good.
+user.save()
+
+# With SQLAlchemy, a request for data on a previously created model object will re-query
+# the database! This means that a *new* transaction has been started.
+print(user.id)
+</code></pre>
+
+<p>The TL;DR here is that if you:</p>
+
+<ol>
+<li>Write an object to the DB and commit the transaction</li>
+<li>Use the Python ORM object to read data from this object</li>
+</ol>
+
+<p><strong>you have started a second transaction in step 2 and needs to commit it.</strong></p>
+
+<p>My serverless handler functions often did just this. The pseudo-code would be something along the
+lines of:</p>
+
+<pre><code class="language-python">def create_thing_handler(event, context):
+    thing = create_thing_in_db(event.data)
+    return serialize_to_json(thing)
+</code></pre>
+
+<p>The act of asking for data from <code>thing</code> would start an entirely new transaction, as SQLAlchemy will
+go back into the DB to get the data which was written. The end result is that transactions were
+left lying around in an <code>idle in transaction</code> state. The subsequent request to my Lambda functions
+would work just fine since these connections would start all over again with new <code>BEGIN</code> and <code>COMMIT</code>
+statements. Eventually, the connections would be committed, or timeout as the Lambda functions was
+expired by AWS.</p>
+
+<p>The same problem exists for my read-only handlers. When <em>reading</em> data, I did not have any
+transaction management which resulted in the same problem.</p>
+
+<pre><code class="language-python">def get_thing_handler(event, context):
+    thing = get_thing_from_db(event.data['id'])
+    return serialize_to_json(thing)
+</code></pre>
+
+<p>Even if there is a <code>COMMIT</code> statement around <code>get_thing_from_db</code>, the last line will open up a new
+transaction which isn&rsquo;t committed.</p>
+
+<p>The worse problem here is when performing any type of database schema changes. Look at the
+<a href="https://www.citusdata.com/blog/2018/02/15/when-postgresql-blocks/" target="_blank">table here from Citusdata</a>
+which explains what statements will block other statements. In the top row, you will see that
+<code>SELECT</code> statements will block <code>ALTER</code> statements.</p>
+
+<blockquote>
+<p>If you have <code>SELECT</code> statements which are <code>idle in transaction</code>, <code>ALTER</code> statements will be
+blocked</p>
+</blockquote>
+
+<p>To demonstrate this, I ran several queries against my REST API from Chapter 2 of my book,
+<a href="https://github.com/brianz/serverless-design-patterns/tree/master/ch2" target="_blank">Serverless Design Patterns and Best
+Practices</a>. The screenshot
+below shows the open connections after hitting a read-only API with a concurrency of 10 using
+<code>siege</code></p>
+
+
+<figure>
+    
+        <img src="http://blog.brianz.bz/images/rds-connections/NullPool-preping-no-commit-siege-c10-r20/postico-01.png" />
+    
+    
+</figure>
+
+
+<p>In this state, I issue a simple <code>ALTER table</code> statement which added a column:</p>
+
+
+<figure>
+    
+        <img src="http://blog.brianz.bz/images/rds-connections/sql-update-table.png" />
+    
+    
+</figure>
+
+
+<p>This query would just hang. If I queried postgres to determine if the open transactions were
+blocking any <em>other</em> transactions, I could very clearly see the reason for my <code>ALTER</code> statement&rsquo;s
+problem:</p>
+
+
+<figure>
+    
+        <img src="http://blog.brianz.bz/images/rds-connections/sql-blocked-queries.png" />
+    
+    
+</figure>
+
+
+<p>The results above show that my 10 open connections are all idle with <code>SELECT</code> statements, and each
+of these is blocking my <code>ALTER table</code> statement.</p>
+
+<h2 id="the-fix">The fix</h2>
+
+<p>The solution which I landed on is a bit coarse but works very well and honestly I can&rsquo;t think if an
+easier or less intrusive way. If we mimic web frameworks, we need to clean up at the end of our handler
+function, just before the response is sent back to the client. To accomplish this, I implemented a
+decorator which I use around all of my Lambda handler function. My decorator is called
+<code>session_committer</code> and looks like this:</p>
+
+<pre><code class="language-python">def session_committer(func):
+    &quot;&quot;&quot;Decorator to commit the DB session.
+
+    Use this from high-level functions such as handler so that the session is always committed or
+    closed.
+
+    &quot;&quot;&quot;
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        finally:
+            commit_session()
+
+    return wrapper
+</code></pre>
+
+<p>Using it is trivial:</p>
+
+<pre><code class="language-python">@session_committer
+def get_thing_handler(event, context):
+    thing = get_thing_from_db(event.data['id'])
+    return serialize_to_json(thing)
+</code></pre>
+
+<p>With this change, after running <code>siege</code> I can see that connections have gone from <code>idle in
+transaction</code> to simple <code>idle</code>, which means the connection is open but the transaction has be
+closed.</p>
+
+
+<figure>
+    
+        <img src="http://blog.brianz.bz/images/rds-connections/QPool-1-preping-siege-c10-r20/postico-01.png" />
+    
+    
+</figure>
+
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>Managing database transactions manually is tricky whether you&rsquo;re using a serverless architecture or
+not. We often take for granted all of the work which web frameworks provide to us and it can be a
+rude awakening when we have to deal with housekeeping issues like this ourselves. Still, I believe
+well-rounded engineers need to understand what is going on with the systems that we use. While
+SQLAlchemy may be a bit more &ldquo;raw&rdquo; than some of the other ORMs out there, it&rsquo;s extremely powerful
+and provides you the ability to do nearly anything you need to do.</p>
+
+<p>There is another subject buried in here which has to do with connection pooling in serverless
+architectures. I plan on covering that in an upcoming post.</p>
+
+<p>If you&rsquo;d like to take a look at all of my SQLAlchemy helper code, I&rsquo;ve put it up in the following
+gist: <a href="https://gist.github.com/brianz/feedc052d64212b6576fa42dd6dcadab" target="_blank">https://gist.github.com/brianz/feedc052d64212b6576fa42dd6dcadab</a></p>
+
+</div>
+
+        <footer class="post-footer clearfix">
+    
+        <p class="post-tags">
+            <span>Tagged:</span>
+            
+            
+                <a href="http://blog.brianz.bz/tags/aws/">aws</a>, 
+            
+                <a href="http://blog.brianz.bz/tags/serverless/">serverless</a>, 
+            
+                <a href="http://blog.brianz.bz/tags/rds/">rds</a>, 
+            
+                <a href="http://blog.brianz.bz/tags/python/">python</a>
+            
+        </p>
+    
+
+    <div class="share">
+        
+            <a class="icon-twitter" href="https://twitter.com/share?text=Managing%20SQLAlchemy%20Transactions%20with%20Serverless&url=http%3a%2f%2fblog.brianz.bz%2fpost%2fserverless-how-to-handle-db-transactions%2f"
+                onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                <i class="fa fa-twitter"></i>
+                <span class="hidden">Twitter</span>
+            </a>
+        
+
+        
+            <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http%3a%2f%2fblog.brianz.bz%2fpost%2fserverless-how-to-handle-db-transactions%2f"
+                onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+                <i class="fa fa-facebook"></i>
+                <span class="hidden">Facebook</span>
+            </a>
+        
+
+        
+            <a class="icon-google-plus" href="https://plus.google.com/share?url=http%3a%2f%2fblog.brianz.bz%2fpost%2fserverless-how-to-handle-db-transactions%2f"
+              onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+              <i class="fa fa-google-plus"></i>
+                <span class="hidden">Google+</span>
+            </a>
+        
+        
+    </div>
+</footer>
+
+        
+    <div class="comments">
+        <div id="disqus_thread"></div>
+<script>
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "brianz" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    </div>
+
+    </article>
+</div>
+
+            </div>
+        </div>
+
+        <footer class="footer">
+            <div class="container">
+                <div class="site-title-wrapper">
+                    <h1 class="site-title">
+                        <a title="Brian Z" href="http://blog.brianz.bz/">Brian Z</a>
+                    </h1>
+                    <a class="button-square button-jump-top js-jump-top" href="#">
+                        <i class="fa fa-angle-up"></i>
+                    </a>
+                </div>
+
+                <p class="footer-copyright">
+                    <span>&copy; 2018 / Powered by <a href="https://gohugo.io/">Hugo</a></span>
+                </p>
+                <p class="footer-copyright">
+                    <span><a href="https://github.com/roryg/ghostwriter">Ghostwriter theme</a> By <a href="http://jollygoodthemes.com">JollyGoodThemes</a></span>
+                    <span>/ <a href="https://github.com/jbub/ghostwriter">Ported</a> to Hugo By <a href="https://github.com/jbub">jbub</a></span>
+                </p>
+            </div>
+        </footer>
+
+        <script src="http://blog.brianz.bz/js/jquery-1.11.3.min.js"></script>
+        <script src="http://blog.brianz.bz/js/jquery.fitvids.js"></script>
+
+        
+            <script src="http://blog.brianz.bz/js/highlight.pack.js"></script>
+        
+
+        <script src="http://blog.brianz.bz/js/scripts.js"></script>
+    </body>
+</html>
+

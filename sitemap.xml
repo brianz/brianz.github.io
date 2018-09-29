@@ -3,6 +3,11 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>http://blog.brianz.bz/post/serverless-how-to-handle-db-transactions/</loc>
+    <lastmod>2018-08-17T16:02:53-06:00</lastmod>
+  </url>
+  
+  <url>
     <loc>http://blog.brianz.bz/post/dark-art-of-vpc-networking/</loc>
     <lastmod>2018-05-20T22:26:15-06:00</lastmod>
   </url>
@@ -106,13 +111,13 @@
   
   <url>
     <loc>http://blog.brianz.bz/tags/aws/</loc>
-    <lastmod>2018-05-20T22:26:15-06:00</lastmod>
+    <lastmod>2018-08-17T16:02:53-06:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>http://blog.brianz.bz/</loc>
-    <lastmod>2018-05-20T22:26:15-06:00</lastmod>
+    <lastmod>2018-08-17T16:02:53-06:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -154,13 +159,19 @@
   
   <url>
     <loc>http://blog.brianz.bz/post/</loc>
-    <lastmod>2018-05-20T22:26:15-06:00</lastmod>
+    <lastmod>2018-08-17T16:02:53-06:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>http://blog.brianz.bz/tags/python/</loc>
-    <lastmod>2017-07-21T23:09:49-06:00</lastmod>
+    <lastmod>2018-08-17T16:02:53-06:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.brianz.bz/tags/rds/</loc>
+    <lastmod>2018-08-17T16:02:53-06:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -172,7 +183,7 @@
   
   <url>
     <loc>http://blog.brianz.bz/tags/serverless/</loc>
-    <lastmod>2018-05-20T22:26:15-06:00</lastmod>
+    <lastmod>2018-08-17T16:02:53-06:00</lastmod>
     <priority>0</priority>
   </url>
   
