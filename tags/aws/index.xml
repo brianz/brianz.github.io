@@ -13,7 +13,7 @@
     
     
     <item>
-      <title>Managing SQLAlchemy Transactions with Serverless</title>
+      <title>Managing Database Transactions with SQLAlchemy in Serverless</title>
       <link>http://blog.brianz.bz/post/serverless-how-to-handle-db-transactions/</link>
       <pubDate>Fri, 17 Aug 2018 16:02:53 -0600</pubDate>
       
