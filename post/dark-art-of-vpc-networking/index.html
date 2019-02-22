@@ -8,7 +8,7 @@
 In chapters 2 and 3, I walk through setting up serverless REST and GraphQL APIs, respectively. Both patterns use RDS as a backend datastore.">
         <meta name="HandheldFriendly" content="True">
         <meta name="MobileOptimized" content="320">
-        <meta name="generator" content="Hugo 0.40.3" />
+        <meta name="generator" content="Hugo 0.53" />
         <meta name="robots" content="index,follow">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         
@@ -20,14 +20,17 @@ In chapters 2 and 3, I walk through setting up serverless REST and GraphQL APIs,
     </head>
     <body>
         
-<script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-ga('create', 'UA-75475240-1', 'auto');
-ga('send', 'pageview');
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-75475240-1', 'auto');
+	
+	ga('send', 'pageview');
+}
 </script>
 
 
@@ -409,12 +412,9 @@ diagram shows a single VPC with a CIDR of <code>10.0.0.0/16</code> deployed in t
 <code>us-west-2</code>. This VPC contains three pairs of public/private subnets, one in each of the three
 availability zones.</p>
 
-
 <figure>
-    
-        <img src="http://blog.brianz.bz/images/vpc-arch.png" alt="Example VPC design for high availability" />
-    
-    
+    <img src="http://blog.brianz.bz/images/vpc-arch.png"
+         alt="Example VPC design for high availability"/> 
 </figure>
 
 
@@ -494,7 +494,7 @@ it, but Stacker can do pretty much all of the hard work.</p>
         
     <div class="comments">
         <div id="disqus_thread"></div>
-<script>
+<script type="application/javascript">
     var disqus_config = function () {
     
     

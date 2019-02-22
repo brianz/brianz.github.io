@@ -7,7 +7,7 @@
         <meta name="description" content="For quite some time, SQLAlchemy has been my go-to database toolkit and ORM for Python microservices and Serverless projects. SQLAlchemy is very powerful and has given me the ability to do pretty much anything I need to do with Postgres, my database of choice nowadays. Of course, the trade off of great power and flexibility is increased complexity. Since SQLAlchemy is a bit more low-level than other ORMs (such as Django, or even Flask&rsquo;s layer on top of SQLAlchemy) you&rsquo;re on the hook for dealing with some details that these other ORMs handle automatically.">
         <meta name="HandheldFriendly" content="True">
         <meta name="MobileOptimized" content="320">
-        <meta name="generator" content="Hugo 0.40.3" />
+        <meta name="generator" content="Hugo 0.53" />
         <meta name="robots" content="index,follow">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         
@@ -19,14 +19,17 @@
     </head>
     <body>
         
-<script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-ga('create', 'UA-75475240-1', 'auto');
-ga('send', 'pageview');
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-75475240-1', 'auto');
+	
+	ga('send', 'pageview');
+}
 </script>
 
 
@@ -289,23 +292,15 @@ Practices</a>. The screenshot
 below shows the open connections after hitting a read-only API with a concurrency of 10 using
 <code>siege</code></p>
 
-
 <figure>
-    
-        <img src="http://blog.brianz.bz/images/rds-connections/NullPool-preping-no-commit-siege-c10-r20/postico-01.png" />
-    
-    
+    <img src="http://blog.brianz.bz/images/rds-connections/NullPool-preping-no-commit-siege-c10-r20/postico-01.png"/> 
 </figure>
 
 
 <p>In this state, I issue a simple <code>ALTER table</code> statement which added a column:</p>
 
-
 <figure>
-    
-        <img src="http://blog.brianz.bz/images/rds-connections/sql-update-table.png" />
-    
-    
+    <img src="http://blog.brianz.bz/images/rds-connections/sql-update-table.png"/> 
 </figure>
 
 
@@ -313,12 +308,8 @@ below shows the open connections after hitting a read-only API with a concurrenc
 blocking any <em>other</em> transactions, I could very clearly see the reason for my <code>ALTER</code> statement&rsquo;s
 problem:</p>
 
-
 <figure>
-    
-        <img src="http://blog.brianz.bz/images/rds-connections/sql-blocked-queries.png" />
-    
-    
+    <img src="http://blog.brianz.bz/images/rds-connections/sql-blocked-queries.png"/> 
 </figure>
 
 
@@ -361,12 +352,8 @@ def get_thing_handler(event, context):
 transaction</code> to simple <code>idle</code>, which means the connection is open but the transaction has be
 closed.</p>
 
-
 <figure>
-    
-        <img src="http://blog.brianz.bz/images/rds-connections/QPool-1-preping-siege-c10-r20/postico-01.png" />
-    
-    
+    <img src="http://blog.brianz.bz/images/rds-connections/QPool-1-preping-siege-c10-r20/postico-01.png"/> 
 </figure>
 
 
@@ -435,7 +422,7 @@ gist: <a href="https://gist.github.com/brianz/feedc052d64212b6576fa42dd6dcadab" 
         
     <div class="comments">
         <div id="disqus_thread"></div>
-<script>
+<script type="application/javascript">
     var disqus_config = function () {
     
     

@@ -9,7 +9,7 @@
  If you&rsquo;re reading this blog it will become very obvious I&rsquo;m a big fan of the Serverless framework to power AWS Lambda and API Gateway integration.">
         <meta name="HandheldFriendly" content="True">
         <meta name="MobileOptimized" content="320">
-        <meta name="generator" content="Hugo 0.40.3" />
+        <meta name="generator" content="Hugo 0.53" />
         <meta name="robots" content="index,follow">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         
@@ -21,14 +21,17 @@
     </head>
     <body>
         
-<script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-ga('create', 'UA-75475240-1', 'auto');
-ga('send', 'pageview');
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-75475240-1', 'auto');
+	
+	ga('send', 'pageview');
+}
 </script>
 
 
@@ -357,21 +360,11 @@ between <code>certbot</code> certificate files and API Gateway Custom Domain for
 <li><code>chain.pem</code> &rarr; Certificate chain</li>
 </ul>
 
-
 <figure>
-    
-        <img src="http://blog.brianz.bz/images/api-gateway-ssl/create-custom-domain-name.png" alt="Creating custom domain" />
-    
-    
-    <figcaption>
-        <p>
-        Note, this screen-shot is from when I set up a different Custom Domain Name mapping
-        
-            
-        
-        </p> 
-    </figcaption>
-    
+    <img src="http://blog.brianz.bz/images/api-gateway-ssl/create-custom-domain-name.png"
+         alt="Creating custom domain"/> <figcaption>
+            <p>Note, this screen-shot is from when I set up a different Custom Domain Name mapping</p>
+        </figcaption>
 </figure>
 
 
@@ -401,21 +394,11 @@ different systems.</p>
 
 <p>Once that is done, you&rsquo;ll be greeted with the following:</p>
 
-
 <figure>
-    
-        <img src="http://blog.brianz.bz/images/api-gateway-ssl/cloudfront-distribution-creating.png" alt="Cloudfront creat" />
-    
-    
-    <figcaption>
-        <p>
-        Again, note this screen-shot is from when I set up a different Custom Domain Name mapping
-        
-            
-        
-        </p> 
-    </figcaption>
-    
+    <img src="http://blog.brianz.bz/images/api-gateway-ssl/cloudfront-distribution-creating.png"
+         alt="Cloudfront creat"/> <figcaption>
+            <p>Again, note this screen-shot is from when I set up a different Custom Domain Name mapping</p>
+        </figcaption>
 </figure>
 
 
@@ -498,7 +481,7 @@ one of the commercial CAs.</p>
         
     <div class="comments">
         <div id="disqus_thread"></div>
-<script>
+<script type="application/javascript">
     var disqus_config = function () {
     
     

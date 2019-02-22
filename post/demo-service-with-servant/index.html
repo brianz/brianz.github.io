@@ -8,7 +8,7 @@
 I&rsquo;ll go a bit deeper in this post and show what it&rsquo;s like to actually author and use a service.">
         <meta name="HandheldFriendly" content="True">
         <meta name="MobileOptimized" content="320">
-        <meta name="generator" content="Hugo 0.40.3" />
+        <meta name="generator" content="Hugo 0.53" />
         <meta name="robots" content="index,follow">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         
@@ -20,14 +20,17 @@ I&rsquo;ll go a bit deeper in this post and show what it&rsquo;s like to actuall
     </head>
     <body>
         
-<script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-ga('create', 'UA-75475240-1', 'auto');
-ga('send', 'pageview');
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-75475240-1', 'auto');
+	
+	ga('send', 'pageview');
+}
 </script>
 
 
@@ -131,7 +134,7 @@ the directory structure for the demo <code>calculator_service</code> on Github:<
 <p>At a bare minimum you&rsquo;ll need a <code>setup.py</code> file and a directory with the correct name.  In this
 example, the name is <code>calculator_service</code>.</p>
 
-<script src="//gist.github.com/brianz/eab945699d396a5656e355e8f1264562.js"></script>
+<script type="application/javascript" src="//gist.github.com/brianz/eab945699d396a5656e355e8f1264562.js"></script>
 
 <p>From there you&rsquo;ll also need a directory where your source code will live.</p>
 
@@ -141,7 +144,7 @@ example, the name is <code>calculator_service</code>.</p>
 pretty simple&hellip;create a file names <code>service.py</code> which contains a class that subclasses
 <code>servant.service.base.Service</code></p>
 
-<script src="//gist.github.com/brianz/7addb2cf37a6cadda3d15fd6c623bf21.js"></script>
+<script type="application/javascript" src="//gist.github.com/brianz/7addb2cf37a6cadda3d15fd6c623bf21.js"></script>
 
 <p>Your service class will only need a few things:</p>
 
@@ -164,7 +167,7 @@ started.</p>
 actions however you like&hellip;one action per file, multiple actions per file, etc.  Since we&rsquo;re
 writing a pretty simple service and only have three actions, we&rsquo;ll put them all in <code>actions.py</code>.</p>
 
-<script src="//gist.github.com/brianz/91b2a58709d569443aab5b98aaa38e0b.js"></script>
+<script type="application/javascript" src="//gist.github.com/brianz/91b2a58709d569443aab5b98aaa38e0b.js"></script>
 
 <p>Let&rsquo;s walk through what it takes to implement a single action (or, an &ldquo;endpoint&rdquo; from the client&rsquo;s
 perspective).  Looking at <code>AddAction</code> we can see that there are two required inputs&hellip;<code>number1</code> and
@@ -231,7 +234,7 @@ easy&hellip;first we&rsquo;ll setup a <code>wsgi</code> server using <code>uwsgi
 file which is the entry-point for the service.  The other is a very short <code>uwsgi</code> config file.
 Servant has built-in support for running as a wsgi server so <code>wsgi_handler.py</code> is quite short:</p>
 
-<script src="//gist.github.com/brianz/f74825460c85c5b5f59255d644a2576a.js"></script>
+<script type="application/javascript" src="//gist.github.com/brianz/f74825460c85c5b5f59255d644a2576a.js"></script>
 
 <p>Now, fire up uwsgi: <code>uwsgi uwsgi.ini</code></p>
 
@@ -305,7 +308,7 @@ matter of a minor change to your client code to point to the remote host.</p>
         
     <div class="comments">
         <div id="disqus_thread"></div>
-<script>
+<script type="application/javascript">
     var disqus_config = function () {
     
     
