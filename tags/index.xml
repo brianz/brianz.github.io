@@ -24,7 +24,7 @@
     <item>
       <title>Architecture</title>
       <link>http://blog.brianz.bz/tags/architecture/</link>
-      <pubDate>Thu, 16 Feb 2017 21:21:10 -0700</pubDate>
+      <pubDate>Tue, 08 Oct 2019 18:27:24 -0600</pubDate>
       
       <guid>http://blog.brianz.bz/tags/architecture/</guid>
       <description></description>
@@ -33,7 +33,7 @@
     <item>
       <title>Aws</title>
       <link>http://blog.brianz.bz/tags/aws/</link>
-      <pubDate>Fri, 28 Sep 2018 21:38:00 -0600</pubDate>
+      <pubDate>Tue, 08 Oct 2019 18:27:24 -0600</pubDate>
       
       <guid>http://blog.brianz.bz/tags/aws/</guid>
       <description></description>
@@ -96,7 +96,7 @@
     <item>
       <title>Python</title>
       <link>http://blog.brianz.bz/tags/python/</link>
-      <pubDate>Fri, 28 Sep 2018 21:38:00 -0600</pubDate>
+      <pubDate>Tue, 08 Oct 2019 18:27:24 -0600</pubDate>
       
       <guid>http://blog.brianz.bz/tags/python/</guid>
       <description></description>
@@ -123,7 +123,7 @@
     <item>
       <title>Serverless</title>
       <link>http://blog.brianz.bz/tags/serverless/</link>
-      <pubDate>Fri, 28 Sep 2018 21:38:00 -0600</pubDate>
+      <pubDate>Tue, 08 Oct 2019 18:27:24 -0600</pubDate>
       
       <guid>http://blog.brianz.bz/tags/serverless/</guid>
       <description></description>
@@ -144,6 +144,15 @@
       <pubDate>Sun, 20 May 2018 22:26:15 -0600</pubDate>
       
       <guid>http://blog.brianz.bz/tags/vpc/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Websockets</title>
+      <link>http://blog.brianz.bz/tags/websockets/</link>
+      <pubDate>Tue, 08 Oct 2019 18:27:24 -0600</pubDate>
+      
+      <guid>http://blog.brianz.bz/tags/websockets/</guid>
       <description></description>
     </item>
     

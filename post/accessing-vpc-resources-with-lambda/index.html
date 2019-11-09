@@ -140,27 +140,24 @@ determine how to create a particular resource, it&rsquo;s a matter of wading thr
 CloudFormation docs.  Taking a look at the
 <a href="http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-rds-database-instance.html" target="_blank">AWS::RDS::DBInstance</a>
 docs, we&rsquo;ll put in the bare minimum:</p>
-
-<pre><code class="language-yaml">resources:
-  Resources:
-    RDSPostgresInstance:
-      Type: AWS::RDS::DBInstance
-      Properties:
-        AllocatedStorage: 100
-        AutoMinorVersionUpgrade: true
-        AvailabilityZone: ${self:provider.region}a
-        DBInstanceClass: db.t2.micro
-        DBName: serverless
-        DBSubnetGroupName: ?????
-        Engine: postgres
-        EngineVersion: 9.6.2
-        MasterUsername: root
-        MasterUserPassword: supersecret
-        PubliclyAccessible: false
-        VPCSecurityGroups:
-          - ?????
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">resources:<span style="color:#bbb">
+</span><span style="color:#bbb">  </span>Resources:<span style="color:#bbb">
+</span><span style="color:#bbb">    </span>RDSPostgresInstance:<span style="color:#bbb">
+</span><span style="color:#bbb">      </span>Type:<span style="color:#bbb"> </span>AWS::RDS::DBInstance<span style="color:#bbb">
+</span><span style="color:#bbb">      </span>Properties:<span style="color:#bbb">
+</span><span style="color:#bbb">        </span>AllocatedStorage:<span style="color:#bbb"> </span><span style="color:#40a070">100</span><span style="color:#bbb">
+</span><span style="color:#bbb">        </span>AutoMinorVersionUpgrade:<span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">true</span><span style="color:#bbb">
+</span><span style="color:#bbb">        </span>AvailabilityZone:<span style="color:#bbb"> </span>${self:provider.region}a<span style="color:#bbb">
+</span><span style="color:#bbb">        </span>DBInstanceClass:<span style="color:#bbb"> </span>db.t2.micro<span style="color:#bbb">
+</span><span style="color:#bbb">        </span>DBName:<span style="color:#bbb"> </span>serverless<span style="color:#bbb">
+</span><span style="color:#bbb">        </span>DBSubnetGroupName:<span style="color:#bbb"> </span>?????<span style="color:#bbb">
+</span><span style="color:#bbb">        </span>Engine:<span style="color:#bbb"> </span>postgres<span style="color:#bbb">
+</span><span style="color:#bbb">        </span>EngineVersion:<span style="color:#bbb"> </span><span style="color:#40a070">9.6</span>.<span style="color:#40a070">2</span><span style="color:#bbb">
+</span><span style="color:#bbb">        </span>MasterUsername:<span style="color:#bbb"> </span>root<span style="color:#bbb">
+</span><span style="color:#bbb">        </span>MasterUserPassword:<span style="color:#bbb"> </span>supersecret<span style="color:#bbb">
+</span><span style="color:#bbb">        </span>PubliclyAccessible:<span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">false</span><span style="color:#bbb">
+</span><span style="color:#bbb">        </span>VPCSecurityGroups:<span style="color:#bbb">
+</span><span style="color:#bbb">          </span>-<span style="color:#bbb"> </span>?????</code></pre></div>
 <p>Very quickly we find there are a couple of fields which are mysterious and call out for more
 CloudFormation code.  What are <code>DBSubnetGroup</code> and <code>VPCSecurityGroups</code>?  These are <em>required</em>, even
 though the CloudFormation docs say they are conditional.  I
@@ -257,28 +254,22 @@ above works. :&gt;)</p>
 <p>This security group will not need any rules.  Why is that?  We will merely attach this SG to our
 Lambda functions.  Because our Lambda functions are associated with this SG, and because this SG
 is allowed inbound access to port <code>5432</code>, our Lambdas will have network access to RDS (almost)!</p>
-
-<pre><code class="language-yaml">    ServerlessSecurityGroup:
-      Type: AWS::EC2::SecurityGroup
-      Properties:
-        GroupDescription: SecurityGroup for Serverless Functions
-        VpcId: ${env:VPC_ID}
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#bbb">    </span>ServerlessSecurityGroup:<span style="color:#bbb">
+</span><span style="color:#bbb">      </span>Type:<span style="color:#bbb"> </span>AWS::EC2::SecurityGroup<span style="color:#bbb">
+</span><span style="color:#bbb">      </span>Properties:<span style="color:#bbb">
+</span><span style="color:#bbb">        </span>GroupDescription:<span style="color:#bbb"> </span>SecurityGroup<span style="color:#bbb"> </span>for<span style="color:#bbb"> </span>Serverless<span style="color:#bbb"> </span>Functions<span style="color:#bbb">
+</span><span style="color:#bbb">        </span>VpcId:<span style="color:#bbb"> </span>${env:VPC_ID}</code></pre></div>
 <h3 id="finalizing-rdspostgresinstance">Finalizing RDSPostgresInstance</h3>
 
 <p>With that, we have created the necessary resources to update the CFN <code>RDSPostgresInstance</code>
 section.  Here, I will only show the updates needed.</p>
-
-<pre><code class="language-yaml">    RDSPostgresInstance:
-      Type: AWS::RDS::DBInstance
-      Properties:
-        DBSubnetGroupName:
-          Ref: RDSSubnetGroup
-        VPCSecurityGroups:
-          - Fn::GetAtt: RDSSecurityGroup.GroupId
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#bbb">    </span>RDSPostgresInstance:<span style="color:#bbb">
+</span><span style="color:#bbb">      </span>Type:<span style="color:#bbb"> </span>AWS::RDS::DBInstance<span style="color:#bbb">
+</span><span style="color:#bbb">      </span>Properties:<span style="color:#bbb">
+</span><span style="color:#bbb">        </span>DBSubnetGroupName:<span style="color:#bbb">
+</span><span style="color:#bbb">          </span>Ref:<span style="color:#bbb"> </span>RDSSubnetGroup<span style="color:#bbb">
+</span><span style="color:#bbb">        </span>VPCSecurityGroups:<span style="color:#bbb">
+</span><span style="color:#bbb">          </span>-<span style="color:#bbb"> </span>Fn::GetAtt:<span style="color:#bbb"> </span>RDSSecurityGroup.GroupId</code></pre></div>
 <p>Again, you&rsquo;ll notice the use of <code>Ref:</code> and there is now a new one, <code>FN::GetAtt</code>.  <code>GetAtt</code> stands
 for &ldquo;get attribute.&rdquo;  Each resource in a CloudFormation template has output attributes which can be
 looked up dynamically at runtime. Just as with <code>Ref</code>, each resource has various attributes which
@@ -296,39 +287,36 @@ of a VPC and our Lambda functions are not.  Our final steps include:</p>
 <li>Updating <code>iamRoleStatements</code> to enable the Lambda functions to create EINs, which is a
 prerequisite for Lambdas to live in a VPC</li>
 </ul>
-
-<pre><code class="language-yaml">provider:
-  name: aws
-  runtime: python3.6
-  memorySize: 128
-  region: ${env:AWS_REGION}
-  timeout: 5
-  environment:
-    DB_USERNAME: ${env:DB_USERNAME}
-    DB_PASSWORD: ${env:DB_PASSWORD}
-    DB_NAME: ${env:DB_NAME}
-    DB_HOST:
-      Fn::GetAtt:
-        - RDSPostgresInstance
-        - Endpoint.Address
-  vpc:
-    securityGroupIds:
-      - Fn::GetAtt: ServerlessSecurityGroup.GroupId
-    subnetIds:
-      - ${env:SUBNET_ID_A}
-      - ${env:SUBNET_ID_B}
-      - ${env:SUBNET_ID_C}
-  iamRoleStatements:
-    # Allow the lambda function permission to create EINs, which is part of the
-    # AWSLambdaVPCAccessExecutionRole
-    - Effect: &quot;Allow&quot;
-      Action:
-        - &quot;ec2:CreateNetworkInterface&quot;
-        - &quot;ec2:DescribeNetworkInterfaces&quot;
-        - &quot;ec2:DeleteNetworkInterface&quot;
-      Resource: &quot;*&quot;
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">provider:<span style="color:#bbb">
+</span><span style="color:#bbb">  </span>name:<span style="color:#bbb"> </span>aws<span style="color:#bbb">
+</span><span style="color:#bbb">  </span>runtime:<span style="color:#bbb"> </span>python3.<span style="color:#40a070">6</span><span style="color:#bbb">
+</span><span style="color:#bbb">  </span>memorySize:<span style="color:#bbb"> </span><span style="color:#40a070">128</span><span style="color:#bbb">
+</span><span style="color:#bbb">  </span>region:<span style="color:#bbb"> </span>${env:AWS_REGION}<span style="color:#bbb">
+</span><span style="color:#bbb">  </span>timeout:<span style="color:#bbb"> </span><span style="color:#40a070">5</span><span style="color:#bbb">
+</span><span style="color:#bbb">  </span>environment:<span style="color:#bbb">
+</span><span style="color:#bbb">    </span>DB_USERNAME:<span style="color:#bbb"> </span>${env:DB_USERNAME}<span style="color:#bbb">
+</span><span style="color:#bbb">    </span>DB_PASSWORD:<span style="color:#bbb"> </span>${env:DB_PASSWORD}<span style="color:#bbb">
+</span><span style="color:#bbb">    </span>DB_NAME:<span style="color:#bbb"> </span>${env:DB_NAME}<span style="color:#bbb">
+</span><span style="color:#bbb">    </span>DB_HOST:<span style="color:#bbb">
+</span><span style="color:#bbb">      </span>Fn::GetAtt:<span style="color:#bbb">
+</span><span style="color:#bbb">        </span>-<span style="color:#bbb"> </span>RDSPostgresInstance<span style="color:#bbb">
+</span><span style="color:#bbb">        </span>-<span style="color:#bbb"> </span>Endpoint.Address<span style="color:#bbb">
+</span><span style="color:#bbb">  </span>vpc:<span style="color:#bbb">
+</span><span style="color:#bbb">    </span>securityGroupIds:<span style="color:#bbb">
+</span><span style="color:#bbb">      </span>-<span style="color:#bbb"> </span>Fn::GetAtt:<span style="color:#bbb"> </span>ServerlessSecurityGroup.GroupId<span style="color:#bbb">
+</span><span style="color:#bbb">    </span>subnetIds:<span style="color:#bbb">
+</span><span style="color:#bbb">      </span>-<span style="color:#bbb"> </span>${env:SUBNET_ID_A}<span style="color:#bbb">
+</span><span style="color:#bbb">      </span>-<span style="color:#bbb"> </span>${env:SUBNET_ID_B}<span style="color:#bbb">
+</span><span style="color:#bbb">      </span>-<span style="color:#bbb"> </span>${env:SUBNET_ID_C}<span style="color:#bbb">
+</span><span style="color:#bbb">  </span>iamRoleStatements:<span style="color:#bbb">
+</span><span style="color:#bbb">    </span><span style="color:#60a0b0;font-style:italic"># Allow the lambda function permission to create EINs, which is part of the</span><span style="color:#bbb">
+</span><span style="color:#bbb">    </span><span style="color:#60a0b0;font-style:italic"># AWSLambdaVPCAccessExecutionRole</span><span style="color:#bbb">
+</span><span style="color:#bbb">    </span>-<span style="color:#bbb"> </span>Effect:<span style="color:#bbb"> </span><span style="color:#4070a0">&#34;Allow&#34;</span><span style="color:#bbb">
+</span><span style="color:#bbb">      </span>Action:<span style="color:#bbb">
+</span><span style="color:#bbb">        </span>-<span style="color:#bbb"> </span><span style="color:#4070a0">&#34;ec2:CreateNetworkInterface&#34;</span><span style="color:#bbb">
+</span><span style="color:#bbb">        </span>-<span style="color:#bbb"> </span><span style="color:#4070a0">&#34;ec2:DescribeNetworkInterfaces&#34;</span><span style="color:#bbb">
+</span><span style="color:#bbb">        </span>-<span style="color:#bbb"> </span><span style="color:#4070a0">&#34;ec2:DeleteNetworkInterface&#34;</span><span style="color:#bbb">
+</span><span style="color:#bbb">      </span>Resource:<span style="color:#bbb"> </span><span style="color:#4070a0">&#34;*&#34;</span></code></pre></div>
 <p>The <code>vpc</code> section accomplished the first two tasks.  By putting this <code>vpc</code> section in the
 <code>provider</code> section, it&rsquo;s applied to <em>all</em> Lambda functions.  If you don&rsquo;t need all Lambdas talking
 to RDS, then you should attach this <code>vpc</code> to only those functions which need access.</p>
@@ -356,85 +344,82 @@ Gateways, which will be a topic for another time.</p>
 <p>Happy VPC-ing!</p>
 
 <p>For completeness, the final <code>serverless.yml</code> file is below, minus the Lamba functions section:</p>
-
-<pre><code class="language-yaml">service: rds-vpc
-
-provider:
-  name: aws
-  runtime: python3.6
-  memorySize: 128
-  region: ${env:AWS_REGION}
-  timeout: 5
-  environment:
-    DB_USERNAME: ${env:DB_USERNAME}
-    DB_PASSWORD: ${env:DB_PASSWORD}
-    DB_NAME: ${env:DB_NAME}
-    DB_HOST:
-      Fn::GetAtt:
-        - RDSPostgresInstance
-        - Endpoint.Address
-  vpc:
-    securityGroupIds:
-      - Fn::GetAtt: ServerlessSecurityGroup.GroupId
-    subnetIds:
-      - ${env:SUBNET_ID_A}
-      - ${env:SUBNET_ID_B}
-      - ${env:SUBNET_ID_C}
-  iamRoleStatements:
-    # Allow the lambda function permission to create EINs, which is part of the
-    # AWSLambdaVPCAccessExecutionRole
-    - Effect: &quot;Allow&quot;
-      Action:
-        - &quot;ec2:CreateNetworkInterface&quot;
-        - &quot;ec2:DescribeNetworkInterfaces&quot;
-        - &quot;ec2:DeleteNetworkInterface&quot;
-      Resource: &quot;*&quot;
-
-resources:
-  Resources:
-    ServerlessSecurityGroup:
-      Type: AWS::EC2::SecurityGroup
-      Properties:
-        GroupDescription: SecurityGroup for Serverless Functions
-        VpcId: ${env:VPC_ID}
-    RDSSecurityGroup:
-      Type: AWS::EC2::SecurityGroup
-      Properties:
-        GroupDescription: Ingress for RDS Instance
-        VpcId: ${env:VPC_ID}
-        SecurityGroupIngress:
-        - IpProtocol: tcp
-          FromPort: '5432'
-          ToPort: '5432'
-          SourceSecurityGroupId:
-            Ref: ServerlessSecurityGroup
-    RDSSubnetGroup:
-      Type: AWS::RDS::DBSubnetGroup
-      Properties:
-        DBSubnetGroupDescription: RDS Subnet Group
-        SubnetIds:
-          - ${env:SUBNET_ID_A}
-          - ${env:SUBNET_ID_B}
-          - ${env:SUBNET_ID_C}
-    RDSPostgresInstance:
-      Type: AWS::RDS::DBInstance
-      Properties:
-        AllocatedStorage: 100
-        AutoMinorVersionUpgrade: true
-        AvailabilityZone: ${self:provider.region}a
-        DBInstanceClass: db.t2.micro
-        DBName: ${env:DB_NAME}
-        DBSubnetGroupName:
-          Ref: RDSSubnetGroup
-        Engine: postgres
-        EngineVersion: 9.6.2
-        MasterUsername: ${env:DB_USERNAME}
-        MasterUserPassword: ${env:DB_PASSWORD}
-        PubliclyAccessible: false
-        VPCSecurityGroups:
-          - Fn::GetAtt: RDSSecurityGroup.GroupId
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">service:<span style="color:#bbb"> </span>rds-vpc<span style="color:#bbb">
+</span><span style="color:#bbb">
+</span><span style="color:#bbb"></span>provider:<span style="color:#bbb">
+</span><span style="color:#bbb">  </span>name:<span style="color:#bbb"> </span>aws<span style="color:#bbb">
+</span><span style="color:#bbb">  </span>runtime:<span style="color:#bbb"> </span>python3.<span style="color:#40a070">6</span><span style="color:#bbb">
+</span><span style="color:#bbb">  </span>memorySize:<span style="color:#bbb"> </span><span style="color:#40a070">128</span><span style="color:#bbb">
+</span><span style="color:#bbb">  </span>region:<span style="color:#bbb"> </span>${env:AWS_REGION}<span style="color:#bbb">
+</span><span style="color:#bbb">  </span>timeout:<span style="color:#bbb"> </span><span style="color:#40a070">5</span><span style="color:#bbb">
+</span><span style="color:#bbb">  </span>environment:<span style="color:#bbb">
+</span><span style="color:#bbb">    </span>DB_USERNAME:<span style="color:#bbb"> </span>${env:DB_USERNAME}<span style="color:#bbb">
+</span><span style="color:#bbb">    </span>DB_PASSWORD:<span style="color:#bbb"> </span>${env:DB_PASSWORD}<span style="color:#bbb">
+</span><span style="color:#bbb">    </span>DB_NAME:<span style="color:#bbb"> </span>${env:DB_NAME}<span style="color:#bbb">
+</span><span style="color:#bbb">    </span>DB_HOST:<span style="color:#bbb">
+</span><span style="color:#bbb">      </span>Fn::GetAtt:<span style="color:#bbb">
+</span><span style="color:#bbb">        </span>-<span style="color:#bbb"> </span>RDSPostgresInstance<span style="color:#bbb">
+</span><span style="color:#bbb">        </span>-<span style="color:#bbb"> </span>Endpoint.Address<span style="color:#bbb">
+</span><span style="color:#bbb">  </span>vpc:<span style="color:#bbb">
+</span><span style="color:#bbb">    </span>securityGroupIds:<span style="color:#bbb">
+</span><span style="color:#bbb">      </span>-<span style="color:#bbb"> </span>Fn::GetAtt:<span style="color:#bbb"> </span>ServerlessSecurityGroup.GroupId<span style="color:#bbb">
+</span><span style="color:#bbb">    </span>subnetIds:<span style="color:#bbb">
+</span><span style="color:#bbb">      </span>-<span style="color:#bbb"> </span>${env:SUBNET_ID_A}<span style="color:#bbb">
+</span><span style="color:#bbb">      </span>-<span style="color:#bbb"> </span>${env:SUBNET_ID_B}<span style="color:#bbb">
+</span><span style="color:#bbb">      </span>-<span style="color:#bbb"> </span>${env:SUBNET_ID_C}<span style="color:#bbb">
+</span><span style="color:#bbb">  </span>iamRoleStatements:<span style="color:#bbb">
+</span><span style="color:#bbb">    </span><span style="color:#60a0b0;font-style:italic"># Allow the lambda function permission to create EINs, which is part of the</span><span style="color:#bbb">
+</span><span style="color:#bbb">    </span><span style="color:#60a0b0;font-style:italic"># AWSLambdaVPCAccessExecutionRole</span><span style="color:#bbb">
+</span><span style="color:#bbb">    </span>-<span style="color:#bbb"> </span>Effect:<span style="color:#bbb"> </span><span style="color:#4070a0">&#34;Allow&#34;</span><span style="color:#bbb">
+</span><span style="color:#bbb">      </span>Action:<span style="color:#bbb">
+</span><span style="color:#bbb">        </span>-<span style="color:#bbb"> </span><span style="color:#4070a0">&#34;ec2:CreateNetworkInterface&#34;</span><span style="color:#bbb">
+</span><span style="color:#bbb">        </span>-<span style="color:#bbb"> </span><span style="color:#4070a0">&#34;ec2:DescribeNetworkInterfaces&#34;</span><span style="color:#bbb">
+</span><span style="color:#bbb">        </span>-<span style="color:#bbb"> </span><span style="color:#4070a0">&#34;ec2:DeleteNetworkInterface&#34;</span><span style="color:#bbb">
+</span><span style="color:#bbb">      </span>Resource:<span style="color:#bbb"> </span><span style="color:#4070a0">&#34;*&#34;</span><span style="color:#bbb">
+</span><span style="color:#bbb">
+</span><span style="color:#bbb"></span>resources:<span style="color:#bbb">
+</span><span style="color:#bbb">  </span>Resources:<span style="color:#bbb">
+</span><span style="color:#bbb">    </span>ServerlessSecurityGroup:<span style="color:#bbb">
+</span><span style="color:#bbb">      </span>Type:<span style="color:#bbb"> </span>AWS::EC2::SecurityGroup<span style="color:#bbb">
+</span><span style="color:#bbb">      </span>Properties:<span style="color:#bbb">
+</span><span style="color:#bbb">        </span>GroupDescription:<span style="color:#bbb"> </span>SecurityGroup<span style="color:#bbb"> </span>for<span style="color:#bbb"> </span>Serverless<span style="color:#bbb"> </span>Functions<span style="color:#bbb">
+</span><span style="color:#bbb">        </span>VpcId:<span style="color:#bbb"> </span>${env:VPC_ID}<span style="color:#bbb">
+</span><span style="color:#bbb">    </span>RDSSecurityGroup:<span style="color:#bbb">
+</span><span style="color:#bbb">      </span>Type:<span style="color:#bbb"> </span>AWS::EC2::SecurityGroup<span style="color:#bbb">
+</span><span style="color:#bbb">      </span>Properties:<span style="color:#bbb">
+</span><span style="color:#bbb">        </span>GroupDescription:<span style="color:#bbb"> </span>Ingress<span style="color:#bbb"> </span>for<span style="color:#bbb"> </span>RDS<span style="color:#bbb"> </span>Instance<span style="color:#bbb">
+</span><span style="color:#bbb">        </span>VpcId:<span style="color:#bbb"> </span>${env:VPC_ID}<span style="color:#bbb">
+</span><span style="color:#bbb">        </span>SecurityGroupIngress:<span style="color:#bbb">
+</span><span style="color:#bbb">        </span>-<span style="color:#bbb"> </span>IpProtocol:<span style="color:#bbb"> </span>tcp<span style="color:#bbb">
+</span><span style="color:#bbb">          </span>FromPort:<span style="color:#bbb"> </span><span style="color:#4070a0">&#39;5432&#39;</span><span style="color:#bbb">
+</span><span style="color:#bbb">          </span>ToPort:<span style="color:#bbb"> </span><span style="color:#4070a0">&#39;5432&#39;</span><span style="color:#bbb">
+</span><span style="color:#bbb">          </span>SourceSecurityGroupId:<span style="color:#bbb">
+</span><span style="color:#bbb">            </span>Ref:<span style="color:#bbb"> </span>ServerlessSecurityGroup<span style="color:#bbb">
+</span><span style="color:#bbb">    </span>RDSSubnetGroup:<span style="color:#bbb">
+</span><span style="color:#bbb">      </span>Type:<span style="color:#bbb"> </span>AWS::RDS::DBSubnetGroup<span style="color:#bbb">
+</span><span style="color:#bbb">      </span>Properties:<span style="color:#bbb">
+</span><span style="color:#bbb">        </span>DBSubnetGroupDescription:<span style="color:#bbb"> </span>RDS<span style="color:#bbb"> </span>Subnet<span style="color:#bbb"> </span>Group<span style="color:#bbb">
+</span><span style="color:#bbb">        </span>SubnetIds:<span style="color:#bbb">
+</span><span style="color:#bbb">          </span>-<span style="color:#bbb"> </span>${env:SUBNET_ID_A}<span style="color:#bbb">
+</span><span style="color:#bbb">          </span>-<span style="color:#bbb"> </span>${env:SUBNET_ID_B}<span style="color:#bbb">
+</span><span style="color:#bbb">          </span>-<span style="color:#bbb"> </span>${env:SUBNET_ID_C}<span style="color:#bbb">
+</span><span style="color:#bbb">    </span>RDSPostgresInstance:<span style="color:#bbb">
+</span><span style="color:#bbb">      </span>Type:<span style="color:#bbb"> </span>AWS::RDS::DBInstance<span style="color:#bbb">
+</span><span style="color:#bbb">      </span>Properties:<span style="color:#bbb">
+</span><span style="color:#bbb">        </span>AllocatedStorage:<span style="color:#bbb"> </span><span style="color:#40a070">100</span><span style="color:#bbb">
+</span><span style="color:#bbb">        </span>AutoMinorVersionUpgrade:<span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">true</span><span style="color:#bbb">
+</span><span style="color:#bbb">        </span>AvailabilityZone:<span style="color:#bbb"> </span>${self:provider.region}a<span style="color:#bbb">
+</span><span style="color:#bbb">        </span>DBInstanceClass:<span style="color:#bbb"> </span>db.t2.micro<span style="color:#bbb">
+</span><span style="color:#bbb">        </span>DBName:<span style="color:#bbb"> </span>${env:DB_NAME}<span style="color:#bbb">
+</span><span style="color:#bbb">        </span>DBSubnetGroupName:<span style="color:#bbb">
+</span><span style="color:#bbb">          </span>Ref:<span style="color:#bbb"> </span>RDSSubnetGroup<span style="color:#bbb">
+</span><span style="color:#bbb">        </span>Engine:<span style="color:#bbb"> </span>postgres<span style="color:#bbb">
+</span><span style="color:#bbb">        </span>EngineVersion:<span style="color:#bbb"> </span><span style="color:#40a070">9.6</span>.<span style="color:#40a070">2</span><span style="color:#bbb">
+</span><span style="color:#bbb">        </span>MasterUsername:<span style="color:#bbb"> </span>${env:DB_USERNAME}<span style="color:#bbb">
+</span><span style="color:#bbb">        </span>MasterUserPassword:<span style="color:#bbb"> </span>${env:DB_PASSWORD}<span style="color:#bbb">
+</span><span style="color:#bbb">        </span>PubliclyAccessible:<span style="color:#bbb"> </span><span style="color:#007020;font-weight:bold">false</span><span style="color:#bbb">
+</span><span style="color:#bbb">        </span>VPCSecurityGroups:<span style="color:#bbb">
+</span><span style="color:#bbb">          </span>-<span style="color:#bbb"> </span>Fn::GetAtt:<span style="color:#bbb"> </span>RDSSecurityGroup.GroupId</code></pre></div>
 </div>
 
         <footer class="post-footer clearfix">
@@ -522,7 +507,7 @@ resources:
                 </div>
 
                 <p class="footer-copyright">
-                    <span>&copy; 2018 / Powered by <a href="https://gohugo.io/">Hugo</a></span>
+                    <span>&copy; 2019 / Powered by <a href="https://gohugo.io/">Hugo</a></span>
                 </p>
                 <p class="footer-copyright">
                     <span><a href="https://github.com/roryg/ghostwriter">Ghostwriter theme</a> By <a href="http://jollygoodthemes.com">JollyGoodThemes</a></span>

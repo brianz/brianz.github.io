@@ -201,46 +201,43 @@ from a given state. Remember, when a request comes in Lazysusan will figure out 
 </ul>
 
 <p>Here is a very simple example of a <code>state.yml</code> file lifted from our Age Calculator example:</p>
-
-<pre><code class="language-yaml">initialState:
-  response:
-    card:
-      type: Simple
-      title: Age Difference
-      content: &gt;
-        When is your birthday?
-    outputSpeech:
-      type: PlainText
-      text: &gt;
-        When is your birthday?
-    shouldEndSession: False
-  branches: &amp;initialStateBranches
-    LaunchRequest: initialState
-    MyAgeIntent: !!python/name:callbacks.calc_difference
-    default: goodBye
-
-missingYear:
-  response:
-    outputSpeech:
-      type: PlainText
-      text: Please say what day, month and year you were born.
-    shouldEndSession: True
-  branches:
-    &lt;&lt;: *initialStateBranches
-    LaunchRequest: initialState
-
-goodBye:
-  response:
-    outputSpeech:
-      type: PlainText
-      text: &gt;
-        Thanks for trying age difference, good bye.
-    shouldEndSession: True
-  branches:
-    &lt;&lt;: *initialStateBranches
-    LaunchRequest: initialState
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">initialState:<span style="color:#bbb">
+</span><span style="color:#bbb">  </span>response:<span style="color:#bbb">
+</span><span style="color:#bbb">    </span>card:<span style="color:#bbb">
+</span><span style="color:#bbb">      </span>type:<span style="color:#bbb"> </span>Simple<span style="color:#bbb">
+</span><span style="color:#bbb">      </span>title:<span style="color:#bbb"> </span>Age<span style="color:#bbb"> </span>Difference<span style="color:#bbb">
+</span><span style="color:#bbb">      </span>content:<span style="color:#bbb"> </span><span style="color:#4070a0;font-style:italic">&gt;
+</span><span style="color:#4070a0;font-style:italic">        When is your birthday?</span><span style="color:#bbb">
+</span><span style="color:#bbb">    </span>outputSpeech:<span style="color:#bbb">
+</span><span style="color:#bbb">      </span>type:<span style="color:#bbb"> </span>PlainText<span style="color:#bbb">
+</span><span style="color:#bbb">      </span>text:<span style="color:#bbb"> </span><span style="color:#4070a0;font-style:italic">&gt;
+</span><span style="color:#4070a0;font-style:italic">        When is your birthday?</span><span style="color:#bbb">
+</span><span style="color:#bbb">    </span>shouldEndSession:<span style="color:#bbb"> </span>False<span style="color:#bbb">
+</span><span style="color:#bbb">  </span>branches:<span style="color:#bbb"> </span><span style="color:#007020">&amp;initialStateBranches</span><span style="color:#bbb">
+</span><span style="color:#bbb">    </span>LaunchRequest:<span style="color:#bbb"> </span>initialState<span style="color:#bbb">
+</span><span style="color:#bbb">    </span>MyAgeIntent:<span style="color:#bbb"> </span><span style="color:#007020">!!python/name:callbacks.calc_difference</span><span style="color:#bbb">
+</span><span style="color:#bbb">    </span>default:<span style="color:#bbb"> </span>goodBye<span style="color:#bbb">
+</span><span style="color:#bbb">
+</span><span style="color:#bbb"></span>missingYear:<span style="color:#bbb">
+</span><span style="color:#bbb">  </span>response:<span style="color:#bbb">
+</span><span style="color:#bbb">    </span>outputSpeech:<span style="color:#bbb">
+</span><span style="color:#bbb">      </span>type:<span style="color:#bbb"> </span>PlainText<span style="color:#bbb">
+</span><span style="color:#bbb">      </span>text:<span style="color:#bbb"> </span>Please<span style="color:#bbb"> </span>say<span style="color:#bbb"> </span>what<span style="color:#bbb"> </span>day,<span style="color:#bbb"> </span>month<span style="color:#bbb"> </span>and<span style="color:#bbb"> </span>year<span style="color:#bbb"> </span>you<span style="color:#bbb"> </span>were<span style="color:#bbb"> </span>born.<span style="color:#bbb">
+</span><span style="color:#bbb">    </span>shouldEndSession:<span style="color:#bbb"> </span>True<span style="color:#bbb">
+</span><span style="color:#bbb">  </span>branches:<span style="color:#bbb">
+</span><span style="color:#bbb">    </span>&lt;&lt;:<span style="color:#bbb"> </span><span style="color:#007020">*initialStateBranches</span><span style="color:#bbb">
+</span><span style="color:#bbb">    </span>LaunchRequest:<span style="color:#bbb"> </span>initialState<span style="color:#bbb">
+</span><span style="color:#bbb">
+</span><span style="color:#bbb"></span>goodBye:<span style="color:#bbb">
+</span><span style="color:#bbb">  </span>response:<span style="color:#bbb">
+</span><span style="color:#bbb">    </span>outputSpeech:<span style="color:#bbb">
+</span><span style="color:#bbb">      </span>type:<span style="color:#bbb"> </span>PlainText<span style="color:#bbb">
+</span><span style="color:#bbb">      </span>text:<span style="color:#bbb"> </span><span style="color:#4070a0;font-style:italic">&gt;
+</span><span style="color:#4070a0;font-style:italic">        Thanks for trying age difference, good bye.</span><span style="color:#bbb">
+</span><span style="color:#bbb">    </span>shouldEndSession:<span style="color:#bbb"> </span>True<span style="color:#bbb">
+</span><span style="color:#bbb">  </span>branches:<span style="color:#bbb">
+</span><span style="color:#bbb">    </span>&lt;&lt;:<span style="color:#bbb"> </span><span style="color:#007020">*initialStateBranches</span><span style="color:#bbb">
+</span><span style="color:#bbb">    </span>LaunchRequest:<span style="color:#bbb"> </span>initialState</code></pre></div>
 <p>A &ldquo;session&rdquo; in Alexa parlance can be a bit nebulous. By default, when a user launches your skill and
 begins interacting it there is a built-in session which is active.  This &ldquo;session&rdquo; is nothing more
 than some data sent to your Lambda function in the <code>json</code> payload.
@@ -301,15 +298,12 @@ calculator</code>.  So, we are:</p>
 
 <p>With those to pieces of information, Lazysusan will look up the <code>LaunchRequest</code> key in the list of
 <code>branches</code> in the <code>initialState</code> block.</p>
-
-<pre><code class="language-yaml">initialState:
-  # snip
-  branches: &amp;initialStateBranches
-    LaunchRequest: initialState
-    MyAgeIntent: !!python/name:callbacks.calc_difference
-    default: goodBye
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">initialState:<span style="color:#bbb">
+</span><span style="color:#bbb">  </span><span style="color:#60a0b0;font-style:italic"># snip</span><span style="color:#bbb">
+</span><span style="color:#bbb">  </span>branches:<span style="color:#bbb"> </span><span style="color:#007020">&amp;initialStateBranches</span><span style="color:#bbb">
+</span><span style="color:#bbb">    </span>LaunchRequest:<span style="color:#bbb"> </span>initialState<span style="color:#bbb">
+</span><span style="color:#bbb">    </span>MyAgeIntent:<span style="color:#bbb"> </span><span style="color:#007020">!!python/name:callbacks.calc_difference</span><span style="color:#bbb">
+</span><span style="color:#bbb">    </span>default:<span style="color:#bbb"> </span>goodBye</code></pre></div>
 <p>As you can see in the yaml above, <code>LaunchRequest</code> simply points back
 to the <code>initialState</code> block which contains a fully valid Alexa response in yaml.  Lazysusan will
 take this content verbatim, convert it into json and sent it back to Alexa.</p>
@@ -327,10 +321,7 @@ The user responded with a date which triggers a <code>MyAgeIntent</code> from th
 <p>With those to pieces of information, Lazysusan will look up the <code>MyAgeIntent</code> key the list of
 <code>branches</code> in the <code>initialState</code> block. Looking at the <code>branches</code> list above we can see how
 Lazysusan will determine the response.</p>
-
-<pre><code class="language-yaml">    MyAgeIntent: !!python/name:callbacks.calc_difference
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#bbb">    </span>MyAgeIntent:<span style="color:#bbb"> </span><span style="color:#007020">!!python/name:callbacks.calc_difference</span></code></pre></div>
 <p>This is a magical little part of the <a href="http://pyyaml.org/wiki/PyYAMLDocumentation" target="_blank">PyYAML</a> package.
 Here, <code>MyAgeIntent</code> is literally pointing to a Python function. If Lazysusan encounters a callable
 object/function in <code>states.yml</code> it will call that function with six arguments (you can see those
@@ -359,44 +350,41 @@ called, <code>build_response</code>.</p>
 
 <p>Let&rsquo;s take a look at the callback function which Lazysusan invokes when a <code>MyAgeIntent</code> is
 encountered during an Alexa request:</p>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#007020;font-weight:bold">def</span> <span style="color:#06287e">calc_difference</span>(<span style="color:#666">**</span>kwargs):
+    request <span style="color:#666">=</span> kwargs[<span style="color:#4070a0">&#34;request&#34;</span>]
+    session <span style="color:#666">=</span> kwargs[<span style="color:#4070a0">&#34;session&#34;</span>]
+    state_machine <span style="color:#666">=</span> kwargs[<span style="color:#4070a0">&#34;state_machine&#34;</span>]
+    log <span style="color:#666">=</span> get_logger()
 
-<pre><code class="language-python">def calc_difference(**kwargs):
-    request = kwargs[&quot;request&quot;]
-    session = kwargs[&quot;session&quot;]
-    state_machine = kwargs[&quot;state_machine&quot;]
-    log = get_logger()
+    date_string <span style="color:#666">=</span> request<span style="color:#666">.</span>get_slot_value(<span style="color:#4070a0">&#34;dob&#34;</span>)
+    <span style="color:#007020;font-weight:bold">if</span> <span style="color:#007020;font-weight:bold">not</span> date_string:
+        log<span style="color:#666">.</span>error(<span style="color:#4070a0">&#34;Could not find date in slots&#34;</span>)
+        <span style="color:#007020;font-weight:bold">return</span> <span style="color:#4070a0">&#34;goodBye&#34;</span>
 
-    date_string = request.get_slot_value(&quot;dob&quot;)
-    if not date_string:
-        log.error(&quot;Could not find date in slots&quot;)
-        return &quot;goodBye&quot;
+    <span style="color:#007020;font-weight:bold">if</span> date_string<span style="color:#666">.</span>startswith(<span style="color:#4070a0">&#39;XXXX-&#39;</span>):
+        <span style="color:#007020;font-weight:bold">return</span> <span style="color:#4070a0">&#34;missingYear&#34;</span>
 
-    if date_string.startswith('XXXX-'):
-        return &quot;missingYear&quot;
+    now <span style="color:#666">=</span> datetime<span style="color:#666">.</span>now()
 
-    now = datetime.now()
+    dob <span style="color:#666">=</span> get_dob_from_date_string(date_string)
+    <span style="color:#007020;font-weight:bold">if</span> <span style="color:#007020;font-weight:bold">not</span> is_valid_day(dob):
+        <span style="color:#007020;font-weight:bold">return</span> <span style="color:#4070a0">&#34;invalidDate&#34;</span>
 
-    dob = get_dob_from_date_string(date_string)
-    if not is_valid_day(dob):
-        return &quot;invalidDate&quot;
+    age <span style="color:#666">=</span> get_age_from_dob(dob, now)
 
-    age = get_age_from_dob(dob, now)
+    <span style="color:#60a0b0;font-style:italic"># First get a breakdown of how old user is in years, months, days</span>
+    msg <span style="color:#666">=</span> age_breakdown(age)
 
-    # First get a breakdown of how old user is in years, months, days
-    msg = age_breakdown(age)
+    <span style="color:#60a0b0;font-style:italic"># next figure out the days until the users next birthday</span>
+    msg <span style="color:#666">+=</span> <span style="color:#4070a0">&#34;</span><span style="color:#70a0d0;font-style:italic">%s</span><span style="color:#4070a0">&#34;</span> <span style="color:#666">%</span> (days_until_birthday(dob, now), )
 
-    # next figure out the days until the users next birthday
-    msg += &quot;%s&quot; % (days_until_birthday(dob, now), )
+    <span style="color:#60a0b0;font-style:italic"># finally add whether we&#39;re older or younger than the last user</span>
+    msg <span style="color:#666">+=</span> <span style="color:#4070a0">&#34;</span><span style="color:#70a0d0;font-style:italic">%s</span><span style="color:#4070a0">&#34;</span> <span style="color:#666">%</span> (last_user_difference(session, dob), )
 
-    # finally add whether we're older or younger than the last user
-    msg += &quot;%s&quot; % (last_user_difference(session, dob), )
+    session<span style="color:#666">.</span><span style="color:#007020">set</span>(DOB_KEY, dob<span style="color:#666">.</span>toordinal())
 
-    session.set(DOB_KEY, dob.toordinal())
-
-    response_dict = build_response(&quot;ageResponse&quot;, msg, state_machine)
-    return build_response_payload(response_dict, session.get_state_params())
-</code></pre>
-
+    response_dict <span style="color:#666">=</span> build_response(<span style="color:#4070a0">&#34;ageResponse&#34;</span>, msg, state_machine)
+    <span style="color:#007020;font-weight:bold">return</span> build_response_payload(response_dict, session<span style="color:#666">.</span>get_state_params())</code></pre></div>
 <p>We won&rsquo;t go through every line, but a few things worth noting:</p>
 
 <ul>
@@ -405,18 +393,12 @@ only care about three of those and get them out of the <code>kwargs</code> dicti
 <li>You&rsquo;ll notice three different places where some error checking is performed. If the error
 condition in triggered you&rsquo;ll see some return statements, such as:</li>
 </ul>
-
-<pre><code class="language-python">if date_string.startswith('XXXX-'):
-    return &quot;missingYear&quot;
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#007020;font-weight:bold">if</span> date_string<span style="color:#666">.</span>startswith(<span style="color:#4070a0">&#39;XXXX-&#39;</span>):
+    <span style="color:#007020;font-weight:bold">return</span> <span style="color:#4070a0">&#34;missingYear&#34;</span></code></pre></div>
 <p>When a string is returned from a callback, Lazysusan assumes this is a key to a response in
 <code>states.yml</code>. If the error above was triggered the response would be synthesized from the
 <code>missingYear</code> text above:</p>
-
-<pre><code class="language-yaml">text: Please say what day, month and year you were born.
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">text:<span style="color:#bbb"> </span>Please<span style="color:#bbb"> </span>say<span style="color:#bbb"> </span>what<span style="color:#bbb"> </span>day,<span style="color:#bbb"> </span>month<span style="color:#bbb"> </span>and<span style="color:#bbb"> </span>year<span style="color:#bbb"> </span>you<span style="color:#bbb"> </span>were<span style="color:#bbb"> </span>born.</code></pre></div>
 <p>As a reminder, the structure of yaml file for responses is completely driven by the required format
 for an alexa response. There is zero translation / mutation done by Lazysusan</p>
 
@@ -578,7 +560,7 @@ skill such as the age calculator and some others which are driven almost exclusi
                 </div>
 
                 <p class="footer-copyright">
-                    <span>&copy; 2018 / Powered by <a href="https://gohugo.io/">Hugo</a></span>
+                    <span>&copy; 2019 / Powered by <a href="https://gohugo.io/">Hugo</a></span>
                 </p>
                 <p class="footer-copyright">
                     <span><a href="https://github.com/roryg/ghostwriter">Ghostwriter theme</a> By <a href="http://jollygoodthemes.com">JollyGoodThemes</a></span>

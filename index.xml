@@ -7,10 +7,20 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2016-2017. All rights reserved.</copyright>
-    <lastBuildDate>Fri, 28 Sep 2018 21:38:00 -0600</lastBuildDate>
+    <lastBuildDate>Tue, 08 Oct 2019 18:27:24 -0600</lastBuildDate>
     
 	<atom:link href="http://blog.brianz.bz/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Building a Serverless Slack clone with Python and Websockets</title>
+      <link>http://blog.brianz.bz/post/serverless-websockets-and-python/</link>
+      <pubDate>Tue, 08 Oct 2019 18:27:24 -0600</pubDate>
+      
+      <guid>http://blog.brianz.bz/post/serverless-websockets-and-python/</guid>
+      <description>In late 2018, API Gateway released support for websockets. This was a really exciting milestone for API Gateway and serverless computing since, historically, serverless APIs were mostly limited to stateless connections. Wouldn&amp;rsquo;t it be great if we could bring along our serverless architectures as we move to a more real-time style of application development. Well, now we can!
+You may be thinking, how on earth does this work since Lambda functions (or FaaS, in general) are (mostly) stateless?</description>
+    </item>
     
     <item>
       <title>Managing Database Transactions with SQLAlchemy in Serverless</title>
@@ -200,7 +210,8 @@ With that, my inaugural post will be on how I set up this blog.</description>
       
       <guid>http://blog.brianz.bz/about/</guid>
       <description>Background My name is Brian Zambrano and this is my tiny corner of the internet where I (mostly) talk about software and related technology. I currently reside in Fort Collins, CO with my wife and twin boys. In addition to software I really like the outdoors, coffee and cycling.
-You can read more about my professional background on my LinkedIn profile. In a nutshell, I grew up in Sunnyvale, CA and originally studied Materials Engineering at Cal Poly, San Luis Obispo.</description>
+I&amp;rsquo;m currently employed at AWS as a System Development Engineer.
+All opinions here are my own and does not in any way relate to my employer.</description>
     </item>
     
   </channel>

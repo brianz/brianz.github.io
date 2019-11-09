@@ -196,23 +196,20 @@ rollback these transactions yourself.</p>
 transaction.</p>
 
 <p>The definition and usage look like this:</p>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#007020;font-weight:bold">from</span> <span style="color:#0e84b5;font-weight:bold">.</span> <span style="color:#007020;font-weight:bold">import</span> get_session
 
-<pre><code class="language-python">from . import get_session
+<span style="color:#007020;font-weight:bold">class</span> <span style="color:#0e84b5;font-weight:bold">ModelMixin</span>:
 
-class ModelMixin:
-
-    def save(self, *, commit=True):
-        session = get_session()
-        session.add(self)
-        if commit:
+    <span style="color:#007020;font-weight:bold">def</span> <span style="color:#06287e">save</span>(self, <span style="color:#666">*</span>, commit<span style="color:#666">=</span>True):
+        session <span style="color:#666">=</span> get_session()
+        session<span style="color:#666">.</span>add(self)
+        <span style="color:#007020;font-weight:bold">if</span> commit:
             commit_session()
 
-class User(BaseModel, Base):
-      &quot;&quot;&quot;Model for the clients table.&quot;&quot;&quot;
-      email = Column(String(128), nullable=False)
-      name = Column(String(128), nullable=False)
-</code></pre>
-
+<span style="color:#007020;font-weight:bold">class</span> <span style="color:#0e84b5;font-weight:bold">User</span>(BaseModel, Base):
+      <span style="color:#4070a0">&#34;&#34;&#34;Model for the clients table.&#34;&#34;&#34;</span>
+      email <span style="color:#666">=</span> Column(String(<span style="color:#40a070">128</span>), nullable<span style="color:#666">=</span>False)
+      name <span style="color:#666">=</span> Column(String(<span style="color:#40a070">128</span>), nullable<span style="color:#666">=</span>False)</code></pre></div>
 <blockquote>
 <p><strong>Note:</strong> <code>Base</code>, in the example above, is merely the <code>declaritive_base</code> instance
 <a href="https://docs.sqlalchemy.org/en/latest/orm/extensions/declarative/basic_use.html" target="_blank">as you can read about here</a></p>
@@ -228,19 +225,16 @@ user.save()
 <p>Now, all is well. However, if you add one more line after the save, a <em>new</em> transaction would be
 started. Follow the common scenario below of writing something to the DB, then immediately using
 the ORM object which was written.</p>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#60a0b0;font-style:italic"># Instantiate a new `User`. DB isn&#39;t touched</span>
+user <span style="color:#666">=</span> User(email<span style="color:#666">=</span><span style="color:#4070a0">&#39;test@bar.com&#39;</span>, name<span style="color:#666">=</span><span style="color:#4070a0">&#39;Brian Zambrano&#39;</span>)
 
-<pre><code class="language-python"># Instantiate a new `User`. DB isn't touched
-user = User(email='test@bar.com', name='Brian Zambrano')
+<span style="color:#60a0b0;font-style:italic"># Save will open up a connection via my get_session helper, then commit it with the </span>
+<span style="color:#60a0b0;font-style:italic"># commit_session # helper. Life is good.</span>
+user<span style="color:#666">.</span>save()
 
-# Save will open up a connection via my get_session helper, then commit it with the 
-# commit_session # helper. Life is good.
-user.save()
-
-# With SQLAlchemy, a request for data on a previously created model object will re-query
-# the database! This means that a *new* transaction has been started.
-print(user.id)
-</code></pre>
-
+<span style="color:#60a0b0;font-style:italic"># With SQLAlchemy, a request for data on a previously created model object will re-query</span>
+<span style="color:#60a0b0;font-style:italic"># the database! This means that a *new* transaction has been started.</span>
+<span style="color:#007020;font-weight:bold">print</span>(user<span style="color:#666">.</span><span style="color:#007020">id</span>)</code></pre></div>
 <p>The TL;DR here is that if you:</p>
 
 <ol>
@@ -252,12 +246,9 @@ print(user.id)
 
 <p>My serverless handler functions often did just this. The pseudo-code would be something along the
 lines of:</p>
-
-<pre><code class="language-python">def create_thing_handler(event, context):
-    thing = create_thing_in_db(event.data)
-    return serialize_to_json(thing)
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#007020;font-weight:bold">def</span> <span style="color:#06287e">create_thing_handler</span>(event, context):
+    thing <span style="color:#666">=</span> create_thing_in_db(event<span style="color:#666">.</span>data)
+    <span style="color:#007020;font-weight:bold">return</span> serialize_to_json(thing)</code></pre></div>
 <p>The act of asking for data from <code>thing</code> would start an entirely new transaction, as SQLAlchemy will
 go back into the DB to get the data which was written. The end result is that transactions were
 left lying around in an <code>idle in transaction</code> state. The subsequent request to my Lambda functions
@@ -267,12 +258,9 @@ expired by AWS.</p>
 
 <p>The same problem exists for my read-only handlers. When <em>reading</em> data, I did not have any
 transaction management which resulted in the same problem.</p>
-
-<pre><code class="language-python">def get_thing_handler(event, context):
-    thing = get_thing_from_db(event.data['id'])
-    return serialize_to_json(thing)
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#007020;font-weight:bold">def</span> <span style="color:#06287e">get_thing_handler</span>(event, context):
+    thing <span style="color:#666">=</span> get_thing_from_db(event<span style="color:#666">.</span>data[<span style="color:#4070a0">&#39;id&#39;</span>])
+    <span style="color:#007020;font-weight:bold">return</span> serialize_to_json(thing)</code></pre></div>
 <p>Even if there is a <code>COMMIT</code> statement around <code>get_thing_from_db</code>, the last line will open up a new
 transaction which isn&rsquo;t committed.</p>
 
@@ -323,31 +311,25 @@ easier or less intrusive way. If we mimic web frameworks, we need to clean up at
 function, just before the response is sent back to the client. To accomplish this, I implemented a
 decorator which I use around all of my Lambda handler function. My decorator is called
 <code>session_committer</code> and looks like this:</p>
-
-<pre><code class="language-python">def session_committer(func):
-    &quot;&quot;&quot;Decorator to commit the DB session.
-
-    Use this from high-level functions such as handler so that the session is always committed or
-    closed.
-
-    &quot;&quot;&quot;
-    def wrapper(*args, **kwargs):
-        try:
-            return func(*args, **kwargs)
-        finally:
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#007020;font-weight:bold">def</span> <span style="color:#06287e">session_committer</span>(func):
+    <span style="color:#4070a0">&#34;&#34;&#34;Decorator to commit the DB session.
+</span><span style="color:#4070a0">
+</span><span style="color:#4070a0">    Use this from high-level functions such as handler so that the session is always committed or
+</span><span style="color:#4070a0">    closed.
+</span><span style="color:#4070a0">
+</span><span style="color:#4070a0">    &#34;&#34;&#34;</span>
+    <span style="color:#007020;font-weight:bold">def</span> <span style="color:#06287e">wrapper</span>(<span style="color:#666">*</span>args, <span style="color:#666">**</span>kwargs):
+        <span style="color:#007020;font-weight:bold">try</span>:
+            <span style="color:#007020;font-weight:bold">return</span> func(<span style="color:#666">*</span>args, <span style="color:#666">**</span>kwargs)
+        <span style="color:#007020;font-weight:bold">finally</span>:
             commit_session()
 
-    return wrapper
-</code></pre>
-
+    <span style="color:#007020;font-weight:bold">return</span> wrapper</code></pre></div>
 <p>Using it is trivial:</p>
-
-<pre><code class="language-python">@session_committer
-def get_thing_handler(event, context):
-    thing = get_thing_from_db(event.data['id'])
-    return serialize_to_json(thing)
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#555;font-weight:bold">@session_committer</span>
+<span style="color:#007020;font-weight:bold">def</span> <span style="color:#06287e">get_thing_handler</span>(event, context):
+    thing <span style="color:#666">=</span> get_thing_from_db(event<span style="color:#666">.</span>data[<span style="color:#4070a0">&#39;id&#39;</span>])
+    <span style="color:#007020;font-weight:bold">return</span> serialize_to_json(thing)</code></pre></div>
 <p>With this change, after running <code>siege</code> I can see that connections have gone from <code>idle in
 transaction</code> to simple <code>idle</code>, which means the connection is open but the transaction has be
 closed.</p>
@@ -461,7 +443,7 @@ gist: <a href="https://gist.github.com/brianz/feedc052d64212b6576fa42dd6dcadab" 
                 </div>
 
                 <p class="footer-copyright">
-                    <span>&copy; 2018 / Powered by <a href="https://gohugo.io/">Hugo</a></span>
+                    <span>&copy; 2019 / Powered by <a href="https://gohugo.io/">Hugo</a></span>
                 </p>
                 <p class="footer-copyright">
                     <span><a href="https://github.com/roryg/ghostwriter">Ghostwriter theme</a> By <a href="http://jollygoodthemes.com">JollyGoodThemes</a></span>

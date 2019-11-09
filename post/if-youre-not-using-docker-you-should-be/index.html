@@ -138,28 +138,19 @@ anytime soon).  Since containers are so cheap it&rsquo;s trivial to build you&rs
 install all of the packages you need.  Here&rsquo;s a two-line <code>Dockerfile</code> which will work and can be
 used to build documentation using the popular (Sphinx)[<a href="http://sphinx.pocoo.org" target="_blank">http://sphinx.pocoo.org</a>] library&hellip;I&rsquo;ll
 install some extension just for fun:</p>
-
-<pre><code class="language-dockerfile"># Dockerfile
-FROM python:2.7
-
-RUN pip install sphinx sphinxcontrib-argdoc
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-dockerfile" data-lang="dockerfile"><span style="color:#60a0b0;font-style:italic"># Dockerfile</span><span style="">
+</span><span style=""></span><span style="color:#007020;font-weight:bold">FROM</span><span style="color:#4070a0"> python:2.7</span><span style="">
+</span><span style="">
+</span><span style=""></span><span style="color:#007020;font-weight:bold">RUN</span> pip install sphinx sphinxcontrib-argdoc</code></pre></div>
 <p>Now, let&rsquo;s build it:</p>
-
-<pre><code class="language-bash">$ docker build -t bz/sphinx .
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ docker build -t bz/sphinx .</code></pre></div>
 <p>And now you have a little Docker image named <code>bz/sphinx</code> which you can use to build Sphinx documentation. Doing that
 may not be as obvious as you&rsquo;d think. If you create a container and write/build your docs,
 everything will disappear once the container is killed. The trick is to mount a local folder on
 your host system as a volume in the Docker container.</p>
-
-<pre><code class="language-bash">brianz@bz-cconline$ docker run --rm -it -v `pwd`:/code  bz/sphinx  bash
-root@675a26dba565:/# cd /code/
-root@675a26dba565:/code# sphinx-quickstart
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">brianz@bz-cconline$ docker run --rm -it -v <span style="color:#4070a0">`</span><span style="color:#007020">pwd</span><span style="color:#4070a0">`</span>:/code  bz/sphinx  bash
+root@675a26dba565:/# <span style="color:#007020">cd</span> /code/
+root@675a26dba565:/code# sphinx-quickstart</code></pre></div>
 <p>After stepping through the <code>sphinx-quickstart</code> I&rsquo;m done and can now edit my files on my host system
 and build the docs using Sphinx on the Docker container. Even when the Docker container is nuked,
 provided I use the volume (using <code>-v $(pwd):/code</code>) the files on your host are visible from within
@@ -210,36 +201,27 @@ much.  I was able to successfully:</p>
 <p><img src="http://blog.brianz.bz/images/donald.jpg" alt="the-donald" /></p>
 
 <p>Here&rsquo;s the <code>Dockerfile</code></p>
-
-<pre><code class="language-dockerfile"># Dockerfile
-FROM kavolorn/opencv
-
-RUN apt-get update
-RUN apt-get install -y curl
-RUN curl -O https://bootstrap.pypa.io/get-pip.py
-RUN python3 get-pip.py
-RUN apt-get install -y libfreetype6-dev
-RUN python3 -m pip install matplotlib
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-dockerfile" data-lang="dockerfile"><span style="color:#60a0b0;font-style:italic"># Dockerfile</span><span style="">
+</span><span style=""></span><span style="color:#007020;font-weight:bold">FROM</span><span style="color:#4070a0"> kavolorn/opencv</span><span style="">
+</span><span style="">
+</span><span style=""></span><span style="color:#007020;font-weight:bold">RUN</span> apt-get update<span style="">
+</span><span style=""></span><span style="color:#007020;font-weight:bold">RUN</span> apt-get install -y curl<span style="">
+</span><span style=""></span><span style="color:#007020;font-weight:bold">RUN</span> curl -O https://bootstrap.pypa.io/get-pip.py<span style="">
+</span><span style=""></span><span style="color:#007020;font-weight:bold">RUN</span> python3 get-pip.py<span style="">
+</span><span style=""></span><span style="color:#007020;font-weight:bold">RUN</span> apt-get install -y libfreetype6-dev<span style="">
+</span><span style=""></span><span style="color:#007020;font-weight:bold">RUN</span> python3 -m pip install matplotlib</code></pre></div>
 <p>Now, let&rsquo;s build it:</p>
-
-<pre><code class="language-bash">$ docker build -t bz/opencv .
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ docker build -t bz/opencv .</code></pre></div>
 <p>And the Python3 file to create the histogram&hellip;mostly <a href="http://opencv-python-tutroals.readthedocs.org/en/latest/py_tutorials/py_imgproc/py_histograms/py_histogram_begins/py_histogram_begins.html" target="_blank">copied from
 here</a></p>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#60a0b0;font-style:italic"># histo.py</span>
+<span style="color:#007020;font-weight:bold">import</span> <span style="color:#0e84b5;font-weight:bold">cv2</span>
+<span style="color:#007020;font-weight:bold">import</span> <span style="color:#0e84b5;font-weight:bold">numpy</span> <span style="color:#007020;font-weight:bold">as</span> <span style="color:#0e84b5;font-weight:bold">np</span>
+<span style="color:#007020;font-weight:bold">from</span> <span style="color:#0e84b5;font-weight:bold">matplotlib</span> <span style="color:#007020;font-weight:bold">import</span> pyplot <span style="color:#007020;font-weight:bold">as</span> plt
 
-<pre><code class="language-python"># histo.py
-import cv2
-import numpy as np
-from matplotlib import pyplot as plt
-
-img = cv2.imread('donald.jpg',0)
-plt.hist(img.ravel(),256,[0,256])
-plt.savefig('histogram.png')
-</code></pre>
-
+img <span style="color:#666">=</span> cv2<span style="color:#666">.</span>imread(<span style="color:#4070a0">&#39;donald.jpg&#39;</span>,<span style="color:#40a070">0</span>)
+plt<span style="color:#666">.</span>hist(img<span style="color:#666">.</span>ravel(),<span style="color:#40a070">256</span>,[<span style="color:#40a070">0</span>,<span style="color:#40a070">256</span>])
+plt<span style="color:#666">.</span>savefig(<span style="color:#4070a0">&#39;histogram.png&#39;</span>)</code></pre></div>
 <p>All we&rsquo;ll do now is launch a container from this new <code>bz/opencv</code> image and again, mount our current working directory as a volume
 in the container. Using this technique allows us to read/write files on either the host or
 container and see those changes in both places.</p>
@@ -247,21 +229,15 @@ container and see those changes in both places.</p>
 <p>The Python code above will be running inside the container. This line:
 <code>plt.savefig('histogram.png')</code> will write a new png file in the container&hellip;however, because we
 mounted this as a volume it will end up on our <em>local</em> system. Nice.</p>
-
-<pre><code class="language-bash"># run the image
-$ docker run --rm -it -v $(pwd):/code bz/opencv bash
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#60a0b0;font-style:italic"># run the image</span>
+$ docker run --rm -it -v <span style="color:#007020;font-weight:bold">$(</span><span style="color:#007020">pwd</span><span style="color:#007020;font-weight:bold">)</span>:/code bz/opencv bash
 root@f278f7a7124e:/# 
-root@f278f7a7124e:/# cd /code
-root@f278f7a7124e:/code# python histo.py
-</code></pre>
-
+root@f278f7a7124e:/# <span style="color:#007020">cd</span> /code
+root@f278f7a7124e:/code# python histo.py</code></pre></div>
 <p>And with that, I get an image on my <em>local</em> system which I can open:</p>
-
-<pre><code class="language-bash">brianz@gold$ pwd
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">brianz@gold$ <span style="color:#007020">pwd</span>
 /Users/brianz/dev/opencv-test
-brianz@gold$ open histogram.png 
-</code></pre>
-
+brianz@gold$ open histogram.png </code></pre></div>
 <p><img src="http://blog.brianz.bz/images/histogram.png" alt="color-histogram" /></p>
 
 <p>From here it&rsquo;d be pretty easy to add an <code>ENTRYPOINT</code> and <code>CMD</code> so that we could tell a container to
@@ -270,13 +246,10 @@ Docker image into an executable rather than a long-lived running system.</p>
 
 <p>A few tweaks to the python script could be made such that the command to create
 historgrams from images would look something like the following:</p>
-
-<pre><code class="language-bash">$ docker run --rm \
-    -v path/to/images:/images \
-    bz/opencv \
-    python3 histo.py --in-file=some-image.jpg --out-file=some-image-histogram.png
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ docker run --rm <span style="color:#4070a0;font-weight:bold">\
+</span><span style="color:#4070a0;font-weight:bold"></span>    -v path/to/images:/images <span style="color:#4070a0;font-weight:bold">\
+</span><span style="color:#4070a0;font-weight:bold"></span>    bz/opencv <span style="color:#4070a0;font-weight:bold">\
+</span><span style="color:#4070a0;font-weight:bold"></span>    python3 histo.py --in-file<span style="color:#666">=</span>some-image.jpg --out-file<span style="color:#666">=</span>some-image-histogram.png</code></pre></div>
 </div>
 
         <footer class="post-footer clearfix">
@@ -360,7 +333,7 @@ historgrams from images would look something like the following:</p>
                 </div>
 
                 <p class="footer-copyright">
-                    <span>&copy; 2018 / Powered by <a href="https://gohugo.io/">Hugo</a></span>
+                    <span>&copy; 2019 / Powered by <a href="https://gohugo.io/">Hugo</a></span>
                 </p>
                 <p class="footer-copyright">
                     <span><a href="https://github.com/roryg/ghostwriter">Ghostwriter theme</a> By <a href="http://jollygoodthemes.com">JollyGoodThemes</a></span>

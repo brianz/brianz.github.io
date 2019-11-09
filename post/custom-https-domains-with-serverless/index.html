@@ -194,42 +194,34 @@ or software.</p>
 <p>I&rsquo;m using Docker for all this since it&rsquo;s so easy. <code>certbot</code> is installable via <code>pip</code>, however
 there are several system dependencies you&rsquo;ll need. Because it&rsquo;s so easy with Docker it&rsquo;s my
 suggested method for using <code>certbot</code>. Here&rsquo;s a two line <code>Dockerfile</code> which will work:</p>
-
-<pre><code class="language-Dockerfile">FROM python:2
-RUN pip install certbot
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Dockerfile" data-lang="Dockerfile"><span style="color:#007020;font-weight:bold">FROM</span><span style="color:#4070a0"> python:2</span><span style="">
+</span><span style=""></span><span style="color:#007020;font-weight:bold">RUN</span> pip install certbot</code></pre></div>
 <p>It&rsquo;s really that easy.</p>
 
 <p>My accompanying <code>Makefile</code>:</p>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Makefile" data-lang="Makefile"><span style="color:#bb60d5">NAME</span><span style="color:#666">=</span><span style="color:#4070a0">&#34;bz/certbot&#34;</span>
 
-<pre><code class="language-Makefile">NAME=&quot;bz/certbot&quot;
+<span style="color:#06287e">.PHONY</span><span style="color:#666">:</span> all shell
 
-.PHONY: all shell
+<span style="color:#06287e">all </span><span style="color:#666">:</span>
+	docker build -t <span style="color:#007020;font-weight:bold">$(</span>NAME<span style="color:#007020;font-weight:bold">)</span> .
 
-all :
-	docker build -t $(NAME) .
-
-shell :
-	docker run --rm -it \
-		-v `pwd`/letsencrypt:/etc/letsencrypt \
-		$(NAME) bash
-</code></pre>
-
+<span style="color:#06287e">shell </span><span style="color:#666">:</span>
+	docker run --rm -it <span style="color:#4070a0;font-weight:bold">\
+</span><span style="color:#4070a0;font-weight:bold"></span>		-v <span style="color:#4070a0">`</span><span style="color:#007020">pwd</span><span style="color:#4070a0">`</span>/letsencrypt:/etc/letsencrypt <span style="color:#4070a0;font-weight:bold">\
+</span><span style="color:#4070a0;font-weight:bold"></span>		<span style="color:#007020;font-weight:bold">$(</span>NAME<span style="color:#007020;font-weight:bold">)</span> bash
+</code></pre></div>
 <p>So now I&rsquo;ll just:</p>
-
-<pre><code class="language-bash">$ make
-$ # lots of output
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ make
+$ <span style="color:#60a0b0;font-style:italic"># lots of output</span>
 Removing intermediate container 71cb0a9bbfb9
 Successfully built f93119d079ac
 $ mkdir letsencrypt
 $ make shell
-docker run --rm -it \
-                -v `pwd`/letsencrypt:/etc/letsencrypt \
-                &quot;bz/certbot&quot; bash
-root@ff55a6336d39:/#
-</code></pre>
-
+docker run --rm -it <span style="color:#4070a0;font-weight:bold">\
+</span><span style="color:#4070a0;font-weight:bold"></span>                -v <span style="color:#4070a0">`</span><span style="color:#007020">pwd</span><span style="color:#4070a0">`</span>/letsencrypt:/etc/letsencrypt <span style="color:#4070a0;font-weight:bold">\
+</span><span style="color:#4070a0;font-weight:bold"></span>                <span style="color:#4070a0">&#34;bz/certbot&#34;</span> bash
+root@ff55a6336d39:/#</code></pre></div>
 <p><strong>Note</strong>: Here I&rsquo;m creating a <em>local</em> directory names <code>letsencrypt</code> and mounting in into the
 container as <code>/etc/letsencrypt</code>. The reason for that is because <code>certbot</code> will place all of the
 created certificates into <code>/etc/letsencrypt</code>. We want any created files to persist on our local
@@ -259,21 +251,20 @@ expect your webserver to be able to serve static content from a path which looks
 </ul>
 
 <p>Here is the full output from my run:</p>
-
-<pre><code class="language-bash">root@271530c5cbad:/certs# certbot certonly --manual -d dilbert.brianz.bz --preferred-challenges dns
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">root@271530c5cbad:/certs# certbot certonly --manual -d dilbert.brianz.bz --preferred-challenges dns
 Saving debug log to /var/log/letsencrypt/letsencrypt.log
 Obtaining a new certificate
 Performing the following challenges:
-dns-01 challenge for dilbert.brianz.bz
+dns-01 challenge <span style="color:#007020;font-weight:bold">for</span> dilbert.brianz.bz
 
 -------------------------------------------------------------------------------
 NOTE: The IP of this machine will be publicly logged as having requested this
-certificate. If you're running certbot in manual mode on a machine that is not
-your server, please ensure you're okay with that.
+certificate. If you<span style="color:#4070a0">&#39;re running certbot in manual mode on a machine that is not
+</span><span style="color:#4070a0">your server, please ensure you&#39;</span>re okay with that.
 
 Are you OK with your IP being logged?
 -------------------------------------------------------------------------------
-(Y)es/(N)o: Y
+<span style="color:#666">(</span>Y<span style="color:#666">)</span>es/<span style="color:#666">(</span>N<span style="color:#666">)</span>o: Y
 
 -------------------------------------------------------------------------------
 Please deploy a DNS TXT record under the name
@@ -284,9 +275,7 @@ tBkgiRMxuIGSKH-WzJiJMTCi5uuEsZUUJJmg8FIBZ40
 Once this is deployed,
 -------------------------------------------------------------------------------
 Press Enter to Continue
-Waiting for verification...
-</code></pre>
-
+Waiting <span style="color:#007020;font-weight:bold">for</span> verification...</code></pre></div>
 <h2 id="create-txt-record">Create TXT record</h2>
 
 <p>This part is easy enough. Simply add a <code>TXT</code> record in your DNS zone file as instructed. I&rsquo;m using
@@ -296,47 +285,38 @@ Route53 and this is what it looks like:</p>
 
 <p>It may take a bit for this record to propagate.  You can check that it&rsquo;s returning the correct value
 using <code>dig</code>:</p>
-
-<pre><code class="language-bash">$ dig -t TXT _acme-challenge.dilbert.brianz.bz
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ dig -t TXT _acme-challenge.dilbert.brianz.bz</code></pre></div>
 <h2 id="finishing-off-challenge">Finishing off challenge</h2>
 
 <p>Once your <code>TXT</code> record is working, simply hit enter back in the <code>certbot</code> prompt:</p>
-
-<pre><code class="language-bash">Cleaning up challenges
-Generating key (2048 bits): /etc/letsencrypt/keys/0000_key-certbot.pem
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">Cleaning up challenges
+Generating key <span style="color:#666">(</span><span style="color:#40a070">2048</span> bits<span style="color:#666">)</span>: /etc/letsencrypt/keys/0000_key-certbot.pem
 Creating CSR: /etc/letsencrypt/csr/0000_csr-certbot.pem
 
 IMPORTANT NOTES:
  - Congratulations! Your certificate and chain have been saved at
    /etc/letsencrypt/live/dilbert.brianz.bz/fullchain.pem. Your cert will
-   expire on 2017-05-18. To obtain a new or tweaked version of this
+   expire on <span style="color:#40a070">2017</span>-05-18. To obtain a new or tweaked version of this
    certificate in the future, simply run certbot again. To
-   non-interactively renew *all* of your certificates, run &quot;certbot
-   renew&quot;
+   non-interactively renew *all* of your certificates, run <span style="color:#4070a0">&#34;certbot
+</span><span style="color:#4070a0">   renew&#34;</span>
  - If you like Certbot, please consider supporting our work by:
 
-   Donating to ISRG / Let's Encrypt:   https://letsencrypt.org/donate
-   Donating to EFF:                    https://eff.org/donate-le
-</code></pre>
-
+   Donating to ISRG / Let<span style="">&#39;</span>s Encrypt:   https://letsencrypt.org/donate
+   Donating to EFF:                    https://eff.org/donate-le</code></pre></div>
 <p>Nice! Again, you&rsquo;ll notice that <code>certbot</code> put the keys in <code>/etc/letsencrypt</code>. If you&rsquo;re using
 Docker like I am these will now be sitting on your host system. It&rsquo;s now safe to kill the
 container.</p>
 
 <p>There are four certificate files created:</p>
-
-<pre><code class="language-bash">$ pwd
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ <span style="color:#007020">pwd</span>
 /Users/brianz/dev/certbot/letsencrypt/live/dilbert.brianz.bz
 $ ls -l
--rw-r--r--  1 brianz  staff  543 Feb 16 16:56 README
-lrwxr-xr-x  1 brianz  staff   38 Feb 16 16:56 cert.pem -&gt; ../../archive/dilbert.brianz.bz/cert1.pem
-lrwxr-xr-x  1 brianz  staff   39 Feb 16 16:56 chain.pem -&gt; ../../archive/dilbert.brianz.bz/chain1.pem
-lrwxr-xr-x  1 brianz  staff   43 Feb 16 16:56 fullchain.pem -&gt; ../../archive/dilbert.brianz.bz/fullchain1.pem
-lrwxr-xr-x  1 brianz  staff   41 Feb 16 16:56 privkey.pem -&gt; ../../archive/dilbert.brianz.bz/privkey1.pem
-</code></pre>
-
+-rw-r--r--  <span style="color:#40a070">1</span> brianz  staff  <span style="color:#40a070">543</span> Feb <span style="color:#40a070">16</span> <span style="color:#40a070">16</span>:56 README
+lrwxr-xr-x  <span style="color:#40a070">1</span> brianz  staff   <span style="color:#40a070">38</span> Feb <span style="color:#40a070">16</span> <span style="color:#40a070">16</span>:56 cert.pem -&gt; ../../archive/dilbert.brianz.bz/cert1.pem
+lrwxr-xr-x  <span style="color:#40a070">1</span> brianz  staff   <span style="color:#40a070">39</span> Feb <span style="color:#40a070">16</span> <span style="color:#40a070">16</span>:56 chain.pem -&gt; ../../archive/dilbert.brianz.bz/chain1.pem
+lrwxr-xr-x  <span style="color:#40a070">1</span> brianz  staff   <span style="color:#40a070">43</span> Feb <span style="color:#40a070">16</span> <span style="color:#40a070">16</span>:56 fullchain.pem -&gt; ../../archive/dilbert.brianz.bz/fullchain1.pem
+lrwxr-xr-x  <span style="color:#40a070">1</span> brianz  staff   <span style="color:#40a070">41</span> Feb <span style="color:#40a070">16</span> <span style="color:#40a070">16</span>:56 privkey.pem -&gt; ../../archive/dilbert.brianz.bz/privkey1.pem</code></pre></div>
 <h2 id="setting-up-custom-domain-with-api-gateway">Setting up custom domain with API Gateway</h2>
 
 <p>Now that we have our certificate files, it&rsquo;s time to set up a custom domain in API Gateway. How
@@ -520,7 +500,7 @@ one of the commercial CAs.</p>
                 </div>
 
                 <p class="footer-copyright">
-                    <span>&copy; 2018 / Powered by <a href="https://gohugo.io/">Hugo</a></span>
+                    <span>&copy; 2019 / Powered by <a href="https://gohugo.io/">Hugo</a></span>
                 </p>
                 <p class="footer-copyright">
                     <span><a href="https://github.com/roryg/ghostwriter">Ghostwriter theme</a> By <a href="http://jollygoodthemes.com">JollyGoodThemes</a></span>

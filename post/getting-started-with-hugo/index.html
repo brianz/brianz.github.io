@@ -127,19 +127,13 @@ it&rsquo;s written in Go (I usually hate dealing with Ruby gems and dependencies
 
 <p>Here&rsquo;s the TL;DR of what I did to go from zero to blogging <em>(this is from memory so it may not be
 100% correct)</em>:</p>
-
-<pre><code class="language-bash">$ brew install hugo
-$ mkdir bz-blog &amp;&amp; cd bz-blog
-$ hugo new site brianz
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ brew install hugo
+$ mkdir bz-blog <span style="color:#666">&amp;&amp;</span> <span style="color:#007020">cd</span> bz-blog
+$ hugo new site brianz</code></pre></div>
 <p>To find a theme I liked went to the <a href="http://themes.gohugo.io" target="_blank">Hugo themes</a> site and picked
 <a href="http://themes.gohugo.io/greyshade/" target="_blank">greyshade</a>. Hugo themes are <em>really</em> easy to use:</p>
-
-<pre><code class="language-bash">$ cd brianz/themes
-$ git clone https://github.com/cxfksword/greyshade.git
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ <span style="color:#007020">cd</span> brianz/themes
+$ git clone https://github.com/cxfksword/greyshade.git</code></pre></div>
 <p>I don&rsquo;t especially like the <code>.toml</code> syntax which is what you get by default for the config file. I
 change <code>config.toml</code> into <code>config.yaml</code>. The main thing is that I don&rsquo;t like needed to add quotes
 around everything in the <code>toml</code> files. With yaml, I can just write stuff like this&gt;</p>
@@ -167,15 +161,12 @@ $ python
 <p><strong>Note:</strong>, there is a small issue with the greyshade theme in that Hugo will throw an error when
 creating a new post. To fix this simply create a file at <code>archetypes/default.md</code> with the following
 contents (or customize as you see fit):</p>
-
-<pre><code class="language-markdown">+++
-
-draft=true
-tags = []
-
-+++
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-markdown" data-lang="markdown">+++<span style="">
+</span><span style="">
+</span><span style=""></span>draft=true<span style="">
+</span><span style=""></span>tags = []<span style="">
+</span><span style="">
+</span><span style=""></span>+++</code></pre></div>
 <p>With that, I can now create new posts and see it in real-time using <code>hugo server --buildDrafts</code>.</p>
 
 <p>Now that things are working, I&rsquo;ll talk about publishing things in my next post.</p>
@@ -263,7 +254,7 @@ tags = []
                 </div>
 
                 <p class="footer-copyright">
-                    <span>&copy; 2018 / Powered by <a href="https://gohugo.io/">Hugo</a></span>
+                    <span>&copy; 2019 / Powered by <a href="https://gohugo.io/">Hugo</a></span>
                 </p>
                 <p class="footer-copyright">
                     <span><a href="https://github.com/roryg/ghostwriter">Ghostwriter theme</a> By <a href="http://jollygoodthemes.com">JollyGoodThemes</a></span>

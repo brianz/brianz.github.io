@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Building a Serverless Slack clone with Python and Websockets &middot; Brian Zambrano</title>
+        <meta name="description" content="In late 2018, API Gateway released support for websockets. This was a really exciting milestone for API Gateway and serverless computing since, historically, serverless APIs were mostly limited to stateless connections. Wouldn&rsquo;t it be great if we could bring along our serverless architectures as we move to a more real-time style of application development. Well, now we can!
+You may be thinking, how on earth does this work since Lambda functions (or FaaS, in general) are (mostly) stateless?">
+        <meta name="HandheldFriendly" content="True">
+        <meta name="MobileOptimized" content="320">
+        <meta name="generator" content="Hugo 0.53" />
+        <meta name="robots" content="index,follow">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <link rel="stylesheet" href="http://blog.brianz.bz/dist/styles.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,600,700,300&subset=latin,cyrillic-ext,latin-ext,cyrillic">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+        
+        
+    </head>
+    <body>
+        
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-75475240-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+
+        <div id="wrapper">
+            <header class="site-header">
+                <div class="container">
+                    <div class="site-title-wrapper">
+                        
+                            <h1 class="site-title">
+                                <a title="Brian Z" href="http://blog.brianz.bz/">Brian Z</a>
+                            </h1>
+                        
+                        <a class="button-square" href="http://blog.brianz.bz/index.xml"><i class="fa fa-rss"></i></a>
+                        
+                            <a class="button-square button-social hint--top" data-hint="Twitter" title="Twitter" href="https://twitter.com/brianzambrano">
+                                <i class="fa fa-twitter"></i>
+                            </a>
+                        
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="Github" title="Github" href="https://github.com/brianz">
+                                <i class="fa fa-github-alt"></i>
+                            </a>
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="Stack Overflow" title="Stack Overflow" href="http://stackoverflow.com/users/87858/brianz">
+                                <i class="fa fa-stack-overflow"></i>
+                            </a>
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="LinkedIn" title="LinkedIn" href="https://www.linkedin.com/in/brianzambrano">
+                                <i class="fa fa-linkedin"></i>
+                            </a>
+                        
+                        
+                        
+                    </div>
+
+                    <ul class="site-nav">
+                        
+    <li class="site-nav-item">
+        <a title="About" href="http://blog.brianz.bz/about/">About</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="Posts" href="http://blog.brianz.bz/post/">Posts</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="Home" href="http://blog.brianz.bz/">Home</a>
+    </li>
+
+                    </ul>
+                </div>
+            </header>
+
+            <div id="container">
+
+
+<div class="container">
+    <article class="post-container" itemscope="" itemtype="http://schema.org/BlogPosting">
+        <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Building a Serverless Slack clone with Python and Websockets</h1>
+    
+    <p class="post-date">
+        <span>Published <time datetime="2019-10-08" itemprop="datePublished">08 Oct 2019, 18:27</time></span>
+        <span>by</span>
+        <span itemscope="" itemprop="author" itemtype="https://schema.org/Person">
+            <span itemprop="name">
+                <a href="#" itemprop="url" rel="author">Brian Zambrano</a>
+            </span>
+        </span>
+    </p>
+</header>
+
+        <div class="post-content clearfix" itemprop="articleBody">
+    
+
+    
+
+<p>In late 2018, API Gateway <a href="https://aws.amazon.com/blogs/compute/announcing-websocket-apis-in-amazon-api-gateway/" target="_blank">released support for websockets</a>. This was a really exciting milestone for API Gateway and serverless computing since, historically, serverless APIs were mostly limited to stateless connections. Wouldn&rsquo;t it be great if we could bring along our serverless architectures as we move to a more real-time style of application development. Well, now we can!</p>
+
+<p>You may be thinking, how on earth does this work since Lambda functions (or FaaS, in general) are (mostly) stateless? That is a really great question, and one I asked myself as soon as I heard about Websocket support in API Gateway. The detailed answer is down below, but in short:</p>
+
+<hr />
+
+<p>Lambdas functions are still stateless, but by using a datastore (like DynamoDB) to store state, we can mimic a long-lived stateful connection between client and server.</p>
+
+<hr />
+
+<p><strong>Note:</strong> All of the code can be found <a href="https://github.com/brianz/noco-serverless-chat" target="_blank">in the Github repository</a></p>
+
+<p>The whole thing went well&hellip;you can see the results in the asciicast below:</p>
+
+<p><a href="https://asciinema.org/a/O1ya9VitrkhH1lQVCqxbJsV6P" target="_blank"><img src="https://asciinema.org/a/O1ya9VitrkhH1lQVCqxbJsV6P.svg" alt="asciicast" /></a></p>
+
+<h1 id="websockets-and-python-on-aws">Websockets and Python on AWS</h1>
+
+<p>I organize of the Northern Colorado AWS Meetup in Fort Collins, CO. There was a request to do a hands-on lab to get people more familiar with building something for real, rather than just hearing a presentation. Since websockets was new, and because I&rsquo;m a Python guy, I decided to do a hands-on demo of building a chat application using Python and websockets. What I quickly found (at the time) was that <em>there is very little documentation or example code using Python and websockets</em>. Most of the documentation/blogs I found (back in April of 2019) centered around Node.</p>
+
+<p>I was able to come up with a pretty cool chat application using the Node examples that I found as a guide. The funny thing is that the websocket part is actually very very small. There is a big caveat with the Python implementation, which I&rsquo;ll call out below.</p>
+
+<h1 id="websockets-and-api-gateway">Websockets and API Gateway</h1>
+
+<p>I&rsquo;ll start at a high level&hellip;how does API Gateway work with Websockets? First, let&rsquo;s take a quick look at how to create a Websocket endpoint in API GW using the Serverless framework.</p>
+
+<p>In the <a href="https://github.com/brianz/noco-serverless-chat/blob/master/serverless/serverless.yml" target="_blank">serverless.yml</a> file, you define functions and handlers as you normally would. The difference from an API endpoint is in the <code>events</code> key. Here, the <code>event</code> is a <code>websocket</code> event.</p>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">functions:<span style="color:#bbb">
+</span><span style="color:#bbb">  </span>connect:<span style="color:#bbb">
+</span><span style="color:#bbb">    </span>handler:<span style="color:#bbb"> </span>handler.connect<span style="color:#bbb">
+</span><span style="color:#bbb">    </span>events:<span style="color:#bbb">
+</span><span style="color:#bbb">      </span>-<span style="color:#bbb"> </span>websocket:<span style="color:#bbb"> </span>$connect<span style="color:#bbb">
+</span><span style="color:#bbb">  </span>disconnect:<span style="color:#bbb">
+</span><span style="color:#bbb">    </span>handler:<span style="color:#bbb"> </span>handler.disconnect<span style="color:#bbb">
+</span><span style="color:#bbb">    </span>events:<span style="color:#bbb">
+</span><span style="color:#bbb">      </span>-<span style="color:#bbb"> </span>websocket:<span style="color:#bbb"> </span>$disconnect<span style="color:#bbb">
+</span><span style="color:#bbb">  </span>default:<span style="color:#bbb">
+</span><span style="color:#bbb">    </span>handler:<span style="color:#bbb"> </span>handler.default<span style="color:#bbb">
+</span><span style="color:#bbb">    </span>events:<span style="color:#bbb">
+</span><span style="color:#bbb">      </span>-<span style="color:#bbb"> </span>websocket:<span style="color:#bbb"> </span>$default</code></pre></div>
+<p>There are three websocket events which are triggered by default from any websocket client library. Those are:</p>
+
+<ul>
+<li><code>connect</code> -&gt; Triggered when the initial connection is established</li>
+<li><code>disconnect</code> -&gt; Triggered when the a connection closed</li>
+<li><code>default</code> -&gt; Everything else</li>
+</ul>
+
+<p>You should note here that these handler functions I&rsquo;ve set up are just plain ol&rsquo; Python Lambda functions. What is slightly different is, of course, the payload that these functions receive when they are triggered from a Websocket invocation.</p>
+
+<p>Remember, a websocket connection is a full-duplex connection. This is just a fancy way of saying that when a connection is opened, it stays open until either the client or server severs the connection. While that connection is open, the client may send data to the server, and the server can <em>push</em> data down to the client. This is exactly what we want in a chat system&hellip;if a new message arrives, we want to <em>push</em> that message to all of the connected users.</p>
+
+<p>API Gateway provides us with that long-lived websocket connection. The connection with a client is actually made between the client, and API Gateway. API GW is in charge of keeping that connection alive, and proxying the data between the client and our Lambda function.</p>
+
+<p>I&rsquo;ll walk you through a brief exchange to make things more clear (this is all very high level):</p>
+
+<ul>
+<li>Client establishes a connection with our API GW Websocket endpoint</li>
+</ul>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#007020;font-weight:bold">const</span> ws <span style="color:#666">=</span> <span style="color:#007020;font-weight:bold">new</span> Websocket(<span style="color:#4070a0">&#39;wss://our-apigatewayendpoint.us-west2.amazon.com&#39;</span>)
+</code></pre></div>
+<ul>
+<li>API GW creates a &ldquo;connection id&rdquo; with that client, and invokes <code>handler.connect</code> (using example from above)</li>
+<li>Our <code>handler.connect</code> function is invoked&hellip;in the payload is a <code>connectionId</code> which uniquely identifies that single client.</li>
+<li>The client now sends some data:</li>
+</ul>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">ws.send(JSON.stringify({ message<span style="color:#666">:</span> <span style="color:#4070a0">&#34;ping&#34;</span> })
+</code></pre></div>
+<ul>
+<li>Our <code>handler.default</code> function is invoked&hellip;in the payload is a <code>connectionId</code> which identifies that single client on that
+same connection. Also in the payload the a JSON-encoded data which was sent: <code>'{&quot;message&quot;:&quot;ping&quot;}'</code>. Using the
+<code>connectionId</code>, we can send a message <em>back</em> to the client (I&rsquo;ll demonstrate how to do this, later). We can also perform
+any business logic based on the payload sent.</li>
+<li>The client closes the connection:</li>
+</ul>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">ws.close();
+</code></pre></div>
+<ul>
+<li>Our <code>handler.disconnect</code> function is invoked&hellip;in the payload is a <code>connectionId</code> which identifies that single client on that same connection. We can now clean up any state we have for that connection since we now know it&rsquo;s gone.</li>
+</ul>
+
+<hr />
+
+<p><strong>The key with all of this is that API Gateway gives us a <code>connectionId</code>, which identifies a unique, connected client. Our Lambda functions receive messages from clients that include a <code>connectionId</code> and we use that <code>connectionId</code> to push messages to clients.</strong></p>
+
+<hr />
+
+<h1 id="slack-clone">Slack clone</h1>
+
+<p>Chat applications are sort of like the &ldquo;Hello World!&rdquo; of websockets, in my opinion. Rather than just doing a basic chat app, I wanted to support a couple of more features akin to Slack or other chat platforms&hellip;what I ended up with:</p>
+
+<ul>
+<li>Setting a username</li>
+<li>Different &ldquo;channels&rdquo;</li>
+</ul>
+
+<p>That&rsquo;s not very complicated, but it&rsquo;s pretty clear there will be some state that we&rsquo;ll need to keep track of. In my implementation, I used DynamoDB which is very well-suited for this application. If you think through the basics of a chat application (broadcasting messages), and the two additial features above, I&rsquo;ll need to save:</p>
+
+<ul>
+<li>A list of users, and what channel they are connected to</li>
+<li>A mapping of &ldquo;connection&rdquo; to username, to allow people to change their user name</li>
+<li>A list of all the messages and what room those messages were sent</li>
+</ul>
+
+<p>So, let&rsquo;s dig into some of the code and figure out how this all works. I&rsquo;ll walk through it in three blocks, which map 1-to-1 with the websocket lifecycle methods:</p>
+
+<ul>
+<li><code>connect</code></li>
+<li><code>default</code></li>
+<li><code>disconnect</code></li>
+</ul>
+
+<h1 id="connect">Connect</h1>
+
+<p>So, a user connects&hellip;what do we need to do if we&rsquo;re implementing a chat system? In my case, I&rsquo;m going to:</p>
+
+<ul>
+<li>Extract the <code>connectionId</code> from the request</li>
+<li>Save the <code>connectionId</code>, treating them as an <code>anonymous</code> user</li>
+<li>Place the user in the <code>general</code> channel</li>
+</ul>
+
+<p>You can follow the logic in <a href="https://github.com/brianz/noco-serverless-chat/blob/master/serverless/handler.py" target="_blank">my handler.py file on Github</a>, but it&rsquo;s so simple we can walk through it here:</p>
+
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#007020;font-weight:bold">def</span> <span style="color:#06287e">connect</span>(event, context):
+    <span style="color:#4070a0">&#34;&#34;&#34;Lambda handler for a websocket connect event&#34;&#34;&#34;</span>
+    connection_id <span style="color:#666">=</span> _get_connection_id(event)
+    aws<span style="color:#666">.</span>set_connection_id(connection_id)
+
+    <span style="color:#007020;font-weight:bold">return</span> {
+        <span style="color:#4070a0">&#39;statusCode&#39;</span>: <span style="color:#40a070">200</span>,
+        <span style="color:#4070a0">&#39;body&#39;</span>: <span style="color:#4070a0">&#39;connect&#39;</span>,
+    }
+
+<span style="color:#007020;font-weight:bold">def</span> <span style="color:#06287e">_get_connection_id</span>(event):
+    ctx <span style="color:#666">=</span> event[<span style="color:#4070a0">&#39;requestContext&#39;</span>]
+    <span style="color:#007020;font-weight:bold">return</span> ctx[<span style="color:#4070a0">&#39;connectionId&#39;</span>]</code></pre></div>
+
+<p>Pretty simple stuff. You can see the <code>_get_connection_id</code> helper just pulls out the <code>connectionId</code> from the Lambda event payload. I pass that <code>connectionId</code> to the other helper. This is my own code that I namespace within my Lambda package. You can read it <a href="https://github.com/brianz/noco-serverless-chat/blob/master/serverless/noco/aws.py" target="_blank">in its entirety on Github as well</a>. Frankly, most of the complexity in this app (and in the <code>set_connection_id</code>
+helper function) comes from saving the state in DynamoDB and getting the structure right so that we can easily query it. In short, what I do in
+DynamoDB during a connection is:</p>
+
+<ul>
+<li>Update the list of channels. If someone connects for the first time, a <code>#general</code> channel is stored</li>
+<li>Inserting a record for the <code>connectionId</code>. When someone connects, I basically store the fact that they are connected and in the <code>#general</code> channel.</li>
+</ul>
+
+<p>So, now let&rsquo;s assume two people have connected. What do we need to do when someone types a message in the <code>#general</code> channel?</p>
+
+<h1 id="default">Default</h1>
+
+<p>Now, something a bit more fun&hellip;a user types a message into our chat system and hits <code>Enter</code>. What do we do? Well, to start, this is not
+a <code>connect</code> or <code>disconnect</code> event, so API Gateway will invoke our <code>default</code> handler. There is a way to create your own websocket event types
+which you can map to different functions, but I won&rsquo;t cover that here.</p>
+
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span><span style="color:#007020;font-weight:bold">def</span> <span style="color:#06287e">default</span>(event, context):
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>    <span style="color:#4070a0">&#34;&#34;&#34;Default handler for websocket messages&#34;&#34;&#34;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span>    message <span style="color:#666">=</span> event<span style="color:#666">.</span>get(<span style="color:#4070a0">&#39;body&#39;</span>, <span style="color:#4070a0">&#39;&#39;</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span>    <span style="color:#007020;font-weight:bold">if</span> <span style="color:#007020;font-weight:bold">not</span> message<span style="color:#666">.</span>strip():
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>        <span style="color:#007020;font-weight:bold">return</span> {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span>            <span style="color:#4070a0">&#39;statusCode&#39;</span>: <span style="color:#40a070">200</span>,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span>        }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>    <span style="color:#007020;font-weight:bold">if</span> message<span style="color:#666">.</span>startswith(<span style="color:#4070a0">&#39;/&#39;</span>):
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>        <span style="color:#007020;font-weight:bold">return</span> _handle_slash(message, event)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span>    connection_id, request_time <span style="color:#666">=</span> _get_conn_id_and_time(event)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span>    user <span style="color:#666">=</span> aws<span style="color:#666">.</span>get_user(connection_id)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16</span>    channel_name <span style="color:#666">=</span> user<span style="color:#666">.</span>get(<span style="color:#4070a0">&#39;channel_name&#39;</span>, <span style="color:#4070a0">&#39;general&#39;</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17</span>    username <span style="color:#666">=</span> user<span style="color:#666">.</span>get(<span style="color:#4070a0">&#39;username&#39;</span>, <span style="color:#4070a0">&#39;anonymous&#39;</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19</span>    <span style="color:#60a0b0;font-style:italic"># Save the message to dynamodb</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20</span>    aws<span style="color:#666">.</span>save_message(connection_id, request_time, message, channel_name)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22</span>    <span style="color:#60a0b0;font-style:italic"># broadcast the message to all connected users</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23</span>    _broadcast(
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24</span>        message,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25</span>        _get_endpoint(event),
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26</span>        connection_id,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27</span>        channel_name,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28</span>        username,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29</span>    )
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">30</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">31</span>    <span style="color:#007020;font-weight:bold">return</span> {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">32</span>        <span style="color:#4070a0">&#39;statusCode&#39;</span>: <span style="color:#40a070">200</span>,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">33</span>        <span style="color:#4070a0">&#39;body&#39;</span>: safe_dumps(message),
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">34</span>    }</code></pre></div>
+
+<p>Let&rsquo;s break this down. When there is a regular text message (ie, not a <code>/</code> command, as picked up on line 10):</p>
+
+<ul>
+<li>I extract out the <code>connectionId</code> and time of the request. This is used to save the message, using the time of the request as the sort key in DynamoDB</li>
+<li>Get the user from DynamoDB, using the <code>connectionId</code> as the unique identifier, which I saved
+during the <code>connect</code> event</li>
+<li>Get the channel name, which is stored in the <code>user</code> record in DynamoDB. Defaults to <code>general</code>.</li>
+<li>Get the <code>username</code>, also in the <code>user</code> record in DynamoDB. Defaults to <code>anonymous</code>.</li>
+<li>Save the new message in DynamoDB</li>
+<li>Broadcast the message out to other users, for this particular channel</li>
+</ul>
+
+<p>That&rsquo;s sort of a lot, but most of it is just housekeeping, saving state in DynamoDB to support people
+changing the usernames and changing channels. The interesting bit here is the <code>_broadcast</code> helper which
+will push out the message to other users in the channel. Let&rsquo;s look at that since that&rsquo;s the meat
+of this entire blog post.</p>
+
+<p>Pushing a message to open websockets is pretty simple. Here it the <code>_broadcast</code> helper, in its entirety:</p>
+
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span><span style="color:#007020;font-weight:bold">def</span> <span style="color:#06287e">_broadcast</span>(message, endpoint, sender, channel, username):
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>    client <span style="color:#666">=</span> boto3<span style="color:#666">.</span>client(<span style="color:#4070a0">&#39;apigatewaymanagementapi&#39;</span>, endpoint_url<span style="color:#666">=</span>endpoint)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span>    <span style="color:#60a0b0;font-style:italic"># need to look up what channel the user is connected to</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span>    <span style="color:#007020;font-weight:bold">for</span> connection_id <span style="color:#007020;font-weight:bold">in</span> aws<span style="color:#666">.</span>get_connected_connection_ids(channel):
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>        <span style="color:#007020;font-weight:bold">if</span> connection_id <span style="color:#666">==</span> sender:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span>            <span style="color:#007020;font-weight:bold">continue</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span>        client<span style="color:#666">.</span>post_to_connection(
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>            ConnectionId<span style="color:#666">=</span>connection_id,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>            Data<span style="color:#666">=</span><span style="color:#4070a0">&#39;#{} {}: {}&#39;</span><span style="color:#666">.</span>format(channel, username, message),
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>        )</code></pre></div>
+
+<p>You can use boto3 to push messages to a websocket connection using the <code>post_to_connection</code> API call, as shown above.</p>
+
+<hr />
+
+<p><strong>A big caveat here is that you need to use a new version of boto3. The boto3 that comes with Python Lambda functions
+is out-of-date, and does not have this API included!</strong></p>
+
+<hr />
+
+<p>This function works by taking a message, API GW Http endpoint (See Github code for details on how to extract that), the sender&rsquo;s
+<code>connectionId</code>, the <code>channel</code> the message was sent, and the <code>username</code> of who sent it. It&rsquo;s really only four lines of code, so
+let&rsquo;s break it down further.</p>
+
+<p>First, I need a client object from boto3&hellip;nothing fancy there. The only trick is that we need to pass in an <code>endpoint_url</code>. The
+boto3 docs do not call this out explicitly. There is a <a href="https://github.com/boto/boto3/issues/1914" target="_blank">Github issue tracking this</a>. Hopefully
+the docs get updated soon. I&rsquo;m fairly certain the reason this endpoint URL is required is that, behind the scenes, the interface
+to the open Websocket connections is handled via HTTP. You can read about it
+<a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-how-to-call-websocket-api-connections.html" target="_blank">in the API Gateway docs</a></p>
+
+<p>Now that I have a client object, i need to fetch the list of connections/people who need to receive the message. This is all
+handled in the <code>get_connection_connection_ids</code> helper on line 5. There isn&rsquo;t any magic here&hellip;it&rsquo;s just a DynamoDB query to fetch the list
+of users in the channel.</p>
+
+<p>Since we don&rsquo;t want to echo message back to the user who sent it, we <code>continue</code> when we inevitably see the <code>connection_id</code> of the
+<code>sender</code> on lines 6-7.</p>
+
+<p>Now, it&rsquo;s time to broadcast! This is just a simple call to <code>client.post_to_connection</code>, which takes a connection id, and some
+string data. Here, I&rsquo;m just formatting the message so recipients see the channel name, username of who sent the message, and the
+message itself:</p>
+
+<pre><code>&lt; #general BZ1: hello from BZ1 
+&lt; #general BZ1: what's up?
+</code></pre>
+
+<h1 id="disconnect">Disconnect</h1>
+
+<p>When a client willingly closes the connection or it times out due to inactivity, the <code>disconnect</code> event is triggered. All I do here
+is clean up that user&rsquo;s data in DynamoDB, since we no longer want to attempt to send them messages. You can peruse the code if
+you&rsquo;re curious on the details</p>
+
+<h1 id="conclusion">Conclusion</h1>
+
+<p>Using websockets with API Gateway, Lambda functions and Python is quite simple and fun. The trick to most of this is using the latest
+version of boto3, and using the undocumented <code>boto3.client('apigatewaymanagementapi', endpoint_url=endpoint)</code> client.</p>
+
+<p>One thing which will make your life easier is created a Lambda Layer with a new boto3 package, and using it in your projects. This
+is exactly what I did&hellip;the layer is public, so if you like, you&rsquo;re welcome to use it in <code>us-west-2</code>. It looks like this in
+a <code>serverless.yml</code> file:</p>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">connect:<span style="color:#bbb">
+</span><span style="color:#bbb">  </span>handler:<span style="color:#bbb"> </span>handler.connect<span style="color:#bbb">
+</span><span style="color:#bbb">  </span>layers:<span style="color:#bbb">
+</span><span style="color:#bbb">    </span>-<span style="color:#bbb"> </span>arn:aws:lambda:us-west-<span style="color:#40a070">2</span>:<span style="color:#40a070">420819310858</span>:layer:boto3-botocore:<span style="color:#40a070">1</span><span style="color:#bbb">
+</span><span style="color:#bbb">  </span>events:<span style="color:#bbb">
+</span><span style="color:#bbb">    </span>-<span style="color:#bbb"> </span>websocket:<span style="color:#bbb"> </span>$connect</code></pre></div>
+<p>Just like serverless architectures shine for certain cases, there are times when something else is better suited. For example,
+if you were trying to implement a copy of Google docs using websockets and Lambdas, I&rsquo;d say you would have a hard time. While
+websockets are quite fast, using them with API Gateway, Lambda and a database does add latency to your round trips. If you need
+something which handles a round trip in a few milliseconds, I&rsquo;d say a traditional server storing state in memory would be a
+better starting point. However, if you have something which doesn&rsquo;t have extremely low latency demands, consider API Gateway
+and Lambda.</p>
+
+</div>
+
+        <footer class="post-footer clearfix">
+    
+        <p class="post-tags">
+            <span>Tagged:</span>
+            
+            
+                <a href="http://blog.brianz.bz/tags/aws/">aws</a>, 
+            
+                <a href="http://blog.brianz.bz/tags/architecture/">architecture</a>, 
+            
+                <a href="http://blog.brianz.bz/tags/python/">python</a>, 
+            
+                <a href="http://blog.brianz.bz/tags/websockets/">websockets</a>, 
+            
+                <a href="http://blog.brianz.bz/tags/serverless/">serverless</a>
+            
+        </p>
+    
+
+    <div class="share">
+        
+            <a class="icon-twitter" href="https://twitter.com/share?text=Building%20a%20Serverless%20Slack%20clone%20with%20Python%20and%20Websockets&url=http%3a%2f%2fblog.brianz.bz%2fpost%2fserverless-websockets-and-python%2f"
+                onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                <i class="fa fa-twitter"></i>
+                <span class="hidden">Twitter</span>
+            </a>
+        
+
+        
+            <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http%3a%2f%2fblog.brianz.bz%2fpost%2fserverless-websockets-and-python%2f"
+                onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+                <i class="fa fa-facebook"></i>
+                <span class="hidden">Facebook</span>
+            </a>
+        
+
+        
+            <a class="icon-google-plus" href="https://plus.google.com/share?url=http%3a%2f%2fblog.brianz.bz%2fpost%2fserverless-websockets-and-python%2f"
+              onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+              <i class="fa fa-google-plus"></i>
+                <span class="hidden">Google+</span>
+            </a>
+        
+        
+    </div>
+</footer>
+
+        
+    <div class="comments">
+        <div id="disqus_thread"></div>
+<script type="application/javascript">
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "brianz" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    </div>
+
+    </article>
+</div>
+
+            </div>
+        </div>
+
+        <footer class="footer">
+            <div class="container">
+                <div class="site-title-wrapper">
+                    <h1 class="site-title">
+                        <a title="Brian Z" href="http://blog.brianz.bz/">Brian Z</a>
+                    </h1>
+                    <a class="button-square button-jump-top js-jump-top" href="#">
+                        <i class="fa fa-angle-up"></i>
+                    </a>
+                </div>
+
+                <p class="footer-copyright">
+                    <span>&copy; 2019 / Powered by <a href="https://gohugo.io/">Hugo</a></span>
+                </p>
+                <p class="footer-copyright">
+                    <span><a href="https://github.com/roryg/ghostwriter">Ghostwriter theme</a> By <a href="http://jollygoodthemes.com">JollyGoodThemes</a></span>
+                    <span>/ <a href="https://github.com/jbub/ghostwriter">Ported</a> to Hugo By <a href="https://github.com/jbub">jbub</a></span>
+                </p>
+            </div>
+        </footer>
+
+        <script src="http://blog.brianz.bz/js/jquery-1.11.3.min.js"></script>
+        <script src="http://blog.brianz.bz/js/jquery.fitvids.js"></script>
+
+        
+            <script src="http://blog.brianz.bz/js/highlight.pack.js"></script>
+        
+
+        <script src="http://blog.brianz.bz/js/scripts.js"></script>
+    </body>
+</html>
+

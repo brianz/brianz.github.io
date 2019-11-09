@@ -180,26 +180,20 @@ S3 bucket.</p>
 <p>Let&rsquo;s setup <code>meta sync</code>. To be crystal clear, this setup only needs to be performed <em>once</em> by the
 original author of the project. After all, the <code>_meta</code> directory will be created when the project
 is first brought to life, so it&rsquo;ll be the responsibility of that first developer to set this up:</p>
-
-<pre><code class="language-bash">root@1035dd7cffb6:/code$ npm install serverless-meta-sync --save
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">root@1035dd7cffb6:/code$ npm install serverless-meta-sync --save</code></pre></div>
 <p>Now that the plugin is installed I just need to update the <code>s-project.json</code> file:</p>
-
-<pre><code class="language-json">{
-  &quot;name&quot;: &quot;serverless-demo&quot;,
-  &quot;custom&quot;: {
-    &quot;meta&quot;: {
-      &quot;name&quot;: &quot;brianz-cco-serverless-test&quot;,
-      &quot;region&quot;: &quot;us-west-2&quot;
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">{
+  <span style="color:#062873;font-weight:bold">&#34;name&#34;</span>: <span style="color:#4070a0">&#34;serverless-demo&#34;</span>,
+  <span style="color:#062873;font-weight:bold">&#34;custom&#34;</span>: {
+    <span style="color:#062873;font-weight:bold">&#34;meta&#34;</span>: {
+      <span style="color:#062873;font-weight:bold">&#34;name&#34;</span>: <span style="color:#4070a0">&#34;brianz-cco-serverless-test&#34;</span>,
+      <span style="color:#062873;font-weight:bold">&#34;region&#34;</span>: <span style="color:#4070a0">&#34;us-west-2&#34;</span>
     }
   },
-  &quot;plugins&quot;: [
-    &quot;serverless-meta-sync&quot;
+  <span style="color:#062873;font-weight:bold">&#34;plugins&#34;</span>: [
+    <span style="color:#4070a0">&#34;serverless-meta-sync&#34;</span>
   ]
-}
-</code></pre>
-
+}</code></pre></div>
 <p>All I&rsquo;m doing is telling the plugin to sync the <code>_meta</code> directory to an S3 bucket named
 <code>brianz-cco-serverless-test</code> in <code>us-west-2</code>.  Now that that&rsquo;s done, I issue the sync command&hellip;the
 trick here is ensuring you <em>sync for all of your stages and regions</em>. That&rsquo;s easy to gloss over but
@@ -212,73 +206,58 @@ meta sync</code> commands.</strong></p>
 
 <p>From part iii of this series I created two stages&hellip;<code>dev</code> and
 <code>production</code>. I authored that project on my laptop so I&rsquo;ll be doing the following on that computer:</p>
-
-<pre><code class="language-bash">root@5457e51bf687:/code$ sls meta sync -s dev -r us-west-2
-Serverless: Going to sync &quot;s-variables-dev-uswest2.json&quot;... 
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">root@5457e51bf687:/code$ sls meta sync -s dev -r us-west-2
+Serverless: Going to sync <span style="color:#4070a0">&#34;s-variables-dev-uswest2.json&#34;</span>... 
 Serverless: Creating remote copy of s-variables-dev-uswest2.json...  
 Serverless: Done  
 root@5457e51bf687:/code$ sls meta sync -s production -r us-west-2
 Serverless: Creating remote copy of s-variables-production-uswest2.json...  
-Serverless: Done  
-</code></pre>
-
+Serverless: Done  </code></pre></div>
 <p>This is the first step in setting yourself up for development on multiple system.</p>
 
 <h2 id="setup-a-project-after-git-clone">Setup a project after <code>git clone</code></h2>
 
 <p>Now, I switch over to my iMac and clone the repo. You&rsquo;d hope that you&rsquo;d just be able to clone the
 repo, install packages, <code>sync</code> the <code>_meta</code> folder and you&rsquo;d be done.  You&rsquo;d be wrong.</p>
-
-<pre><code class="language-bash">brianz@gold$ git clone https://github.com/brianz/serverless-demo.git
-brianz@gold$ cd serverless-demo/
-brianz@gold(master=)$ ls -l
-total 32
--rw-r--r--  1 brianz  staff   182 May 19 09:53 Dockerfile
--rw-r--r--  1 brianz  staff  1081 May 19 09:53 LICENSE
--rwxr-xr-x  1 brianz  staff   174 May 19 09:53 Makefile
--rw-r--r--  1 brianz  staff   411 May 19 09:53 README.md
--rw-r--r--  1 brianz  staff    39 May 31 20:24 config
-drwxr-xr-x  7 brianz  staff   238 May 31 20:17 serverless-demo/
-brianz@gold(master=)$ cd serverless-demo/
-brianz@gold(master=)$ ls -l
-total 24
--rw-r--r--  1 brianz  staff   328 May 19 09:53 package.json
--rw-r--r--  1 brianz  staff   190 May 19 09:53 s-project.json
--rw-r--r--  1 brianz  staff  1527 May 19 09:53 s-resources-cf.json
-drwxr-xr-x  3 brianz  staff   102 May 19 09:53 src
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">brianz@gold$ git clone https://github.com/brianz/serverless-demo.git
+brianz@gold$ <span style="color:#007020">cd</span> serverless-demo/
+brianz@gold<span style="color:#666">(</span><span style="color:#bb60d5">master</span><span style="color:#666">=)</span>$ ls -l
+total <span style="color:#40a070">32</span>
+-rw-r--r--  <span style="color:#40a070">1</span> brianz  staff   <span style="color:#40a070">182</span> May <span style="color:#40a070">19</span> <span style="color:#40a070">09</span>:53 Dockerfile
+-rw-r--r--  <span style="color:#40a070">1</span> brianz  staff  <span style="color:#40a070">1081</span> May <span style="color:#40a070">19</span> <span style="color:#40a070">09</span>:53 LICENSE
+-rwxr-xr-x  <span style="color:#40a070">1</span> brianz  staff   <span style="color:#40a070">174</span> May <span style="color:#40a070">19</span> <span style="color:#40a070">09</span>:53 Makefile
+-rw-r--r--  <span style="color:#40a070">1</span> brianz  staff   <span style="color:#40a070">411</span> May <span style="color:#40a070">19</span> <span style="color:#40a070">09</span>:53 README.md
+-rw-r--r--  <span style="color:#40a070">1</span> brianz  staff    <span style="color:#40a070">39</span> May <span style="color:#40a070">31</span> <span style="color:#40a070">20</span>:24 config
+drwxr-xr-x  <span style="color:#40a070">7</span> brianz  staff   <span style="color:#40a070">238</span> May <span style="color:#40a070">31</span> <span style="color:#40a070">20</span>:17 serverless-demo/
+brianz@gold<span style="color:#666">(</span><span style="color:#bb60d5">master</span><span style="color:#666">=)</span>$ <span style="color:#007020">cd</span> serverless-demo/
+brianz@gold<span style="color:#666">(</span><span style="color:#bb60d5">master</span><span style="color:#666">=)</span>$ ls -l
+total <span style="color:#40a070">24</span>
+-rw-r--r--  <span style="color:#40a070">1</span> brianz  staff   <span style="color:#40a070">328</span> May <span style="color:#40a070">19</span> <span style="color:#40a070">09</span>:53 package.json
+-rw-r--r--  <span style="color:#40a070">1</span> brianz  staff   <span style="color:#40a070">190</span> May <span style="color:#40a070">19</span> <span style="color:#40a070">09</span>:53 s-project.json
+-rw-r--r--  <span style="color:#40a070">1</span> brianz  staff  <span style="color:#40a070">1527</span> May <span style="color:#40a070">19</span> <span style="color:#40a070">09</span>:53 s-resources-cf.json
+drwxr-xr-x  <span style="color:#40a070">3</span> brianz  staff   <span style="color:#40a070">102</span> May <span style="color:#40a070">19</span> <span style="color:#40a070">09</span>:53 src</code></pre></div>
 <p>OK&hellip;this is what we expect.  There isn&rsquo;t a <code>_meta</code> folder. Let&rsquo;s start getting set up and see
 what happens (as a reminder I&rsquo;m in a Docker container when running <code>sls</code> aka <code>serverless</code>):</p>
-
-<pre><code class="language-bash">root@bcdeb57d5754:/code$ sls meta sync  
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">root@bcdeb57d5754:/code$ sls meta sync  
 /usr/local/lib/node_modules/serverless/node_modules/bluebird/js/release/async.js:61
-        fn = function () { throw arg; };
+        <span style="color:#bb60d5">fn</span> <span style="color:#666">=</span> <span style="color:#007020;font-weight:bold">function</span> <span style="color:#666">()</span> <span style="color:#666">{</span> throw arg; <span style="color:#666">}</span>;
                            ^
 
-ServerlessError: This plugin could not be found: serverless-meta-sync
-</code></pre>
-
+ServerlessError: This plugin could not be found: serverless-meta-sync</code></pre></div>
 <p>Doh!  We need to install the plugin which makes sense. Since we (or our colleague who setup the
 project, aka me on my MBPro) performed an <code>npm install --save</code> of the plugin it&rsquo;ll be in our <code>package.json</code>. As with
 any node/npm system all we&rsquo;ll need to do is <code>npm install</code>:</p>
-
-<pre><code class="language-bash">root@bcdeb57d5754:/code$  npm install
-# snip...lots of output
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">root@bcdeb57d5754:/code$  npm install
+<span style="color:#60a0b0;font-style:italic"># snip...lots of output</span>
 npm info ok 
-root@bcdeb57d5754:/code$ 
-</code></pre>
-
+root@bcdeb57d5754:/code$ </code></pre></div>
 <p>Now that we have met all our requirements let&rsquo;s try to sync again:</p>
-
-<pre><code class="language-bash">root@bcdeb57d5754:/code$ sls meta sync 
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">root@bcdeb57d5754:/code$ sls meta sync 
 /usr/local/lib/node_modules/serverless/node_modules/bluebird/js/release/async.js:61
-        fn = function () { throw arg; };
+        <span style="color:#bb60d5">fn</span> <span style="color:#666">=</span> <span style="color:#007020;font-weight:bold">function</span> <span style="color:#666">()</span> <span style="color:#666">{</span> throw arg; <span style="color:#666">}</span>;
                            ^
 
-ServerlessError: No existing stages in the project
-</code></pre>
-
+ServerlessError: No existing stages in the project</code></pre></div>
 <p>Hrmmm&hellip;.it&rsquo;s really not that simple. The root cause here is that Serverless still knows nothing of
 our project.  Since Serverless works by keeping track of several files in the <code>_meta</code> directory it
 doesn&rsquo;t even know what your project is about&hellip;what resource it needs, nada.  <strong>Serverless should
@@ -298,113 +277,98 @@ recreate a few files.</p>
 <p>So let&rsquo;s do it.  Note, you can also pass command line arguments to
 speed this up as needed.  Doing a <code>sls project init --help</code> will show you all of the options you
 can use.</p>
-
-<pre><code class="language-bash">root@bcdeb57d5754:/code$ sls project init
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">root@bcdeb57d5754:/code$ sls project init
  _______                             __
 |   _   .-----.----.--.--.-----.----|  .-----.-----.-----.
 |   |___|  -__|   _|  |  |  -__|   _|  |  -__|__ --|__ --|
-|____   |_____|__|  \___/|_____|__| |__|_____|_____|_____|
+|____   |_____|__|  <span style="color:#4070a0;font-weight:bold">\_</span>__/|_____|__| |__|_____|_____|_____|
 |   |   |             The Serverless Application Framework
 |       |                           serverless.com, v0.5.5
-`-------'
+<span style="color:#4070a0">`</span>-------<span style="">&#39;</span>
 
 Serverless: Initializing Serverless Project...  
-Serverless: Enter a new stage name for this project:  (dev) 
-Serverless: For the &quot;dev&quot; stage, do you want to use an existing Amazon Web Services profile or
+Serverless: Enter a new stage name <span style="color:#007020;font-weight:bold">for</span> this project:  <span style="color:#666">(</span>dev<span style="color:#666">)</span> 
+Serverless: For the <span style="color:#4070a0">&#34;dev&#34;</span> stage, <span style="color:#007020;font-weight:bold">do</span> you want to use an existing Amazon Web Services profile or
 create a new one?
   &gt; Existing Profile
     Create A New Profile
-Serverless: Select a profile for your project: 
+Serverless: Select a profile <span style="color:#007020;font-weight:bold">for</span> your project: 
   &gt; default
-Serverless: Creating stage &quot;dev&quot;...  
-Serverless: Select a new region for your stage: 
+Serverless: Creating stage <span style="color:#4070a0">&#34;dev&#34;</span>...  
+Serverless: Select a new region <span style="color:#007020;font-weight:bold">for</span> your stage: 
     us-east-1
   &gt; us-west-2
     eu-west-1
     eu-central-1
     ap-northeast-1
-Serverless: Creating region &quot;us-west-2&quot; in stage &quot;dev&quot;...  
-Serverless: Deploying resources to stage &quot;dev&quot; in region &quot;us-west-2&quot; via Cloudformation (~3
-minutes)...  
+Serverless: Creating region <span style="color:#4070a0">&#34;us-west-2&#34;</span> in stage <span style="color:#4070a0">&#34;dev&#34;</span>...  
+Serverless: Deploying resources to stage <span style="color:#4070a0">&#34;dev&#34;</span> in region <span style="color:#4070a0">&#34;us-west-2&#34;</span> via Cloudformation <span style="color:#666">(</span>~3
+minutes<span style="color:#666">)</span>...  
 Serverless: No resource updates are to be performed.  
-Serverless: Successfully created region &quot;us-west-2&quot; within stage &quot;dev&quot;  
-Serverless: Successfully created stage &quot;dev&quot;  
-Serverless: Successfully initialized project &quot;serverless-demo&quot;  
-</code></pre>
-
-<pre><code class="language-bash">brianz@gold(master=)$ l
-total 32
-drwxr-xr-x   4 brianz  staff   136 Jun 28 16:58 _meta/
--rw-r--r--   1 brianz  staff    23 Jun 28 16:58 admin.env
-drwxr-xr-x  20 brianz  staff   680 Jun 28 16:56 node_modules/
--rw-r--r--   1 brianz  staff   327 Jun 28 16:58 package.json
--rw-r--r--   1 brianz  staff   189 Jun 28 16:58 s-project.json
--rw-r--r--   1 brianz  staff  1527 Jun 28 16:58 s-resources-cf.json
-drwxr-xr-x   3 brianz  staff   102 May 19 09:53 src/
-</code></pre>
-
+Serverless: Successfully created region <span style="color:#4070a0">&#34;us-west-2&#34;</span> within stage <span style="color:#4070a0">&#34;dev&#34;</span>  
+Serverless: Successfully created stage <span style="color:#4070a0">&#34;dev&#34;</span>  
+Serverless: Successfully initialized project <span style="color:#4070a0">&#34;serverless-demo&#34;</span>  </code></pre></div><div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">brianz@gold<span style="color:#666">(</span><span style="color:#bb60d5">master</span><span style="color:#666">=)</span>$ l
+total <span style="color:#40a070">32</span>
+drwxr-xr-x   <span style="color:#40a070">4</span> brianz  staff   <span style="color:#40a070">136</span> Jun <span style="color:#40a070">28</span> <span style="color:#40a070">16</span>:58 _meta/
+-rw-r--r--   <span style="color:#40a070">1</span> brianz  staff    <span style="color:#40a070">23</span> Jun <span style="color:#40a070">28</span> <span style="color:#40a070">16</span>:58 admin.env
+drwxr-xr-x  <span style="color:#40a070">20</span> brianz  staff   <span style="color:#40a070">680</span> Jun <span style="color:#40a070">28</span> <span style="color:#40a070">16</span>:56 node_modules/
+-rw-r--r--   <span style="color:#40a070">1</span> brianz  staff   <span style="color:#40a070">327</span> Jun <span style="color:#40a070">28</span> <span style="color:#40a070">16</span>:58 package.json
+-rw-r--r--   <span style="color:#40a070">1</span> brianz  staff   <span style="color:#40a070">189</span> Jun <span style="color:#40a070">28</span> <span style="color:#40a070">16</span>:58 s-project.json
+-rw-r--r--   <span style="color:#40a070">1</span> brianz  staff  <span style="color:#40a070">1527</span> Jun <span style="color:#40a070">28</span> <span style="color:#40a070">16</span>:58 s-resources-cf.json
+drwxr-xr-x   <span style="color:#40a070">3</span> brianz  staff   <span style="color:#40a070">102</span> May <span style="color:#40a070">19</span> <span style="color:#40a070">09</span>:53 src/</code></pre></div>
 <p>Voila!  Our <code>_meta</code> directory is now available.</p>
 
 <p>At this point, if you inspect any of the <code>variables</code> files inside <code>_meta/</code> you&rsquo;ll see that they&rsquo;re
 empty.  We&rsquo;re finally at the point where we can pull down our secret variables and config which we
 previously synced using meta-sync.</p>
-
-<pre><code class="language-bash">root@bcdeb57d5754:/code$ sls meta sync 
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">root@bcdeb57d5754:/code$ sls meta sync 
 Serverless: WARNING: This variable is not defined: magicVariable  
 Serverless: WARNING: This variable is not defined: region  
 Serverless: WARNING: This variable is not defined: region  
-Serverless: Going to sync &quot;s-variables-dev.json&quot;... 
+Serverless: Going to sync <span style="color:#4070a0">&#34;s-variables-dev.json&#34;</span>... 
   
- {
-+  MY_MAGIC_VARIABLE: &quot;dev&quot;
- }
+ <span style="color:#666">{</span>
++  MY_MAGIC_VARIABLE: <span style="color:#4070a0">&#34;dev&#34;</span>
+ <span style="color:#666">}</span>
 
 Serverless: How should these differences be handled?
     Review these changes one by one
-  &gt; Apply these changes to the local version
-    Discard these changes and sync the remote version with the local one
+  &gt; Apply these changes to the <span style="color:#007020">local</span> version
+    Discard these changes and sync the remote version with the <span style="color:#007020">local</span> one
     Cancel
-Serverless: Done 
-</code></pre>
-
+Serverless: Done </code></pre></div>
 <p>Excellent&hellip;it finally worked.  At this point we&rsquo;re all set to use the <code>dev</code> stage.</p>
-
-<pre><code class="language-bash">root@bcdeb57d5754:/code$ ls -l _meta/variables/
-total 12
--rw-r--r-- 1 1000 staff 34 Jun 28 22:58 s-variables-common.json
--rw-r--r-- 1 1000 staff 27 Jun 28 22:58 s-variables-dev-uswest2.json
--rw-r--r-- 1 1000 staff 50 Jun 28 23:08 s-variables-dev.json
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">root@bcdeb57d5754:/code$ ls -l _meta/variables/
+total <span style="color:#40a070">12</span>
+-rw-r--r-- <span style="color:#40a070">1</span> <span style="color:#40a070">1000</span> staff <span style="color:#40a070">34</span> Jun <span style="color:#40a070">28</span> <span style="color:#40a070">22</span>:58 s-variables-common.json
+-rw-r--r-- <span style="color:#40a070">1</span> <span style="color:#40a070">1000</span> staff <span style="color:#40a070">27</span> Jun <span style="color:#40a070">28</span> <span style="color:#40a070">22</span>:58 s-variables-dev-uswest2.json
+-rw-r--r-- <span style="color:#40a070">1</span> <span style="color:#40a070">1000</span> staff <span style="color:#40a070">50</span> Jun <span style="color:#40a070">28</span> <span style="color:#40a070">23</span>:08 s-variables-dev.json</code></pre></div>
 <p>What&rsquo;s missing? Remember, we have a &ldquo;production&rdquo; stage with it&rsquo;s own variables. That stage&rsquo;s
 variables file hasn&rsquo;t been pulled down after our <code>sync</code>.  <strong>We
 need to issue multiple <code>project init</code> and sync commands for different stages/regions!</strong> This is
 clunky, but at least we only need to do it once per stage:</p>
-
-<pre><code class="language-bash">root@bcdeb57d5754:/code$ sls project init -s production
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">root@bcdeb57d5754:/code$ sls project init -s production
 Serverless: Initializing Serverless Project...  
-Serverless: For the &quot;production&quot; stage, do you want to use an existing Amazon Web Services profile
+Serverless: For the <span style="color:#4070a0">&#34;production&#34;</span> stage, <span style="color:#007020;font-weight:bold">do</span> you want to use an existing Amazon Web Services profile
 or create a new one?
   &gt; Existing Profile
     Create A New Profile
-Serverless: Select a profile for your project: 
+Serverless: Select a profile <span style="color:#007020;font-weight:bold">for</span> your project: 
   &gt; default
-Serverless: Creating stage &quot;production&quot;...  
-Serverless: Select a new region for your stage: 
+Serverless: Creating stage <span style="color:#4070a0">&#34;production&#34;</span>...  
+Serverless: Select a new region <span style="color:#007020;font-weight:bold">for</span> your stage: 
     us-east-1
   &gt; us-west-2
     eu-west-1
     eu-central-1
     ap-northeast-1
-Serverless: Creating region &quot;us-west-2&quot; in stage &quot;production&quot;...  
-Serverless: Deploying resources to stage &quot;production&quot; in region &quot;us-west-2&quot; via Cloudformation (~3
-minutes)...  
+Serverless: Creating region <span style="color:#4070a0">&#34;us-west-2&#34;</span> in stage <span style="color:#4070a0">&#34;production&#34;</span>...  
+Serverless: Deploying resources to stage <span style="color:#4070a0">&#34;production&#34;</span> in region <span style="color:#4070a0">&#34;us-west-2&#34;</span> via Cloudformation <span style="color:#666">(</span>~3
+minutes<span style="color:#666">)</span>...  
 Serverless: No resource updates are to be performed.  
-Serverless: Successfully created region &quot;us-west-2&quot; within stage &quot;production&quot;  
-Serverless: Successfully created stage &quot;production&quot;  
-Serverless: Successfully initialized project &quot;serverless-demo&quot;  
-</code></pre>
-
+Serverless: Successfully created region <span style="color:#4070a0">&#34;us-west-2&#34;</span> within stage <span style="color:#4070a0">&#34;production&#34;</span>  
+Serverless: Successfully created stage <span style="color:#4070a0">&#34;production&#34;</span>  
+Serverless: Successfully initialized project <span style="color:#4070a0">&#34;serverless-demo&#34;</span>  </code></pre></div>
 <p>Now that we&rsquo;ve <code>init'ed</code> the production stage we can finally sync it:</p>
 
 <pre><code>root@bcdeb57d5754:/code$ sls meta sync -s production
@@ -441,16 +405,13 @@ Python library and some of our own Python code. This will demonstrate a few thin
 </ul>
 
 <p>First we&rsquo;ll create the function and endpoint&hellip;this is a Python 2.7 function:</p>
-
-<pre><code class="language-bash">root@bcdeb57d5754:/code$ sls function create src/authenticate -r python2.7
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">root@bcdeb57d5754:/code$ sls <span style="color:#007020;font-weight:bold">function</span> create src/authenticate -r python2.7
 Serverless: For this new Function, would you like to create an Endpoint, Event, or just the
 Function?
   &gt; Create Endpoint
     Create Event
     Just the Function...
-Serverless: Successfully created function: &quot;src/authenticate&quot;  
-</code></pre>
-
+Serverless: Successfully created <span style="color:#007020;font-weight:bold">function</span>: <span style="color:#4070a0">&#34;src/authenticate&#34;</span>  </code></pre></div>
 <p>Now that the function and API endpoint are set up we&rsquo;ll actually need to write some some. Crack
 open the <code>src/authenticate/handler.py</code> function if you&rsquo;re following along. You can also <a href="https://github.com/brianz/serverless-demo/blob/part-iv/serverless-demo/src/authenticate/handler.py" target="_blank">look at
 the final version on
@@ -480,13 +441,10 @@ Lambda function/handler has no way of knowing that it should look in this direct
 dependencies.</p>
 
 <p><strong>Before</strong> any imports to 3rd party packages we need to hack the system path ourselves:</p>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">cwd <span style="color:#666">=</span> os<span style="color:#666">.</span>path<span style="color:#666">.</span>dirname(os<span style="color:#666">.</span>path<span style="color:#666">.</span>realpath(__file__))
+sys<span style="color:#666">.</span>path<span style="color:#666">.</span>append(os<span style="color:#666">.</span>path<span style="color:#666">.</span>join(cwd, <span style="color:#4070a0">&#34;../lib&#34;</span>))
 
-<pre><code class="language-python">cwd = os.path.dirname(os.path.realpath(__file__))
-sys.path.append(os.path.join(cwd, &quot;../lib&quot;))
-
-# now you can import jwt or anything else you install
-</code></pre>
-
+<span style="color:#60a0b0;font-style:italic"># now you can import jwt or anything else you install</span></code></pre></div>
 <p>Pretty simple&hellip;if you decide to change the name of your directory which holds your dependencies
 you&rsquo;ll of course need to change your functions to reference that location.  Also, if you create a
 function which is nested any deeper in the package structure you&rsquo;ll have to adjust the
@@ -499,27 +457,18 @@ function would then need to use <code>&quot;../..lib&quot; since it's two direct
 with our handler function. This is done by mangling the <code>handler</code> value in <code>s-function.json</code>. In
 short, all you do it change the path to the handler which you&rsquo;re using. Originally the <code>handler</code>
 value is a simple string, pointing to your handlerfile.handlerfunction like this:</p>
-
-<pre><code class="language-json">    &quot;handler&quot;: &quot;handler.handler&quot;,
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">    <span style="color:#4070a0">&#34;handler&#34;</span><span style="">:</span> <span style="color:#4070a0">&#34;handler.handler&#34;</span><span style="">,</span></code></pre></div>
 <p>Our change will add in one level to the path to that handler file:</p>
-
-<pre><code class="language-json">    &quot;handler&quot;: &quot;authenticate/handler.handler&quot;,
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">    <span style="color:#4070a0">&#34;handler&#34;</span><span style="">:</span> <span style="color:#4070a0">&#34;authenticate/handler.handler&#34;</span><span style="">,</span></code></pre></div>
 <p>Serverless will notice this and then package up everything which sits alongside the <code>authenticate</code>
 directory:</p>
-
-<pre><code class="language-bash">brianz@gold(master=)$ ls -l
-total 16
-drwxr-xr-x  5 brianz  staff  170 Jul  1 11:18 authenticate/
--rwxr-xr-x  1 brianz  staff   94 Jun 28 20:46 build-requirements.sh*
-drwxr-xr-x  5 brianz  staff  170 Jun 20 16:18 hello/
-drwxr-xr-x  4 brianz  staff  136 Jun 28 20:45 lib/
--rw-r--r--  1 brianz  staff   13 Jun 28 20:41 requirements.txt
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">brianz@gold<span style="color:#666">(</span><span style="color:#bb60d5">master</span><span style="color:#666">=)</span>$ ls -l
+total <span style="color:#40a070">16</span>
+drwxr-xr-x  <span style="color:#40a070">5</span> brianz  staff  <span style="color:#40a070">170</span> Jul  <span style="color:#40a070">1</span> <span style="color:#40a070">11</span>:18 authenticate/
+-rwxr-xr-x  <span style="color:#40a070">1</span> brianz  staff   <span style="color:#40a070">94</span> Jun <span style="color:#40a070">28</span> <span style="color:#40a070">20</span>:46 build-requirements.sh*
+drwxr-xr-x  <span style="color:#40a070">5</span> brianz  staff  <span style="color:#40a070">170</span> Jun <span style="color:#40a070">20</span> <span style="color:#40a070">16</span>:18 hello/
+drwxr-xr-x  <span style="color:#40a070">4</span> brianz  staff  <span style="color:#40a070">136</span> Jun <span style="color:#40a070">28</span> <span style="color:#40a070">20</span>:45 lib/
+-rw-r--r--  <span style="color:#40a070">1</span> brianz  staff   <span style="color:#40a070">13</span> Jun <span style="color:#40a070">28</span> <span style="color:#40a070">20</span>:41 requirements.txt</code></pre></div>
 <p>Everything you see here will wind up in our final zip file.</p>
 
 <h3 id="extracting-post-body">Extracting POST body</h3>
@@ -527,32 +476,23 @@ drwxr-xr-x  4 brianz  staff  136 Jun 28 20:45 lib/
 <p>Finally, there&rsquo;s the work of extracting content from the actual <code>POST</code> body and sending it over to
 the Lambda function.  This is handled by API Gateway.  Here&rsquo;s the change/addition in
 <code>s-function.json</code>:</p>
-
-<pre><code class="language-json">&quot;requestTemplates&quot;: {
-  &quot;application/json&quot;: {
-    &quot;token&quot;: &quot;$input.json('$.token')&quot;
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json"><span style="color:#4070a0">&#34;requestTemplates&#34;</span><span style="">:</span> {
+  <span style="color:#062873;font-weight:bold">&#34;application/json&#34;</span>: {
+    <span style="color:#062873;font-weight:bold">&#34;token&#34;</span>: <span style="color:#4070a0">&#34;$input.json(&#39;$.token&#39;)&#34;</span>
   }
-}
-</code></pre>
-
+}</code></pre></div>
 <p>This is one of the most confusing parts of API Gateway IMO. This ends up injecting a <code>token</code> field
 into your Lambda <code>event</code> by extracting the <code>token</code> field from the expected json payload in the
 <code>POST</code>.  Our Python function can then reference this:</p>
-
-<pre><code class="language-python">token = event.get('token', '')
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">token <span style="color:#666">=</span> event<span style="color:#666">.</span>get(<span style="color:#4070a0">&#39;token&#39;</span>, <span style="color:#4070a0">&#39;&#39;</span>)</code></pre></div>
 <p>Phew! Let&rsquo;s try this out. Our JWT secret for signing our tokens is simply the string <code>&quot;secret&quot;</code>.
 You can visit <a href="https://jwt.io" target="_blank">https://jwt.io</a> and generate a new token and try it for yourself. My Lambda function
 will simply decode the token and return the results if it&rsquo;s valid. If it&rsquo;s <em>not</em> valid the Lambda
 function will raise an exception which will be returned to you:</p>
 
 <p>Here&rsquo;s a valid token:</p>
-
-<pre><code class="language-bash">$ curl -s -d '{&quot;token&quot;: &quot;eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImJyaWFueiIsIm9yaWdfaWF0IjoxNDY3MTMyMTgzLCJleHAiOjE3ODI3NTIzNzIsImVtYWlsIjoiYnJpYW56QGdtYWlsLmNvbSIsInNjb3BlcyI6WyJkZXZlbG9wZXIiLCJzZXJ2ZXJsZXNzLWZhbiJdfQ.tmbOyytr0vbNdaFL0wc31SIpWw8E_xqUIDoWsXYM2do&quot;}' \
-https://4m98c4l3i1.execute-api.us-west-2.amazonaws.com/dev/authenticate | python -mjson.tool
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ curl -s -d <span style="color:#4070a0">&#39;{&#34;token&#34;: &#34;eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImJyaWFueiIsIm9yaWdfaWF0IjoxNDY3MTMyMTgzLCJleHAiOjE3ODI3NTIzNzIsImVtYWlsIjoiYnJpYW56QGdtYWlsLmNvbSIsInNjb3BlcyI6WyJkZXZlbG9wZXIiLCJzZXJ2ZXJsZXNzLWZhbiJdfQ.tmbOyytr0vbNdaFL0wc31SIpWw8E_xqUIDoWsXYM2do&#34;}&#39;</span> <span style="color:#4070a0;font-weight:bold">\
+</span><span style="color:#4070a0;font-weight:bold"></span>https://4m98c4l3i1.execute-api.us-west-2.amazonaws.com/dev/authenticate | python -mjson.tool</code></pre></div>
 <pre><code>{
     &quot;email&quot;: &quot;brianz@gmail.com&quot;,
     &quot;exp&quot;: 1782752372,
@@ -569,68 +509,56 @@ https://4m98c4l3i1.execute-api.us-west-2.amazonaws.com/dev/authenticate | python
 that I pushed the <code>exp</code> (expires) field far in the future.</p>
 
 <p>Let&rsquo;s try an invalid signature where the <code>exp</code> field is in the past:</p>
-
-<pre><code class="language-bash">curl -s -d '{&quot;token&quot;: &quot;eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImJyaWFueiIsIm9yaWdfaWF0IjoxNDY3MTMyMTgzLCJleHAiOjE0NjcyMTk2OTMsImVtYWlsIjoiYnJpYW56QGdtYWlsLmNvbSIsInNjb3BlcyI6WyJkZXZlbG9wZXIiLCJzZXJ2ZXJsZXNzLWZhbiJdfQ.A1UJOKcSfpUSuAgZoBO9g0oBtGdkrl71VtNt4F5eJZg&quot;}' \
-https://4m98c4l3i1.execute-api.us-west-2.amazonaws.com/dev/authenticate | python -mjson.tool
-</code></pre>
-
-<pre><code class="language-json">{
-    &quot;errorMessage&quot;: &quot;Signature has expired&quot;,
-    &quot;errorType&quot;: &quot;ExpiredSignatureError&quot;,
-    &quot;stackTrace&quot;: [
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">curl -s -d <span style="color:#4070a0">&#39;{&#34;token&#34;: &#34;eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImJyaWFueiIsIm9yaWdfaWF0IjoxNDY3MTMyMTgzLCJleHAiOjE0NjcyMTk2OTMsImVtYWlsIjoiYnJpYW56QGdtYWlsLmNvbSIsInNjb3BlcyI6WyJkZXZlbG9wZXIiLCJzZXJ2ZXJsZXNzLWZhbiJdfQ.A1UJOKcSfpUSuAgZoBO9g0oBtGdkrl71VtNt4F5eJZg&#34;}&#39;</span> <span style="color:#4070a0;font-weight:bold">\
+</span><span style="color:#4070a0;font-weight:bold"></span>https://4m98c4l3i1.execute-api.us-west-2.amazonaws.com/dev/authenticate | python -mjson.tool</code></pre></div><div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">{
+    <span style="color:#062873;font-weight:bold">&#34;errorMessage&#34;</span>: <span style="color:#4070a0">&#34;Signature has expired&#34;</span>,
+    <span style="color:#062873;font-weight:bold">&#34;errorType&#34;</span>: <span style="color:#4070a0">&#34;ExpiredSignatureError&#34;</span>,
+    <span style="color:#062873;font-weight:bold">&#34;stackTrace&#34;</span>: [
         [
-            &quot;/var/task/authenticate/handler.py&quot;,
-            30,
-            &quot;handler&quot;,
-            &quot;decoded = jwt_decode_handler(token)&quot;
+            <span style="color:#4070a0">&#34;/var/task/authenticate/handler.py&#34;</span>,
+            <span style="color:#40a070">30</span>,
+            <span style="color:#4070a0">&#34;handler&#34;</span>,
+            <span style="color:#4070a0">&#34;decoded = jwt_decode_handler(token)&#34;</span>
         ],
         [
-            &quot;/var/task/authenticate/handler.py&quot;,
-            21,
-            &quot;jwt_decode_handler&quot;,
-            &quot;return jwt.decode(token, JWT_SECRET_KEY)&quot;
+            <span style="color:#4070a0">&#34;/var/task/authenticate/handler.py&#34;</span>,
+            <span style="color:#40a070">21</span>,
+            <span style="color:#4070a0">&#34;jwt_decode_handler&#34;</span>,
+            <span style="color:#4070a0">&#34;return jwt.decode(token, JWT_SECRET_KEY)&#34;</span>
         ],
         [
-            &quot;/var/task/authenticate/../lib/jwt/api_jwt.py&quot;,
-            75,
-            &quot;decode&quot;,
-            &quot;self._validate_claims(payload, merged_options, **kwargs)&quot;
+            <span style="color:#4070a0">&#34;/var/task/authenticate/../lib/jwt/api_jwt.py&#34;</span>,
+            <span style="color:#40a070">75</span>,
+            <span style="color:#4070a0">&#34;decode&#34;</span>,
+            <span style="color:#4070a0">&#34;self._validate_claims(payload, merged_options, **kwargs)&#34;</span>
         ],
         [
-            &quot;/var/task/authenticate/../lib/jwt/api_jwt.py&quot;,
-            104,
-            &quot;_validate_claims&quot;,
-            &quot;self._validate_exp(payload, now, leeway)&quot;
+            <span style="color:#4070a0">&#34;/var/task/authenticate/../lib/jwt/api_jwt.py&#34;</span>,
+            <span style="color:#40a070">104</span>,
+            <span style="color:#4070a0">&#34;_validate_claims&#34;</span>,
+            <span style="color:#4070a0">&#34;self._validate_exp(payload, now, leeway)&#34;</span>
         ],
         [
-            &quot;/var/task/authenticate/../lib/jwt/api_jwt.py&quot;,
-            149,
-            &quot;_validate_exp&quot;,
-            &quot;raise ExpiredSignatureError('Signature has expired')&quot;
+            <span style="color:#4070a0">&#34;/var/task/authenticate/../lib/jwt/api_jwt.py&#34;</span>,
+            <span style="color:#40a070">149</span>,
+            <span style="color:#4070a0">&#34;_validate_exp&#34;</span>,
+            <span style="color:#4070a0">&#34;raise ExpiredSignatureError(&#39;Signature has expired&#39;)&#34;</span>
         ]
     ]
-}
-</code></pre>
-
+}</code></pre></div>
 <p>Pretty cool. And how about a missing token?</p>
-
-<pre><code class="language-bash">$ curl -s -X POST https://4m98c4l3i1.execute-api.us-west-2.amazonaws.com/dev/authenticate | python -mjson.tool
-</code></pre>
-
-<pre><code class="language-json">{
-    &quot;errorMessage&quot;: &quot;Mission token&quot;,
-    &quot;errorType&quot;: &quot;Exception&quot;,
-    &quot;stackTrace&quot;: [
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ curl -s -X POST https://4m98c4l3i1.execute-api.us-west-2.amazonaws.com/dev/authenticate | python -mjson.tool</code></pre></div><div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">{
+    <span style="color:#062873;font-weight:bold">&#34;errorMessage&#34;</span>: <span style="color:#4070a0">&#34;Mission token&#34;</span>,
+    <span style="color:#062873;font-weight:bold">&#34;errorType&#34;</span>: <span style="color:#4070a0">&#34;Exception&#34;</span>,
+    <span style="color:#062873;font-weight:bold">&#34;stackTrace&#34;</span>: [
         [
-            &quot;/var/task/authenticate/handler.py&quot;,
-            27,
-            &quot;handler&quot;,
-            &quot;raise Exception('Mission token')&quot;
+            <span style="color:#4070a0">&#34;/var/task/authenticate/handler.py&#34;</span>,
+            <span style="color:#40a070">27</span>,
+            <span style="color:#4070a0">&#34;handler&#34;</span>,
+            <span style="color:#4070a0">&#34;raise Exception(&#39;Mission token&#39;)&#34;</span>
         ]
     ]
-}
-</code></pre>
-
+}</code></pre></div>
 <p>If you were doing this for real you&rsquo;d want to handle failures more gracefully.  With API Gateway
 you can match on certain responses to control HTTP return codes. Of course, you&rsquo;d also want to hide
 the details of the stack blowing up and instead return some nicer error messages.</p>
@@ -726,7 +654,7 @@ v1.0 evolves!</p>
                 </div>
 
                 <p class="footer-copyright">
-                    <span>&copy; 2018 / Powered by <a href="https://gohugo.io/">Hugo</a></span>
+                    <span>&copy; 2019 / Powered by <a href="https://gohugo.io/">Hugo</a></span>
                 </p>
                 <p class="footer-copyright">
                     <span><a href="https://github.com/roryg/ghostwriter">Ghostwriter theme</a> By <a href="http://jollygoodthemes.com">JollyGoodThemes</a></span>

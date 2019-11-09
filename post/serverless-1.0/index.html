@@ -135,10 +135,7 @@ use Python I usually install a few base Python packages while I&rsquo;m at it:</
 create resources. If you do any amount of AWS work changes are you&rsquo;ll have <code>AWS_ACCESS_KEY_ID</code> and
 <code>AWS_ACCESS_SECRET_KEY</code> on your local system. What I do is simply copy these into a file called
 <code>.env</code></p>
-
-<pre><code class="language-bash">$ env | grep AWS &gt;&gt; .env
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ env | grep AWS &gt;&gt; .env</code></pre></div>
 <p>Now, I can easily inject these into my Docker container using <code>--env-file .env</code>. If you are
 running on your local system you&rsquo;ll need to have these two <code>AWS</code> variables set. See the <a href="https://serverless.com/framework/docs/providers/aws/guide/credentials/" target="_blank">Serverless
 docs on credentials</a> for
@@ -170,30 +167,24 @@ following:</p>
 <p>Now, on to the Serverless!</p>
 
 <p>Let&rsquo;s create a new project. As usual, we&rsquo;ll be using Python to implement our application code:</p>
-
-<pre><code class="language-bash">$ serverless create --template aws-python --path dilbert --name dilbert
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ serverless create --template aws-python --path dilbert --name dilbert
 Serverless: Generating boilerplate...
-Serverless: Generating boilerplate in &quot;/code/dilbert&quot;
+Serverless: Generating boilerplate in <span style="color:#4070a0">&#34;/code/dilbert&#34;</span>
  _______                             __
 |   _   .-----.----.--.--.-----.----|  .-----.-----.-----.
 |   |___|  -__|   _|  |  |  -__|   _|  |  -__|__ --|__ --|
-|____   |_____|__|  \___/|_____|__| |__|_____|_____|_____|
+|____   |_____|__|  <span style="color:#4070a0;font-weight:bold">\_</span>__/|_____|__| |__|_____|_____|_____|
 |   |   |             The Serverless Application Framework
 |       |                           serverless.com, v1.2.0
- -------'
+ -------<span style="">&#39;</span>
 
-Serverless: Successfully generated boilerplate for template: &quot;aws-python&quot;
-</code></pre>
-
+Serverless: Successfully generated boilerplate <span style="color:#007020;font-weight:bold">for</span> template: <span style="color:#4070a0">&#34;aws-python&#34;</span></code></pre></div>
 <p>Let&rsquo;s <code>cd dilbert</code> and take a look at the files which were generated:</p>
-
-<pre><code class="language-bash">$ tree dilbert/
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ tree dilbert/
 dilbert/
 ├── event.json
 ├── handler.py
-└── serverless.yml
-</code></pre>
-
+└── serverless.yml</code></pre></div>
 <p>This is very similar to previous versions of Serverless and much different at the same time.
 Previously we would have received a higher level <code>s-project.json</code> and <code>s-resources-cf.json</code> files.</p>
 
@@ -202,30 +193,24 @@ Previously we would have received a higher level <code>s-project.json</code> and
 <p>Crack open <code>serverless.yml</code> and you&rsquo;ll see the details on how your function and endpoint(s) are
 configured.  First, let&rsquo;s tune back the memory and timeout&hellip;we&rsquo;re running a very small Lambda
 function so we can tune these both back to some pretty small values.</p>
-
-<pre><code class="language-yaml">service: dilbert
-
-provider:
-  name: aws 
-  runtime: python2.7
-  stage: dev 
-  region: us-west-2
-  memorySize: 256 
-  timeout: 6
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">service:<span style="color:#bbb"> </span>dilbert<span style="color:#bbb">
+</span><span style="color:#bbb">
+</span><span style="color:#bbb"></span>provider:<span style="color:#bbb">
+</span><span style="color:#bbb">  </span>name:<span style="color:#bbb"> </span>aws<span style="color:#bbb"> 
+</span><span style="color:#bbb">  </span>runtime:<span style="color:#bbb"> </span>python2.<span style="color:#40a070">7</span><span style="color:#bbb">
+</span><span style="color:#bbb">  </span>stage:<span style="color:#bbb"> </span>dev<span style="color:#bbb"> 
+</span><span style="color:#bbb">  </span>region:<span style="color:#bbb"> </span>us-west-<span style="color:#40a070">2</span><span style="color:#bbb">
+</span><span style="color:#bbb">  </span>memorySize:<span style="color:#bbb"> </span><span style="color:#40a070">256</span><span style="color:#bbb"> 
+</span><span style="color:#bbb">  </span>timeout:<span style="color:#bbb"> </span><span style="color:#40a070">6</span></code></pre></div>
 <p>In order to wire something up to our Lambda functions we use the <code>functions</code> block. What is nice
 here is that we can now define multiple functions inside of a given &ldquo;service&rdquo;.
 In prior Serverless versions a single function was a bit more self-contained and it was
 hard or unclear how to define a &ldquo;service&rdquo; vs a &ldquo;function&rdquo;.  Now, it&rsquo;s much more clear&hellip;we have
 created a Serverless &ldquo;service&rdquo; which can be made up of one or more &ldquo;functions&rdquo;, all sharing the
 same resources (which we&rsquo;ll get to later).</p>
-
-<pre><code class="language-yaml">functions:
-  hello:
-    handler: handler.hello
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">functions:<span style="color:#bbb">
+</span><span style="color:#bbb">  </span>hello:<span style="color:#bbb">
+</span><span style="color:#bbb">    </span>handler:<span style="color:#bbb"> </span>handler.hello</code></pre></div>
 <p>It&rsquo;s important to note here the <code>handler</code> is really just pointing to <code>handler.py</code>.
 <code>handler.hello</code> then is just telling Serverless to setup a Lambda function which invokes the
 <code>hello</code> function in your <code>handler.py</code> file.</p>
@@ -234,27 +219,23 @@ same resources (which we&rsquo;ll get to later).</p>
 same <code>function</code> block let&rsquo;s add an HTTP <code>GET</code> event as a trigger to our Lambda function. Serverless
 will pick this up and setup our API Gateway entry-point and wire it together with our Lambda
 function/handler:</p>
-
-<pre><code class="language-yaml">functions:
-  hello:
-    handler: handler.hello
-    events:
-     - http:
-         path: /
-         method: get 
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">functions:<span style="color:#bbb">
+</span><span style="color:#bbb">  </span>hello:<span style="color:#bbb">
+</span><span style="color:#bbb">    </span>handler:<span style="color:#bbb"> </span>handler.hello<span style="color:#bbb">
+</span><span style="color:#bbb">    </span>events:<span style="color:#bbb">
+</span><span style="color:#bbb">     </span>-<span style="color:#bbb"> </span>http:<span style="color:#bbb">
+</span><span style="color:#bbb">         </span>path:<span style="color:#bbb"> </span>/<span style="color:#bbb">
+</span><span style="color:#bbb">         </span>method:<span style="color:#bbb"> </span>get<span style="color:#bbb"> </span></code></pre></div>
 <p>Again, quite simple. Serverless is going to take this and create an API Gateway endpoint which
 responds to <code>GET</code> requests at the root.</p>
 
 <h1 id="deployment">Deployment</h1>
 
 <p>Now, let&rsquo;s deploy this and watch Serverless work its magic:</p>
-
-<pre><code class="language-bash">root@ae95b29ae049:/code/dilbert$ sls deploy 
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">root@ae95b29ae049:/code/dilbert$ sls deploy 
 Serverless: Packaging service...
 Serverless: Uploading CloudFormation file to S3...
-Serverless: Uploading service .zip file to S3 (2.19 KB)...
+Serverless: Uploading service .zip file to S3 <span style="color:#666">(</span><span style="color:#40a070">2</span>.19 KB<span style="color:#666">)</span>...
 Serverless: Updating Stack...
 Serverless: Checking Stack update progress...
 ........................
@@ -269,14 +250,9 @@ api keys:
 endpoints:
   GET - https://cjkxszhmwi.execute-api.us-west-2.amazonaws.com/dev/
 functions:
-  dilbert-dev-hello: arn:aws:lambda:us-west-2:420819310858:function:dilbert-dev-hello
-</code></pre>
-
+  dilbert-dev-hello: arn:aws:lambda:us-west-2:420819310858:function:dilbert-dev-hello</code></pre></div>
 <p>Great&hellip;let&rsquo;s hit our endpoint:</p>
-
-<pre><code class="language-bash">$ curl -s ps://cjkxszhmwi.execute-api.us-west-2.amazonaws.com/dev/ | python -mjson.tool 
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ curl -s ps://cjkxszhmwi.execute-api.us-west-2.amazonaws.com/dev/ | python -mjson.tool </code></pre></div>
 <pre><code>{
     &quot;input&quot;: {
         &quot;body&quot;: null,
@@ -361,12 +337,9 @@ little spec above for the Slash commands.</p>
 <p>Here are some highlights of how this is implemented.</p>
 
 <p>For this project, let&rsquo;s rename the function from <code>hello</code> to <code>dilbert</code> in <code>serverless.yml</code>:</p>
-
-<pre><code class="language-yaml">functions:
-  dilbert:
-    handler: handler.dilbert
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">functions:<span style="color:#bbb">
+</span><span style="color:#bbb">  </span>dilbert:<span style="color:#bbb">
+</span><span style="color:#bbb">    </span>handler:<span style="color:#bbb"> </span>handler.dilbert</code></pre></div>
 <p>In our <code>handler.py</code> file we&rsquo;ll now implement a function called <code>dilbert</code> which will accept the same
 two parameters as the <code>hello</code> function, the http event/request and the request context. This
 function will contain all of the logic to parse the request text from Slack and figure out what to
@@ -384,24 +357,21 @@ DynamoDB!</p>
 <p>Because Serverless uses CloudFormation to create your service it&rsquo;s possible to create and manage
 arbitrary AWS resources such as DynamoDB. For our purposes, we&rsquo;d like to create a DynamoDB table to
 cache image urls when we create our stack.</p>
-
-<pre><code class="language-yaml">resources:
-  Resources:
-    dynamoUsersTable:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: devDilbert
-        AttributeDefinitions:
-          - AttributeName: postDay
-            AttributeType: S
-        KeySchema:
-          - AttributeName: postDay
-            KeyType: HASH
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">resources:<span style="color:#bbb">
+</span><span style="color:#bbb">  </span>Resources:<span style="color:#bbb">
+</span><span style="color:#bbb">    </span>dynamoUsersTable:<span style="color:#bbb">
+</span><span style="color:#bbb">      </span>Type:<span style="color:#bbb"> </span>AWS::DynamoDB::Table<span style="color:#bbb">
+</span><span style="color:#bbb">      </span>Properties:<span style="color:#bbb">
+</span><span style="color:#bbb">        </span>TableName:<span style="color:#bbb"> </span>devDilbert<span style="color:#bbb">
+</span><span style="color:#bbb">        </span>AttributeDefinitions:<span style="color:#bbb">
+</span><span style="color:#bbb">          </span>-<span style="color:#bbb"> </span>AttributeName:<span style="color:#bbb"> </span>postDay<span style="color:#bbb">
+</span><span style="color:#bbb">            </span>AttributeType:<span style="color:#bbb"> </span>S<span style="color:#bbb">
+</span><span style="color:#bbb">        </span>KeySchema:<span style="color:#bbb">
+</span><span style="color:#bbb">          </span>-<span style="color:#bbb"> </span>AttributeName:<span style="color:#bbb"> </span>postDay<span style="color:#bbb">
+</span><span style="color:#bbb">            </span>KeyType:<span style="color:#bbb"> </span>HASH<span style="color:#bbb">
+</span><span style="color:#bbb">        </span>ProvisionedThroughput:<span style="color:#bbb">
+</span><span style="color:#bbb">          </span>ReadCapacityUnits:<span style="color:#bbb"> </span><span style="color:#40a070">1</span><span style="color:#bbb">
+</span><span style="color:#bbb">          </span>WriteCapacityUnits:<span style="color:#bbb"> </span><span style="color:#40a070">1</span></code></pre></div>
 <p>This is very cool. During any <code>sls deploy</code> command Serverless will manage this DynamoDB table for
 us, whether that be creating it on the initial <code>sls deploy</code> or updating it if we change any of its
 attributes.</p>
@@ -409,16 +379,13 @@ attributes.</p>
 <p>One &ldquo;gotcha&rdquo; with this is that we need an IAM policy so that our Lambda function (ie, our
 application code in <code>handler.py</code>) has access.  To add the IAM policy we put this block under our
 <code>provider</code> block in <code>serverless.yml</code>:</p>
-
-<pre><code class="language-yaml">provider:
-  ...
-  iamRoleStatements:
-    - Effect: &quot;Allow&quot;
-      Action:
-        - &quot;dynamodb:*&quot;
-      Resource: &quot;arn:aws:dynamodb:${self:provider.region}:*:table/devDilbert&quot;
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">provider:<span style="color:#bbb">
+</span><span style="color:#bbb">  </span>...<span style="color:#bbb">
+</span><span style="color:#bbb">  </span>iamRoleStatements:<span style="color:#bbb">
+</span><span style="color:#bbb">    </span>-<span style="color:#bbb"> </span>Effect:<span style="color:#bbb"> </span><span style="color:#4070a0">&#34;Allow&#34;</span><span style="color:#bbb">
+</span><span style="color:#bbb">      </span>Action:<span style="color:#bbb">
+</span><span style="color:#bbb">        </span>-<span style="color:#bbb"> </span><span style="color:#4070a0">&#34;dynamodb:*&#34;</span><span style="color:#bbb">
+</span><span style="color:#bbb">      </span>Resource:<span style="color:#bbb"> </span><span style="color:#4070a0">&#34;arn:aws:dynamodb:${self:provider.region}:*:table/devDilbert&#34;</span></code></pre></div>
 <h2 id="deploying-and-iterations">Deploying and iterations</h2>
 
 <p>Once this is all setup we can now do another <code>sls deploy</code>. Serverless will set up our DynamoDB
@@ -551,7 +518,7 @@ and microservice development even easier.</p>
                 </div>
 
                 <p class="footer-copyright">
-                    <span>&copy; 2018 / Powered by <a href="https://gohugo.io/">Hugo</a></span>
+                    <span>&copy; 2019 / Powered by <a href="https://gohugo.io/">Hugo</a></span>
                 </p>
                 <p class="footer-copyright">
                     <span><a href="https://github.com/roryg/ghostwriter">Ghostwriter theme</a> By <a href="http://jollygoodthemes.com">JollyGoodThemes</a></span>

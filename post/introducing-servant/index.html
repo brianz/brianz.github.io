@@ -176,40 +176,28 @@ which will take two numbers, add them up and return the sum.</p>
 <p>As a client, the only dependencies is having the servant library installed. You could call this
 from a Django app, one-off script&hellip;wherever. Install servant from github. Here I install it into a
 virtualenv using virtualenvwrapper:</p>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">brianz@gold$ mkvirtualenv test_servant
 
-<pre><code class="language-bash">brianz@gold$ mkvirtualenv test_servant
-
-(test_servant)brianz@gold$ pip install git+https://github.com/clearcare/servant.git@master
-</code></pre>
-
+<span style="color:#666">(</span>test_servant<span style="color:#666">)</span>brianz@gold$ pip install git+https://github.com/clearcare/servant.git@master</code></pre></div>
 <p>Now, I can write some client code:</p>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#60a0b0;font-style:italic"># test_add.py</span>
+<span style="color:#007020;font-weight:bold">import</span> <span style="color:#0e84b5;font-weight:bold">servant.client</span>
 
-<pre><code class="language-python"># test_add.py
-import servant.client
+client <span style="color:#666">=</span> servant<span style="color:#666">.</span>client<span style="color:#666">.</span>Client(<span style="color:#4070a0">&#39;calculator_service&#39;</span>, version<span style="color:#666">=</span><span style="color:#40a070">1</span>)
 
-client = servant.client.Client('calculator_service', version=1)
+<span style="color:#60a0b0;font-style:italic"># add is the actual endpoint we&#39;re calling</span>
+response <span style="color:#666">=</span> client<span style="color:#666">.</span>add(number1<span style="color:#666">=</span><span style="color:#40a070">10</span>, number2<span style="color:#666">=</span><span style="color:#40a070">15</span>)
 
-# add is the actual endpoint we're calling
-response = client.add(number1=10, number2=15)
-
-if response.is_error():
-    print response.errors, response.field_errors
-else:
-    print response.result
-</code></pre>
-
+<span style="color:#007020;font-weight:bold">if</span> response<span style="color:#666">.</span>is_error():
+    <span style="color:#007020;font-weight:bold">print</span> response<span style="color:#666">.</span>errors, response<span style="color:#666">.</span>field_errors
+<span style="color:#007020;font-weight:bold">else</span>:
+    <span style="color:#007020;font-weight:bold">print</span> response<span style="color:#666">.</span>result</code></pre></div>
 <p>That&rsquo;s about it for client code! Provided you have a service named <code>calculator_service</code> available,
 this code will work and spit out the expected result of <code>25</code>. You can actually install
 <code>calculator_service</code> yourself and run this code.</p>
-
-<pre><code class="language-bash">(test_servant)brianz@gold$ cd servant/examples/calculator_service/
-(test_servant)brianz@gold$ pip install .
-</code></pre>
-
-<pre><code class="language-bash">(test_servant)brianz@bz-cconline$ python test_calculator.py 
-25
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#666">(</span>test_servant<span style="color:#666">)</span>brianz@gold$ <span style="color:#007020">cd</span> servant/examples/calculator_service/
+<span style="color:#666">(</span>test_servant<span style="color:#666">)</span>brianz@gold$ pip install .</code></pre></div><div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#666">(</span>test_servant<span style="color:#666">)</span>brianz@bz-cconline$ python test_calculator.py 
+<span style="color:#40a070">25</span></code></pre></div>
 <p>That&rsquo;s how you actually <em>use</em> a servant service. How do you author one?</p>
 
 <h3 id="server">Server</h3>
@@ -221,60 +209,51 @@ to see a more thorough implemenation..but the below code will actually work.</p>
 
 <p>First, you need to define a single <code>service.py</code> file which defines your service and declares all
 its endpoints:</p>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#60a0b0;font-style:italic"># service.py</span>
+<span style="color:#007020;font-weight:bold">from</span> <span style="color:#0e84b5;font-weight:bold">servant.service.base</span> <span style="color:#007020;font-weight:bold">import</span> Service
 
-<pre><code class="language-python"># service.py
-from servant.service.base import Service
+<span style="color:#007020;font-weight:bold">import</span> <span style="color:#0e84b5;font-weight:bold">actions</span>
 
-import actions
+<span style="color:#007020;font-weight:bold">class</span> <span style="color:#0e84b5;font-weight:bold">Calculator</span>(Service):
 
-class Calculator(Service):
+    name <span style="color:#666">=</span> <span style="color:#4070a0">&#39;calculator_service&#39;</span>
+    version <span style="color:#666">=</span> <span style="color:#40a070">1</span> 
 
-    name = 'calculator_service'
-    version = 1 
-
-    action_map = { 
-            'add': actions.AddAction,
-            # we won't implement subtract now
-            # 'subtract': actions.SubtractAction,
-    }
-</code></pre>
-
+    action_map <span style="color:#666">=</span> { 
+            <span style="color:#4070a0">&#39;add&#39;</span>: actions<span style="color:#666">.</span>AddAction,
+            <span style="color:#60a0b0;font-style:italic"># we won&#39;t implement subtract now</span>
+            <span style="color:#60a0b0;font-style:italic"># &#39;subtract&#39;: actions.SubtractAction,</span>
+    }</code></pre></div>
 <p>Next, you&rsquo;ll need to create one or more actions. Note above we import <code>actions</code> and point to two
 different action classes&hellip;we&rsquo;ll only show one here for brevity. But, how you map endpoint
 names to actions is entirely up to you. We always have an <code>actions/</code> directory with different
 actions broken up by area of responsibility. Again, for brevity we&rsquo;ll just show a single action for
 our calculator service.</p>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#60a0b0;font-style:italic"># actions.py</span>
+<span style="color:#007020;font-weight:bold">import</span> <span style="color:#0e84b5;font-weight:bold">servant.fields</span>
+<span style="color:#007020;font-weight:bold">from</span> <span style="color:#0e84b5;font-weight:bold">servant.service.actions</span> <span style="color:#007020;font-weight:bold">import</span> Action
 
-<pre><code class="language-python"># actions.py
-import servant.fields
-from servant.service.actions import Action
-
-class AddAction(Action):
-    number1 = servant.fields.IntField(
-            required=True,
-            in_response=True,
+<span style="color:#007020;font-weight:bold">class</span> <span style="color:#0e84b5;font-weight:bold">AddAction</span>(Action):
+    number1 <span style="color:#666">=</span> servant<span style="color:#666">.</span>fields<span style="color:#666">.</span>IntField(
+            required<span style="color:#666">=</span>True,
+            in_response<span style="color:#666">=</span>True,
     )   
-    number2 = servant.fields.IntField(
-            required=True,
-            in_response=True,
+    number2 <span style="color:#666">=</span> servant<span style="color:#666">.</span>fields<span style="color:#666">.</span>IntField(
+            required<span style="color:#666">=</span>True,
+            in_response<span style="color:#666">=</span>True,
     )   
-    result = servant.fields.IntField(
-            in_response=True,
+    result <span style="color:#666">=</span> servant<span style="color:#666">.</span>fields<span style="color:#666">.</span>IntField(
+            in_response<span style="color:#666">=</span>True,
     )   
 
-    def run(self, **kwargs):
-        self.result = self.number1 + self.number2
-</code></pre>
-
+    <span style="color:#007020;font-weight:bold">def</span> <span style="color:#06287e">run</span>(self, <span style="color:#666">**</span>kwargs):
+        self<span style="color:#666">.</span>result <span style="color:#666">=</span> self<span style="color:#666">.</span>number1 <span style="color:#666">+</span> self<span style="color:#666">.</span>number2</code></pre></div>
 <p>If you ignore <code>setup.py</code> and any other packaging code or files, our actual service is only a few
 files:</p>
-
-<pre><code class="language-bash">(test_servant)brianz@gold$ tree
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#666">(</span>test_servant<span style="color:#666">)</span>brianz@gold$ tree
 ├── __init__.py
 ├── actions.py
-└── service.py
-</code></pre>
-
+└── service.py</code></pre></div>
 <p>You can imagine what <code>SubtractAction</code> would look like. From there, provided you
 can install your service as a Python package, this code is fully functional. You can see all of
 this and actually give it a try&hellip;clone the repo and look in
@@ -291,14 +270,11 @@ know where to connect? What port is the server running on?</p>
 as if it were running on a remote system. The magic here is that the servant client code imports
 your service and executes it as a local library.  When you&rsquo;re ready to deploy your service
 somewhere else and point your clients to the <em>real</em> server, it&rsquo;s a one line change:</p>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#007020;font-weight:bold">import</span> <span style="color:#0e84b5;font-weight:bold">servant.client</span>
 
-<pre><code class="language-python">import servant.client
-
-client = servant.client.Client('calculator_service', version=1)
-# Now point your client to the remote host
-client.configure('remote-host-name-or-ip')
-</code></pre>
-
+client <span style="color:#666">=</span> servant<span style="color:#666">.</span>client<span style="color:#666">.</span>Client(<span style="color:#4070a0">&#39;calculator_service&#39;</span>, version<span style="color:#666">=</span><span style="color:#40a070">1</span>)
+<span style="color:#60a0b0;font-style:italic"># Now point your client to the remote host</span>
+client<span style="color:#666">.</span>configure(<span style="color:#4070a0">&#39;remote-host-name-or-ip&#39;</span>)</code></pre></div>
 <p>The big advantage to this is that it&rsquo;s trivially easy to start developing and testing your service.
 Unit testing is <em>really</em> easy.  The code which gets executed is almost exactly the same. Of course,
 running on a real server rather than as a local library cannot be <em>identical</em>, but it&rsquo;s quite close
@@ -442,7 +418,7 @@ haven&rsquo;t been implemented yet.</p>
                 </div>
 
                 <p class="footer-copyright">
-                    <span>&copy; 2018 / Powered by <a href="https://gohugo.io/">Hugo</a></span>
+                    <span>&copy; 2019 / Powered by <a href="https://gohugo.io/">Hugo</a></span>
                 </p>
                 <p class="footer-copyright">
                     <span><a href="https://github.com/roryg/ghostwriter">Ghostwriter theme</a> By <a href="http://jollygoodthemes.com">JollyGoodThemes</a></span>

@@ -216,52 +216,37 @@ something truly unique to Python.</p>
 <h2 id="immutability-and-variables">Immutability and Variables</h2>
 
 <p>Unlike Python, variables are immutable.  For example:</p>
-
-<pre><code class="language-python">&gt;&gt;&gt; d = {'name': 'bz', 'height': 67}
-&gt;&gt;&gt; some_function(d)
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#666">&gt;&gt;&gt;</span> d <span style="color:#666">=</span> {<span style="color:#4070a0">&#39;name&#39;</span>: <span style="color:#4070a0">&#39;bz&#39;</span>, <span style="color:#4070a0">&#39;height&#39;</span>: <span style="color:#40a070">67</span>}
+<span style="color:#666">&gt;&gt;&gt;</span> some_function(d)</code></pre></div>
 <p>Now, what is the value of <code>d</code> without knowing the details of <code>some_function</code>? It&rsquo;s impossible to
 answer this. The reason is that you&rsquo;re passing the <code>d</code> dictionary <em>by reference</em>, which means
 <code>some_function</code> can mutate any mutable object it&rsquo;s given (lists, sets, class, instances, etc.)</p>
 
 <p>What about Elixir:</p>
-
-<pre><code class="language-elixir">iex&gt; d = %{name: &quot;brian&quot;, height: 67}
-%{height: 67, name: &quot;brian&quot;}    
-iex&gt; some_function.(d)
-%{height: 67, name: &quot;Fred&quot;}  
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-elixir" data-lang="elixir">iex<span style="color:#666">&gt;</span> d <span style="color:#666">=</span> %{<span style="color:#517918">name</span>: <span style="color:#4070a0">&#34;brian&#34;</span>, <span style="color:#517918">height</span>: <span style="color:#40a070">67</span>}
+%{<span style="color:#517918">height</span>: <span style="color:#40a070">67</span>, <span style="color:#517918">name</span>: <span style="color:#4070a0">&#34;brian&#34;</span>}    
+iex<span style="color:#666">&gt;</span> some_function<span style="color:#666">.</span>(d)
+%{<span style="color:#517918">height</span>: <span style="color:#40a070">67</span>, <span style="color:#517918">name</span>: <span style="color:#4070a0">&#34;Fred&#34;</span>}  </code></pre></div>
 <p>You&rsquo;ll notice that the Elixir shell spits out values while it&rsquo;s evaluating commands. Here, we can
 see that <code>some_function</code> is replacing the <code>name</code> key with <code>&quot;Fred&quot;</code>. But, look at <code>d</code> after all of
 this.</p>
-
-<pre><code class="language-elixir">iex&gt; d
-%{height: 67, name: &quot;brian&quot;} 
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-elixir" data-lang="elixir">iex<span style="color:#666">&gt;</span> d
+%{<span style="color:#517918">height</span>: <span style="color:#40a070">67</span>, <span style="color:#517918">name</span>: <span style="color:#4070a0">&#34;brian&#34;</span>} </code></pre></div>
 <p>That&rsquo;s right&hellip;our original map (<code>dict</code> in Python terms) is unchanged. That&rsquo;s pretty great. All of
 a sudden it become <em>much</em> easier to reason about what your program is doing since we&rsquo;re dealing
 with <em>data</em> rather than <em>behavior</em>.</p>
 
 <p>So, if we really did want to update our map, how would we handle this? We&rsquo;ll simply <em>reassign</em> the
 <code>d</code> variable to the <em>results</em> returned from <code>some_function</code>:</p>
-
-<pre><code class="language-elixir">iex&gt; d = some_function.(d)                                                     │:yes
-%{height: 67, name: &quot;Fred&quot;}
-iex&gt; d
-%{height: 67, name: &quot;Fred&quot;}
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-elixir" data-lang="elixir">iex<span style="color:#666">&gt;</span> d <span style="color:#666">=</span> some_function<span style="color:#666">.</span>(d)                                                     <span style="">│</span><span style="color:#517918">:yes</span>
+%{<span style="color:#517918">height</span>: <span style="color:#40a070">67</span>, <span style="color:#517918">name</span>: <span style="color:#4070a0">&#34;Fred&#34;</span>}
+iex<span style="color:#666">&gt;</span> d
+%{<span style="color:#517918">height</span>: <span style="color:#40a070">67</span>, <span style="color:#517918">name</span>: <span style="color:#4070a0">&#34;Fred&#34;</span>}</code></pre></div>
 <p>Let&rsquo;s just try to manhandle this thing:</p>
-
-<pre><code class="language-elixir">iex&gt; Map.put(d, :name, &quot;sam&quot;)
-%{height: 67, name: &quot;sam&quot;}  
-iex&gt; d
-%{height: 67, name: &quot;Fred&quot;}  
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-elixir" data-lang="elixir">iex<span style="color:#666">&gt;</span> <span style="color:#0e84b5;font-weight:bold">Map</span><span style="color:#666">.</span>put(d, <span style="color:#517918">:name</span>, <span style="color:#4070a0">&#34;sam&#34;</span>)
+%{<span style="color:#517918">height</span>: <span style="color:#40a070">67</span>, <span style="color:#517918">name</span>: <span style="color:#4070a0">&#34;sam&#34;</span>}  
+iex<span style="color:#666">&gt;</span> d
+%{<span style="color:#517918">height</span>: <span style="color:#40a070">67</span>, <span style="color:#517918">name</span>: <span style="color:#4070a0">&#34;Fred&#34;</span>}  </code></pre></div>
 <p>Doh! You cannot mutate an existing object. You will always be <em>creating new</em> objects. What you do
 with those is up to you.</p>
 
@@ -282,82 +267,61 @@ exactly?</p>
 <p>Elixir will take an expression and attempt to match whatever is on the left side of the equals sign
 with that is on the right side, in this case, what is happening is that Elixir is matching the
 variable <code>d</code> with the map on the right:</p>
-
-<pre><code class="language-elixir">iex&gt; d = %{name: &quot;brian&quot;, height: 67}
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-elixir" data-lang="elixir">iex<span style="color:#666">&gt;</span> d <span style="color:#666">=</span> %{<span style="color:#517918">name</span>: <span style="color:#4070a0">&#34;brian&#34;</span>, <span style="color:#517918">height</span>: <span style="color:#40a070">67</span>}</code></pre></div>
 <p>There is one item on the left, <code>d</code> and one on the right, <code>%{name: &quot;brian&quot;, height: 67}</code>&hellip;so <code>d</code>
 ends up being pointed at this map.</p>
 
 <p>Let&rsquo;s look an Elixir tuple:</p>
-
-<pre><code class="language-elixir">iex&gt; tup = {1, 2, 3}
-{1, 2, 3}
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-elixir" data-lang="elixir">iex<span style="color:#666">&gt;</span> tup <span style="color:#666">=</span> {<span style="color:#40a070">1</span>, <span style="color:#40a070">2</span>, <span style="color:#40a070">3</span>}
+{<span style="color:#40a070">1</span>, <span style="color:#40a070">2</span>, <span style="color:#40a070">3</span>}</code></pre></div>
 <p>Makes sense.  But we can also do this:</p>
-
-<pre><code class="language-elixir">iex&gt; {a, b, c} = {1, 2, 3}
-{1, 2, 3}
-iex&gt; a
-1
-iex&gt; b
-2
-iex&gt; c
-3
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-elixir" data-lang="elixir">iex<span style="color:#666">&gt;</span> {a, b, c} <span style="color:#666">=</span> {<span style="color:#40a070">1</span>, <span style="color:#40a070">2</span>, <span style="color:#40a070">3</span>}
+{<span style="color:#40a070">1</span>, <span style="color:#40a070">2</span>, <span style="color:#40a070">3</span>}
+iex<span style="color:#666">&gt;</span> a
+<span style="color:#40a070">1</span>
+iex<span style="color:#666">&gt;</span> b
+<span style="color:#40a070">2</span>
+iex<span style="color:#666">&gt;</span> c
+<span style="color:#40a070">3</span></code></pre></div>
 <p>What is happening here is that Elixir attempt to match the left and right side. Because we have the
 same number of arguments, the right side values are assigned to the left side variables. This is
 &ldquo;unpacking&rdquo; in Python&hellip;we can do the same thing so you may not be very impressed (yet):</p>
-
-<pre><code class="language-python">&gt;&gt;&gt; tup = (1, 2, 3)
-&gt;&gt;&gt; (a, b, c) = tup
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#666">&gt;&gt;&gt;</span> tup <span style="color:#666">=</span> (<span style="color:#40a070">1</span>, <span style="color:#40a070">2</span>, <span style="color:#40a070">3</span>)
+<span style="color:#666">&gt;&gt;&gt;</span> (a, b, c) <span style="color:#666">=</span> tup</code></pre></div>
 <p>Going back to our Map / dict, how would you extract the value of a dictionary key and assign it
 into a variable?</p>
-
-<pre><code class="language-python">&gt;&gt;&gt; d
-{'name': 'bz', 'height': 67}
-&gt;&gt;&gt; myheight = d.get('height')
-&gt;&gt;&gt; myheight
-67
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#666">&gt;&gt;&gt;</span> d
+{<span style="color:#4070a0">&#39;name&#39;</span>: <span style="color:#4070a0">&#39;bz&#39;</span>, <span style="color:#4070a0">&#39;height&#39;</span>: <span style="color:#40a070">67</span>}
+<span style="color:#666">&gt;&gt;&gt;</span> myheight <span style="color:#666">=</span> d<span style="color:#666">.</span>get(<span style="color:#4070a0">&#39;height&#39;</span>)
+<span style="color:#666">&gt;&gt;&gt;</span> myheight
+<span style="color:#40a070">67</span></code></pre></div>
 <p>With Elixir, we can extract a value by matching a key on the left with the right:</p>
-
-<pre><code class="language-elixir">iex&gt; %{height: myheight} = d
-%{height: 67, name: &quot;Fred&quot;}
-iex&gt; myheight
-67
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-elixir" data-lang="elixir">iex<span style="color:#666">&gt;</span> %{<span style="color:#517918">height</span>: myheight} <span style="color:#666">=</span> d
+%{<span style="color:#517918">height</span>: <span style="color:#40a070">67</span>, <span style="color:#517918">name</span>: <span style="color:#4070a0">&#34;Fred&#34;</span>}
+iex<span style="color:#666">&gt;</span> myheight
+<span style="color:#40a070">67</span></code></pre></div>
 <p>Wow&hellip;so we&rsquo;re saying, &ldquo;Elixir, please match a Map with a key of &ldquo;height&rdquo; on the left with whatever
 is on the right. If that matches, assign the variable <code>myheight</code> to whatever the value is on the
 right side&rdquo;</p>
 
 <p>That may seem trivial now, but it&rsquo;s the underpinning of Elixir and helps preventing code like this:</p>
-
-<pre><code class="language-python">def view_function(request, user, reports=None):
-    reports = reports or {}
-    for key, f in reports.items():
-        perm_key = 'user.can_view_%s_report' % key 
-        if key == 'unsigned' and not user.sig_on:
-            continue
-        if key in ('foo', 'br') and not user.new_user:
-            continue
-        if key in ('payments', 'all', 'client') and not user.track:
-            continue
-        if key == 'authorizations' and not user.cms_user:
-            continue
-        if key == 'totalcostof' and not user.is_foobar:
-            continue
-        if key == 'premiums' and not \
-                (user.some_attribute and request.user.admin and request.user.admin.is_manager):
-            continue
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#007020;font-weight:bold">def</span> <span style="color:#06287e">view_function</span>(request, user, reports<span style="color:#666">=</span>None):
+    reports <span style="color:#666">=</span> reports <span style="color:#007020;font-weight:bold">or</span> {}
+    <span style="color:#007020;font-weight:bold">for</span> key, f <span style="color:#007020;font-weight:bold">in</span> reports<span style="color:#666">.</span>items():
+        perm_key <span style="color:#666">=</span> <span style="color:#4070a0">&#39;user.can_view_</span><span style="color:#70a0d0;font-style:italic">%s</span><span style="color:#4070a0">_report&#39;</span> <span style="color:#666">%</span> key 
+        <span style="color:#007020;font-weight:bold">if</span> key <span style="color:#666">==</span> <span style="color:#4070a0">&#39;unsigned&#39;</span> <span style="color:#007020;font-weight:bold">and</span> <span style="color:#007020;font-weight:bold">not</span> user<span style="color:#666">.</span>sig_on:
+            <span style="color:#007020;font-weight:bold">continue</span>
+        <span style="color:#007020;font-weight:bold">if</span> key <span style="color:#007020;font-weight:bold">in</span> (<span style="color:#4070a0">&#39;foo&#39;</span>, <span style="color:#4070a0">&#39;br&#39;</span>) <span style="color:#007020;font-weight:bold">and</span> <span style="color:#007020;font-weight:bold">not</span> user<span style="color:#666">.</span>new_user:
+            <span style="color:#007020;font-weight:bold">continue</span>
+        <span style="color:#007020;font-weight:bold">if</span> key <span style="color:#007020;font-weight:bold">in</span> (<span style="color:#4070a0">&#39;payments&#39;</span>, <span style="color:#4070a0">&#39;all&#39;</span>, <span style="color:#4070a0">&#39;client&#39;</span>) <span style="color:#007020;font-weight:bold">and</span> <span style="color:#007020;font-weight:bold">not</span> user<span style="color:#666">.</span>track:
+            <span style="color:#007020;font-weight:bold">continue</span>
+        <span style="color:#007020;font-weight:bold">if</span> key <span style="color:#666">==</span> <span style="color:#4070a0">&#39;authorizations&#39;</span> <span style="color:#007020;font-weight:bold">and</span> <span style="color:#007020;font-weight:bold">not</span> user<span style="color:#666">.</span>cms_user:
+            <span style="color:#007020;font-weight:bold">continue</span>
+        <span style="color:#007020;font-weight:bold">if</span> key <span style="color:#666">==</span> <span style="color:#4070a0">&#39;totalcostof&#39;</span> <span style="color:#007020;font-weight:bold">and</span> <span style="color:#007020;font-weight:bold">not</span> user<span style="color:#666">.</span>is_foobar:
+            <span style="color:#007020;font-weight:bold">continue</span>
+        <span style="color:#007020;font-weight:bold">if</span> key <span style="color:#666">==</span> <span style="color:#4070a0">&#39;premiums&#39;</span> <span style="color:#007020;font-weight:bold">and</span> <span style="color:#007020;font-weight:bold">not</span> \
+                (user<span style="color:#666">.</span>some_attribute <span style="color:#007020;font-weight:bold">and</span> request<span style="color:#666">.</span>user<span style="color:#666">.</span>admin <span style="color:#007020;font-weight:bold">and</span> request<span style="color:#666">.</span>user<span style="color:#666">.</span>admin<span style="color:#666">.</span>is_manager):
+            <span style="color:#007020;font-weight:bold">continue</span></code></pre></div>
 <p>In Elixir, all of these conditionals could be handled with pattern matching, resulting in multiple functions
 that handle some specific part of our domain logic. The code above becomes very very hard to reason
 about, test and debug. Sure, this can be refactored, but to my previous points because it&rsquo;s
@@ -453,7 +417,7 @@ highlights I find interesting.</p>
                 </div>
 
                 <p class="footer-copyright">
-                    <span>&copy; 2018 / Powered by <a href="https://gohugo.io/">Hugo</a></span>
+                    <span>&copy; 2019 / Powered by <a href="https://gohugo.io/">Hugo</a></span>
                 </p>
                 <p class="footer-copyright">
                     <span><a href="https://github.com/roryg/ghostwriter">Ghostwriter theme</a> By <a href="http://jollygoodthemes.com">JollyGoodThemes</a></span>

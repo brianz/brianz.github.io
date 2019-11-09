@@ -186,11 +186,8 @@ an <code>IntField</code> field type which is named <code>result</code>.</p>
 one-liner.  By the time your <code>run</code> method is being executed the basic error checking has completed
 and all of the required and optional fields will be available to you as class attributes.  So, our
 <code>run</code> method simple sets the result using the two inputs we received from the client:</p>
-
-<pre><code class="language-python">def run(self, **kwargs):
-    self.result = self.number1 + self.number2
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#007020;font-weight:bold">def</span> <span style="color:#06287e">run</span>(self, <span style="color:#666">**</span>kwargs):
+    self<span style="color:#666">.</span>result <span style="color:#666">=</span> self<span style="color:#666">.</span>number1 <span style="color:#666">+</span> self<span style="color:#666">.</span>number2</code></pre></div>
 <p>The <code>run</code> method doesn&rsquo;t need to return anything&hellip;all return data is handled via the field
 attributes.</p>
 
@@ -205,28 +202,22 @@ just changes the names of the inputs and output.</p>
 library.</p>
 
 <p>Let&rsquo;s install both Servant and the calculator service into a new virtualenv:</p>
-
-<pre><code class="language-bash">$ cd path/to/servant
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ <span style="color:#007020">cd</span> path/to/servant
 $ mkvirtualenv calculator_service
 $ pip install -e .
-$ cd examples/calculator_service
-$ pip install -e .
-</code></pre>
-
+$ <span style="color:#007020">cd</span> examples/calculator_service
+$ pip install -e .</code></pre></div>
 <p>Now that we have these installed, we can actually test our service!</p>
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#007020;font-weight:bold">import</span> <span style="color:#0e84b5;font-weight:bold">servant.client</span>
 
-<pre><code class="language-python">import servant.client
+client <span style="color:#666">=</span> servant<span style="color:#666">.</span>client<span style="color:#666">.</span>Client(<span style="color:#4070a0">&#39;calculator_service&#39;</span>, version<span style="color:#666">=</span><span style="color:#40a070">1</span>)
 
-client = servant.client.Client('calculator_service', version=1)
+response <span style="color:#666">=</span> client<span style="color:#666">.</span>add(number1<span style="color:#666">=</span><span style="color:#40a070">10</span>, number2<span style="color:#666">=</span><span style="color:#40a070">15</span>)
 
-response = client.add(number1=10, number2=15)
-
-if response.is_error():
-    print response.errors, response.field_errors
-else:
-    print response.result
-</code></pre>
-
+<span style="color:#007020;font-weight:bold">if</span> response<span style="color:#666">.</span>is_error():
+    <span style="color:#007020;font-weight:bold">print</span> response<span style="color:#666">.</span>errors, response<span style="color:#666">.</span>field_errors
+<span style="color:#007020;font-weight:bold">else</span>:
+    <span style="color:#007020;font-weight:bold">print</span> response<span style="color:#666">.</span>result</code></pre></div>
 <p>When we run this, we get our expected result of <code>25</code>.</p>
 
 <p>Now, how do we run this on a separate host so that we&rsquo;re actually a stand-alone service?  Quite
@@ -242,10 +233,7 @@ Servant has built-in support for running as a wsgi server so <code>wsgi_handler.
 above.  You&rsquo;ll note that the client code above <em>only</em> depends on the <code>servant</code> library. Really, the
 only reference to the <code>calculator_service</code> is when we instantiate the <code>Client</code> class.  There is
 only one change we need to make to the client code above to hit a remote system:</p>
-
-<pre><code class="language-python">client.configure('http', host='192.168.88.100', port=8888)
-</code></pre>
-
+<div class="highlight"><pre style="background-color:#f0f0f0;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">client<span style="color:#666">.</span>configure(<span style="color:#4070a0">&#39;http&#39;</span>, host<span style="color:#666">=</span><span style="color:#4070a0">&#39;192.168.88.100&#39;</span>, port<span style="color:#666">=</span><span style="color:#40a070">8888</span>)</code></pre></div>
 <p>We&rsquo;re configuring our client to connect via <code>http</code> to the given host and port.  Once that single
 line is added we can run the client and get the exact same results.</p>
 
@@ -347,7 +335,7 @@ matter of a minor change to your client code to point to the remote host.</p>
                 </div>
 
                 <p class="footer-copyright">
-                    <span>&copy; 2018 / Powered by <a href="https://gohugo.io/">Hugo</a></span>
+                    <span>&copy; 2019 / Powered by <a href="https://gohugo.io/">Hugo</a></span>
                 </p>
                 <p class="footer-copyright">
                     <span><a href="https://github.com/roryg/ghostwriter">Ghostwriter theme</a> By <a href="http://jollygoodthemes.com">JollyGoodThemes</a></span>
